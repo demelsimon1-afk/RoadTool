@@ -4826,6 +4826,7 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
 
                                     <h4 className="font-bold text-xs uppercase text-slate-500 mb-2 mt-4">Wichtige Tatbestände (bis 23 km/h)</h4>
                                     <div className="bg-slate-50 p-2 sm:p-3 rounded-xl border border-slate-200 space-y-1">
+                                        <BkatRow title="Fahren ohne Licht (bei Dämmerung/Dunkelheit)" fines={[{ role: 'Fahrer', tbnr: '117100', cost: '20 €' }]} />
                                         <BkatRow title="E-Scooter mit defekter Bremse" fines={[{ role: 'Fahrer', tbnr: '602018', cost: '25 €' }, { role: 'Halter', tbnr: '602024', cost: '25 €' }]} />
                                         <BkatRow title="E-Scooter ohne gültige Versicherungsplakette" fines={[{ role: 'Fahrer', tbnr: '602118', cost: '40 €' }, { role: 'Halter', tbnr: '602124', cost: '40 €' }]} />
                                         <BkatRow title="E-Scooter mit defektem Licht" fines={[{ role: 'Fahrer', tbnr: '602130', cost: '20 €' }, { role: 'Halter', tbnr: '602030', cost: '20 €' }]} />
@@ -4904,6 +4905,7 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
 
                                     <h4 className="font-bold text-xs uppercase text-slate-500 mb-2 mt-4">Ordnungswidrigkeiten (BKat)</h4>
                                     <div className="bg-slate-50 p-2 sm:p-3 rounded-xl border border-slate-200 space-y-1">
+                                        <BkatRow title="Fahren ohne Licht (bei Dämmerung/Dunkelheit)" fines={[{ role: 'Fahrer', tbnr: '117100', cost: '20 €' }]} />
                                         <BkatRow title="E-Scooter mit defekter Bremse" fines={[{ role: 'Fahrer', tbnr: '602018', cost: '25 €' }, { role: 'Halter', tbnr: '602024', cost: '25 €' }]} />
                                         <BkatRow title="E-Scooter ohne gültige Versicherungsplakette" fines={[{ role: 'Fahrer', tbnr: '602118', cost: '40 €' }, { role: 'Halter', tbnr: '602124', cost: '40 €' }]} />
                                         <BkatRow title="E-Scooter mit defektem Licht" fines={[{ role: 'Fahrer', tbnr: '602130', cost: '20 €' }, { role: 'Halter', tbnr: '602030', cost: '20 €' }]} />
@@ -4994,6 +4996,7 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
 
                                     <h4 className="font-bold text-xs uppercase text-slate-500 mb-2 mt-4">Wichtige Tatbestände (über 23 km/h Inland)</h4>
                                     <div className="bg-slate-50 p-2 sm:p-3 rounded-xl border border-slate-200 space-y-1">
+                                        <BkatRow title="Fahren ohne Licht (bei Dämmerung/Dunkelheit)" fines={[{ role: 'Fahrer', tbnr: '117100', cost: '20 €' }]} />
                                         <BkatRow title="Kleinkraftrad mit defekter Bremse" fines={[{ role: 'Fahrer', tbnr: '341000', cost: '25 €' }, { role: 'Halter', tbnr: '331024', cost: '35 €' }]} />
                                         <BkatRow title="Kleinkraftrad ohne gültige Vers.Plakette" fines={[{ role: 'Fahrer', tbnr: '804118', cost: '40 €' }, { role: 'Halter', tbnr: '804006', cost: '40 €' }]} />
                                         <BkatRow title="Kleinkraftrad mit defektem Licht" fines={[{ role: 'Fahrer', tbnr: '349130', cost: '5 €' }, { role: 'Halter', tbnr: '331054', cost: '15 €' }]} />
@@ -5086,6 +5089,7 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                                         <div className="mb-2 p-2 bg-yellow-50 border border-yellow-200 rounded-lg text-[10px] text-yellow-800 leading-snug">
                                             <strong>Ahndung von Ausstattungsverstößen:</strong> Die StVZO ist in der Regel auf ausländische Fahrzeuge nicht anwendbar. Es muss auf die StVO ausgewichen werden (Auffangtatbestand TBNr. 123112). Bußgeld manuell anpassen!
                                         </div>
+                                        <BkatRow title="Fahren ohne Licht (bei Dämmerung/Dunkelheit)" fines={[{ role: 'Fahrer', tbnr: '117100', cost: '20 €' }]} />
                                         <BkatRow title="Kleinkraftrad mit defekter Bremse (StVO)" fines={[{ role: 'Fahrer', tbnr: '123112', cost: '25 €' }, { role: 'Halter', tbnr: '331006', cost: '25 €' }]} />
                                         <BkatRow title="Kleinkraftrad ohne gültige Vers.Plakette" fines={[{ role: 'Fahrer', tbnr: '804118', cost: '40 €' }, { role: 'Halter', tbnr: '804006', cost: '40 €' }]} />
                                         <BkatRow title="Kleinkraftrad mit defektem Licht (StVO)" fines={[{ role: 'Fahrer', tbnr: '123112', cost: '5 €' }, { role: 'Halter', tbnr: '331006', cost: '15 €' }]} />
