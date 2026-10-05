@@ -464,9 +464,9 @@ const LashingDetailTable = ({ data }) => (
       <thead>
         <tr className="text-slate-400 border-b border-slate-100">
           <th className="pb-1 font-bold">Richtung</th>
-          <th className="pb-1 font-bold hidden sm:table-cell">Gleit-Reib. μ</th>
+          <th className="pb-1 font-bold hidden sm:table-cell">Gleit-Reib. µ</th>
           <th className="pb-1 font-bold">Beschl. c</th>
-          <th className="pb-1 font-bold hidden sm:table-cell">Winkel α</th>
+          <th className="pb-1 font-bold hidden sm:table-cell">Winkel a</th>
           <th className="pb-1 font-bold">Formschluss</th>
           <th className="pb-1 font-bold">F<sub>Form</sub> (daN)</th>
           <th className="pb-1 text-right font-black">Ergebnis</th>
@@ -518,7 +518,7 @@ const LashingFormulaDisplay = ({ values, details, weightClass }) => {
                 <div className="text-[10px] text-slate-400 font-bold mb-1 text-center uppercase">
                     {(!weightClass || weightClass <= 3500) ? 'Berechnung nach Spezialformel (< 3,5t)' : 'Berechnung nach VDI 2700 / DIN EN 12195-1'}
                 </div>
-                <FormulaFraction label={<span className="italic">n</span>} equals="≥" numerator={<span>(F<sub>G</sub> · c) - F<sub>Form</sub> - (F<sub>G</sub> · μ)</span>} denominator={<span>{factor} · μ · sin(α) · STF</span>} />
+                <FormulaFraction label={<span className="italic">n</span>} equals="=" numerator={<span>(F<sub>G</sub> · c) - F<sub>Form</sub> - (F<sub>G</sub> · µ)</span>} denominator={<span>{factor} · µ · sin(a) · STF</span>} />
             </div>
             {details && <LashingDetailTable data={details} />}
         </div>
@@ -536,7 +536,7 @@ const WoodFormulaDisplay = ({ values }) => {
             <div className="grid grid-cols-1 gap-3">
                 <div><div className="flex justify-between text-[10px] uppercase font-bold text-slate-400"><span>1. Raummaß (Gesamt)</span><span>V1 + V2</span></div><div className="font-mono bg-white border border-slate-100 p-1.5 rounded mt-0.5 text-center text-emerald-800">Summe = <strong>{totalVol} m³</strong></div></div>
                 <div><div className="flex justify-between text-[10px] uppercase font-bold text-slate-400"><span>2. Festmeter</span><span>Raummaß · Faktor</span></div><div className="font-mono bg-white border border-slate-100 p-1.5 rounded mt-0.5 text-center text-emerald-800">{totalVol} m³ · {factor} = <strong>{solidVol} m³</strong></div></div>
-                <div><div className="flex justify-between text-[10px] uppercase font-bold text-slate-400"><span>3. Gewicht</span><span>Festmeter · Dichte</span></div><div className="font-mono bg-white border border-slate-100 p-1.5 rounded mt-0.5 text-center font-bold text-emerald-700 text-sm">{solidVol} m³ · {density} kg/m³ ≈ {weight.toLocaleString()} kg</div></div>
+                <div><div className="flex justify-between text-[10px] uppercase font-bold text-slate-400"><span>3. Gewicht</span><span>Festmeter · Dichte</span></div><div className="font-mono bg-white border border-slate-100 p-1.5 rounded mt-0.5 text-center font-bold text-emerald-700 text-sm">{solidVol} m³ · {density} kg/m³ ˜ {weight.toLocaleString()} kg</div></div>
             </div>
         </div>
     </CalculationToggle>
@@ -584,7 +584,7 @@ const BkatRow = ({ title, fines }) => (
                     <div className="flex items-center gap-1.5 text-[10px] font-mono px-2 py-1">
                         {fine.role && <span className="font-bold text-slate-400 uppercase">{fine.role}</span>}
                         <span>{fine.tbnr}</span>
-                        <span>➔ <strong className={`${fine.cost === 'Straftat' ? 'text-purple-600' : 'text-red-600'}`}>{fine.cost}</strong></span>
+                        <span>? <strong className={`${fine.cost === 'Straftat' ? 'text-purple-600' : 'text-red-600'}`}>{fine.cost}</strong></span>
                         {fine.points && fine.points !== '' && fine.points !== '-' && (
                             <span className="text-[9px] font-bold text-amber-500 uppercase ml-0.5">{fine.points}</span>
                         )}
@@ -639,7 +639,7 @@ const AnglePictogram = ({ highlight }) => (
         <line x1="85" y1="60" x2="85" y2="100" stroke={highlight === 'X' ? '#ef4444' : '#cbd5e1'} strokeWidth={highlight === 'X' ? 2 : 1} strokeDasharray={highlight === 'X' ? "none" : "2 2"} markerEnd={highlight === 'X' ? `url(#arrow-${highlight})` : "none"} markerStart={highlight === 'X' ? `url(#arrowRev-${highlight})` : "none"} />
 
         <path d="M85 85 A 15 15 0 0 0 74 89" fill="none" stroke="#4f46e5" strokeWidth="1" />
-        <text x="79" y="83" className="text-[8px] fill-indigo-600 font-bold">β</text>
+        <text x="79" y="83" className="text-[8px] fill-indigo-600 font-bold">ß</text>
 
         {highlight === 'Y' && <text x="65" y="55" textAnchor="middle" className="text-[8px] fill-red-600 font-black">Y (Gegenkathete)</text>}
         {highlight === 'X' && <text x="78" y="80" transform="rotate(-90 78 80)" textAnchor="middle" className="text-[8px] fill-red-600 font-black">X (Ankathete)</text>}
@@ -909,7 +909,7 @@ const PkwCarEditor = ({ car, index, onUpdate, onRemove, onMeasureAngle }) => {
                     </div>
                     <div className="flex flex-col truncate">
                         <span className="font-bold text-slate-700 uppercase tracking-wide text-[11px] truncate">
-                            PKW {index + 1} {isExpanded ? '' : <span className="text-slate-400 font-medium ml-1">• {!isConfigComplete ? 'Eingaben unvollständig' : `${car.weightClass === '2000' ? '≤ 2t' : car.weightClass === '3000' ? '> 2-3t' : '> 3-4,5t'} • ${car.exactAngle != null ? (car.exactAngle > 0 ? '+' : '') + car.exactAngle + '°' : (car.angle === '25' ? '±25°' : car.angle === '10_25' ? '+10°/-25°' : '±10°')} • ${car.orientation === 'forward' ? 'Vorwärts' : 'Rückwärts'}`}</span>}
+                            PKW {index + 1} {isExpanded ? '' : <span className="text-slate-400 font-medium ml-1">o {!isConfigComplete ? 'Eingaben unvollständig' : `${car.weightClass === '2000' ? '= 2t' : car.weightClass === '3000' ? '> 2-3t' : '> 3-4,5t'} o ${car.exactAngle != null ? (car.exactAngle > 0 ? '+' : '') + car.exactAngle + '°' : (car.angle === '25' ? '±25°' : car.angle === '10_25' ? '+10°/-25°' : '±10°')} o ${car.orientation === 'forward' ? 'Vorwärts' : 'Rückwärts'}`}</span>}
                         </span>
                         {!isExpanded && isConfigComplete && !validation.valid && <span className="text-[9px] text-red-500 font-bold truncate">Fehlerhafte Sicherung!</span>}
                     </div>
@@ -1348,7 +1348,7 @@ function SpeedCalculator() {
                 tolerance = Math.ceil(measured * 0.03);
                 const tolRaw = (measured * 0.03).toFixed(2).replace('.', ',');
                 calcDetails.push({ label: 'Bruttowert', value: `${measured} km/h` });
-                calcDetails.push({ label: `Toleranz (3% von ${measured})`, value: `${tolRaw} ➔ - ${tolerance} km/h` });
+                calcDetails.push({ label: `Toleranz (3% von ${measured})`, value: `${tolRaw} ? - ${tolerance} km/h` });
                 calcDetails.push({ label: 'Vorwerfbar (Netto)', value: `= ${measured - tolerance} km/h`, isBold: true });
             }
             netSpeed = measured - tolerance;
@@ -2242,7 +2242,7 @@ function OverloadCalculator({ onSwitch }) {
                 
                <PrintFormulaDisplay result={result.vehicle1} />
  
-               {checkConfiscation(result.vehicle1) && <div className="print-warning" style={{marginTop: '5px'}}>⚠️ Einziehung möglich!</div>}
+               {checkConfiscation(result.vehicle1) && <div className="print-warning" style={{marginTop: '5px'}}>?? Einziehung möglich!</div>}
                <PrintFineDisplay result={result.vehicle1} isTrailer={false} isCombination={false} />
            </div>
  
@@ -2254,7 +2254,7 @@ function OverloadCalculator({ onSwitch }) {
                 
                <PrintFormulaDisplay result={result.vehicle2} />
  
-               {checkConfiscation(result.vehicle2) && <div className="print-warning" style={{marginTop: '5px'}}>⚠️ Einziehung möglich!</div>}
+               {checkConfiscation(result.vehicle2) && <div className="print-warning" style={{marginTop: '5px'}}>?? Einziehung möglich!</div>}
                <PrintFineDisplay result={result.vehicle2} isTrailer={true} isCombination={false} />
            </div>
             )}
@@ -2273,7 +2273,7 @@ function OverloadCalculator({ onSwitch }) {
                 
                <PrintFormulaDisplay result={result.total} />
  
-               {checkConfiscation(result.total) && <div className="print-warning" style={{marginTop: '5px'}}>⚠️ Einziehung möglich!</div>}
+               {checkConfiscation(result.total) && <div className="print-warning" style={{marginTop: '5px'}}>?? Einziehung möglich!</div>}
                <PrintFineDisplay result={result.total} isTrailer={false} isCombination={true} />
            </div>
             )}
@@ -2442,7 +2442,7 @@ function OverloadCalculator({ onSwitch }) {
                         {checkConfiscation(result.vehicle1) && (
                             <div className="mt-2 bg-red-100 border border-red-300 text-red-800 px-2 py-1.5 rounded-lg text-[10px] font-bold flex items-center justify-center gap-1.5 animate-pulse uppercase tracking-wide shadow-sm">
                                 <AlertTriangle className="w-4 h-4 shrink-0" />
-                                 <span>⚠️ Einziehung möglich!</span>
+                                 <span>?? Einziehung möglich!</span>
                             </div>
                         )}
  
@@ -2474,7 +2474,7 @@ function OverloadCalculator({ onSwitch }) {
                         {checkConfiscation(result.vehicle2) && (
                             <div className="mt-2 bg-red-100 border border-red-300 text-red-800 px-2 py-1.5 rounded-lg text-[10px] font-bold flex items-center justify-center gap-1.5 animate-pulse uppercase tracking-wide shadow-sm">
                                 <AlertTriangle className="w-4 h-4 shrink-0" />
-                                 <span>⚠️ Einziehung möglich!</span>
+                                 <span>?? Einziehung möglich!</span>
                             </div>
                         )}
  
@@ -2522,7 +2522,7 @@ function OverloadCalculator({ onSwitch }) {
                     {checkConfiscation(result.total) && (
                         <div className="mt-4 bg-red-100 border border-red-400 text-red-800 px-3 py-2.5 rounded-xl text-xs font-black flex items-center justify-center gap-2 animate-pulse uppercase tracking-widest shadow-inner">
                             <AlertTriangle className="w-5 h-5 shrink-0" />
-                            <span>⚠️ Einziehung möglich!</span>
+                            <span>?? Einziehung möglich!</span>
                         </div>
                     )}
  
@@ -2557,20 +2557,23 @@ function LashingCalculator({ onOpenKnowledge }) {
   const [emptyWeight, setEmptyWeight] = useState('');
   const [loadWeight, setLoadWeight] = useState('');
   const FRICTION_OPTIONS = [
-    { id: '0.20_dirty', val: 0.20, label: '0,20 μ - Nicht besenrein (verschmutzt)' },
-    { id: '0.20_metal', val: 0.20, label: '0,20 μ - Metall auf Metall' },
-    { id: '0.25_gitter', val: 0.25, label: '0,25 μ - Gitterbox auf Siebdruckboden' },
-    { id: '0.25_kunststoff', val: 0.25, label: '0,25 μ - Kunststoffpalette auf Siebdruckboden' },
-    { id: '0.25_papier', val: 0.25, label: '0,25 μ - Papierrolle auf Siebdruckboden' },
-    { id: '0.30_holz_mehrweg', val: 0.30, label: '0,30 μ - Holzpalette Mehrweg auf Siebdruckboden' },
-    { id: '0.35_papier_joloda', val: 0.35, label: '0,35 μ - Papierrolle Siebdruckboden mit Joloda' },
-    { id: '0.35_stroh', val: 0.35, label: '0,35 μ - Strohballen auf Siebdruckboden' },
-    { id: '0.40_kantholz', val: 0.40, label: '0,40 μ - Kantholz auf Siebdruckboden' },
-    { id: '0.45_holz_einweg', val: 0.45, label: '0,45 μ - Holzpalette Einweg auf Siebdruckboden' },
-    { id: '0.45_stahlkiste', val: 0.45, label: '0,45 μ - Stahlkiste auf Siebdruckboden' },
-    { id: '0.45_gummireifen', val: 0.45, label: '0,45 μ - Gummireifen auf Siebdruckboden' },
-    { id: '0.55_betonware', val: 0.55, label: '0,55 μ - Betonware auf Siebdruckboden' },
-    { id: '0.60_antirutsch', val: 0.60, label: '0,60 μ - Antirutschmatte' },
+    { id: '0.20_dirty', val: 0.20, label: '0,20 µ - Nicht besenrein (verschmutzt)' },
+    { id: '0.20_metal', val: 0.20, label: '0,20 µ - Metall auf Metall' },
+    { id: '0.20_Kunststoff, val: 0.20, label: '0,20 µ - Kunststoffpalette auf Siebdruckboden' },
+    { id: '0.25_gitter', val: 0.25, label: '0,25 µ - Gitterbox auf Siebdruckboden' },
+    { id: '0.25_kunststoff', val: 0.25, label: '0,25 µ - Kunststoffpalette auf Siebdruckboden' },
+    { id: '0.25_papier', val: 0.25, label: '0,25 µ - Papierrolle unverpackt auf Siebdruckboden' },
+    { id: '0.30_papier_verpackt', val: 0.30, label: '0,30 µ - Papierrolle verpackt auf Siebdruckboden' },
+    { id: '0.30_papier_verpacktm', val: 0.30, label: '0,30 µ - Papierrolle un-/verpackt auf Metallboden },
+    { id: '0.30_holz_mehrweg', val: 0.30, label: '0,30 µ - Holzpalette Mehrweg auf Siebdruckboden' },
+    { id: '0.35_papier_joloda', val: 0.35, label: '0,35 µ - Papierrolle Siebdruckboden mit Joloda' },
+    { id: '0.35_stroh', val: 0.35, label: '0,35 µ - Strohballen auf Siebdruckboden' },
+    { id: '0.40_kantholz', val: 0.40, label: '0,40 µ - Kantholz auf Siebdruckboden' },
+    { id: '0.45_holz_einweg', val: 0.45, label: '0,45 µ - Holzpalette Einweg auf Siebdruckboden' },
+    { id: '0.45_stahlkiste', val: 0.45, label: '0,45 µ - Stahlkiste auf Siebdruckboden' },
+    { id: '0.45_gummireifen', val: 0.45, label: '0,45 µ - Gummireifen auf Siebdruckboden' },
+    { id: '0.55_betonware', val: 0.55, label: '0,55 µ - Betonware auf Siebdruckboden' },
+    { id: '0.60_antirutsch', val: 0.60, label: '0,60 µ - Antirutschmatte' },
   ];
   
   const [selectedFrictionId, setSelectedFrictionId] = useState('0.30_holz_mehrweg');
@@ -2873,8 +2876,8 @@ function LashingCalculator({ onOpenKnowledge }) {
         <table className="print-table">
            <tbody>
               <tr><th>Ladungsgewicht</th><td>{loadWeight || 0} kg</td></tr>
-              <tr><th>Reibbeiwert (μ)</th><td>{friction.toFixed(2)}</td></tr>
-              <tr><th>Vertikalwinkel (α)</th><td>{angle}°</td></tr>
+              <tr><th>Reibbeiwert (µ)</th><td>{friction.toFixed(2)}</td></tr>
+              <tr><th>Vertikalwinkel (a)</th><td>{angle}°</td></tr>
               <tr><th>Vorspannkraft (STF)</th><td>{stf} daN</td></tr>
               <tr><th>Fahrzeugaufbau</th><td>{bodyCert === 'NONE' ? 'Kein geprüfter Aufbau' : `Code ${bodyCert}`}</td></tr>
            </tbody>
@@ -2894,7 +2897,7 @@ function LashingCalculator({ onOpenKnowledge }) {
         <>
             <h2 className="print-section">Ergebnis: Erforderliche Gurte</h2>
             <table className="print-table">
-               <thead><tr><th>Richtung</th><th>Berechnungsfaktor (c)</th><th>Winkel (α)</th><th>Mindestanzahl Gurte</th></tr></thead>
+               <thead><tr><th>Richtung</th><th>Berechnungsfaktor (c)</th><th>Winkel (a)</th><th>Mindestanzahl Gurte</th></tr></thead>
                <tbody>
                    <tr><td>Sicherung nach Vorne</td><td>{lashingResult.factorForward}g</td><td>{angle}°</td><td><strong>{lashingResult.forward}</strong></td></tr>
                    <tr><td>Sicherung zur Seite</td><td>{lashingResult.factorSide}g</td><td>{angle}°</td><td><strong>{lashingResult.side}</strong></td></tr>
@@ -2915,10 +2918,10 @@ function LashingCalculator({ onOpenKnowledge }) {
                <p className="font-semibold">Verfahren: Kraftschlüssige Ladungssicherung (Niederzurren)</p>
                <div className="font-mono text-sm p-4 bg-slate-50 rounded border border-slate-200">
                  <p className="font-bold mb-1 text-slate-500">Angewandte Formel:</p>
-                 <p className="text-base mb-4">n = ((m · g · c) - F_Form - (m · g · μ)) / (k · μ · STF · sin(α))</p>
+                 <p className="text-base mb-4">n = ((m · g · c) - F_Form - (m · g · µ)) / (k · µ · STF · sin(a))</p>
                  
                  <div className="pt-4 border-t border-slate-300">
-                   <p className="font-bold mb-1 text-slate-500">Eingesetzte Werte (z.B. Sicherung nach vorn, Winkel α = {angle}°):</p>
+                   <p className="font-bold mb-1 text-slate-500">Eingesetzte Werte (z.B. Sicherung nach vorn, Winkel a = {angle}°):</p>
                    <p>n = (({loadWeight || 0} · 9,81 · {lashingResult.factorForward}) - {fitFront ? wallFront * 10 : 0} - ({loadWeight || 0} · 9,81 · {friction.toFixed(2)})) / ({(!allowedWeight || allowedWeight <= 3500) ? '1,8' : '2'} · {friction.toFixed(2)} · {(stf || 0) * 10} · sin({angle || 0}°))</p>
                  </div>
                </div>
@@ -2969,7 +2972,7 @@ function LashingCalculator({ onOpenKnowledge }) {
                                            <td>{Math.round(numN / 10).toLocaleString()} daN</td>
                                            <td>{Math.round((appliedStraps * strapForceN) / 10).toLocaleString()} daN</td>
                                            <td className={isEinziehung ? 'print-warning' : ''}><strong>{percentage.toFixed(1)} %</strong></td>
-                                           <td className={isEinziehung ? 'print-warning' : ''}><strong>{isEinziehung ? '⚠️ JA (≥ 30%)' : 'NEIN'}</strong></td>
+                                           <td className={isEinziehung ? 'print-warning' : ''}><strong>{isEinziehung ? '?? JA (= 30%)' : 'NEIN'}</strong></td>
                                        </tr>
                                    );
                                };
@@ -3000,9 +3003,9 @@ function LashingCalculator({ onOpenKnowledge }) {
           <table className="print-table">
             <tbody>
                  <tr><th>Ladungsgewicht</th><td>{loadWeight || 0} kg</td></tr>
-                 <tr><th>Reibbeiwert (μ)</th><td>{friction.toFixed(2)}</td></tr>
-                 <tr><th>Vertikalwinkel (α)</th><td>{angle}°</td></tr>
-                  <tr><th>Längswinkel (β)</th><td>{angleBeta}°</td></tr>
+                 <tr><th>Reibbeiwert (µ)</th><td>{friction.toFixed(2)}</td></tr>
+                 <tr><th>Vertikalwinkel (a)</th><td>{angle}°</td></tr>
+                  <tr><th>Längswinkel (ß)</th><td>{angleBeta}°</td></tr>
              </tbody>
          </table>
           
@@ -3023,10 +3026,10 @@ function LashingCalculator({ onOpenKnowledge }) {
               <p className="font-semibold">Verfahren: Formschlüssige Ladungssicherung (Diagonalzurren)</p>
               <div className="font-mono text-sm p-4 bg-slate-50 rounded border border-slate-200">
                 <p className="font-bold mb-1 text-slate-500">Angewandte Formel:</p>
-                <p className="text-base mb-4">LC = (m · g · (c_x - μ_D)) / (2 · (μ_D · cos(α) · cos(β) + sin(α)))</p>
+                <p className="text-base mb-4">LC = (m · g · (c_x - µ_D)) / (2 · (µ_D · cos(a) · cos(ß) + sin(a)))</p>
                 
                 <div className="pt-4 border-t border-slate-300">
-                  <p className="font-bold mb-1 text-slate-500">Eingesetzte Werte (z.B. Längsrichtung, Winkel α = {angle}°, Winkel β = {angleBeta}°):</p>
+                  <p className="font-bold mb-1 text-slate-500">Eingesetzte Werte (z.B. Längsrichtung, Winkel a = {angle}°, Winkel ß = {angleBeta}°):</p>
                   <p>LC = ({loadWeight || 0} · 9,81 · ({lashingResult.factorForward} - {friction.toFixed(2)})) / (2 · ({friction.toFixed(2)} · cos({angle || 0}°) · cos({angleBeta || 0}°) + sin({angle || 0}°)))</p>
                 </div>
               </div>
@@ -3054,7 +3057,7 @@ function LashingCalculator({ onOpenKnowledge }) {
                   {carsTop.map((car, idx) => (
                       <tr key={car.id}>
                           <td>Oben - PKW {idx + 1}</td>
-                          <td>{car.weightClass === '2000' ? '≤ 2.000 kg' : car.weightClass === '3000' ? '> 2.000 - 3.000 kg' : car.weightClass === '4500' ? '> 3.000 - 4.500 kg' : '-'}</td>
+                          <td>{car.weightClass === '2000' ? '= 2.000 kg' : car.weightClass === '3000' ? '> 2.000 - 3.000 kg' : car.weightClass === '4500' ? '> 3.000 - 4.500 kg' : '-'}</td>
                           <td>{car.exactAngle != null ? `${car.exactAngle}°` : (car.angle === '25' ? '±25°' : car.angle === '10_25' ? '+10° / -25°' : car.angle === '10' ? '±10°' : '-')}</td>
                           <td>{car.orientation === 'forward' ? 'Vorwärts' : car.orientation === 'backward' ? 'Rückwärts' : '-'}</td>
                           <td>{[car.isLast ? 'Letztes Fzg.' : '', car.noChocks ? 'Keine Keile' : ''].filter(Boolean).join(', ') || '-'}</td>
@@ -3063,7 +3066,7 @@ function LashingCalculator({ onOpenKnowledge }) {
                   {carsBottom.map((car, idx) => (
                       <tr key={car.id}>
                           <td>Unten - PKW {idx + 1}</td>
-                          <td>{car.weightClass === '2000' ? '≤ 2.000 kg' : car.weightClass === '3000' ? '> 2.000 - 3.000 kg' : car.weightClass === '4500' ? '> 3.000 - 4.500 kg' : '-'}</td>
+                          <td>{car.weightClass === '2000' ? '= 2.000 kg' : car.weightClass === '3000' ? '> 2.000 - 3.000 kg' : car.weightClass === '4500' ? '> 3.000 - 4.500 kg' : '-'}</td>
                           <td>{car.exactAngle != null ? `${car.exactAngle}°` : (car.angle === '25' ? '±25°' : car.angle === '10_25' ? '+10° / -25°' : car.angle === '10' ? '±10°' : '-')}</td>
                           <td>{car.orientation === 'forward' ? 'Vorwärts' : car.orientation === 'backward' ? 'Rückwärts' : '-'}</td>
                           <td>{[car.isLast ? 'Letztes Fzg.' : '', car.noChocks ? 'Keine Keile' : ''].filter(Boolean).join(', ') || '-'}</td>
@@ -3251,26 +3254,26 @@ function LashingCalculator({ onOpenKnowledge }) {
               </div>
               <div className="grid grid-cols-2 gap-2">
                <div className="relative col-span-2 sm:col-span-1">
-                    <label className="block text-xs font-bold text-slate-400 uppercase mb-0.5 ml-1">Reibbeiwert (μ)</label>
+                    <label className="block text-xs font-bold text-slate-400 uppercase mb-0.5 ml-1">Reibbeiwert (µ)</label>
                    {selectedFrictionId === 'CUSTOM' ? (
                      <div className="flex gap-1">
                        <div className="relative w-full">
                            <input type="number" step="0.01" value={customFrictionVal} onChange={(e) => setCustomFrictionVal(e.target.value)} className="w-full bg-white border-2 border-indigo-500 rounded-xl px-3 py-2.5 text-base focus:outline-none focus:ring-0 font-medium text-slate-800" placeholder="z.B. 0.33" autoFocus />
-                           <span className="absolute right-3 top-2.5 text-slate-400 font-bold pointer-events-none">μ</span>
+                           <span className="absolute right-3 top-2.5 text-slate-400 font-bold pointer-events-none">µ</span>
                        </div>
                         <button onClick={() => { setSelectedFrictionId('0.30_holz_mehrweg'); setFriction(0.3); }} className="bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-xl px-3 flex items-center justify-center transition-colors no-print" title="Zurück zur Liste"><X className="w-5 h-5" /></button>
                      </div>
                     ) : (
                      <select value={selectedFrictionId} onChange={(e) => setSelectedFrictionId(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none font-medium truncate pr-8">
                        {FRICTION_OPTIONS.map((opt) => (<option key={opt.id} value={opt.id}>{opt.label}</option>))}
-                       <option disabled>──────────</option>
+                       <option disabled>----------</option>
                        <option value="CUSTOM">Eigener Wert...</option>
                       </select>
                     )}
                </div>
   
                <div className="relative col-span-2 sm:col-span-1">
-                   <label className="block text-xs font-bold text-slate-400 uppercase mb-0.5 ml-1">Winkel α (°)</label>
+                   <label className="block text-xs font-bold text-slate-400 uppercase mb-0.5 ml-1">Winkel a (°)</label>
                    <div className="flex gap-1.5">
                        <div className="relative w-full">
                             <input type="number" min="0" max="90" value={angle} onChange={(e) => setAngle(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium" placeholder="90" />
@@ -3416,7 +3419,7 @@ function LashingCalculator({ onOpenKnowledge }) {
                                           label={<span className="italic">m<sub>ungesichert</sub></span>}
                                           equals="=" 
                                           numerator="Restliche fehlende Kraft (N)" 
-                                          denominator="g · (c - μ)" 
+                                          denominator="g · (c - µ)" 
                                       />
                                       <FormulaFraction 
                                           label={<span className="italic">Prozent (%)</span>}
@@ -3461,26 +3464,26 @@ function LashingCalculator({ onOpenKnowledge }) {
                   </div>
                  <div className="grid grid-cols-2 gap-2">
                    <div className="relative col-span-2">
-                       <label className="block text-xs font-bold text-slate-400 uppercase mb-0.5 ml-1">Reibbeiwert (μ)</label>
+                       <label className="block text-xs font-bold text-slate-400 uppercase mb-0.5 ml-1">Reibbeiwert (µ)</label>
                        {selectedFrictionId === 'CUSTOM' ? (
                          <div className="flex gap-1">
                            <div className="relative w-full">
                                 <input type="number" step="0.01" value={customFrictionVal} onChange={(e) => setCustomFrictionVal(e.target.value)} className="w-full bg-white border-2 border-indigo-500 rounded-xl px-3 py-2.5 text-base focus:outline-none focus:ring-0 font-medium text-slate-800" placeholder="z.B. 0.33" autoFocus />
-                                <span className="absolute right-3 top-2.5 text-slate-400 font-bold pointer-events-none">μ</span>
+                                <span className="absolute right-3 top-2.5 text-slate-400 font-bold pointer-events-none">µ</span>
                            </div>
                            <button onClick={() => { setSelectedFrictionId('0.30_holz_mehrweg'); setFriction(0.3); }} className="bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-xl px-3 flex items-center justify-center transition-colors no-print" title="Zurück zur Liste"><X className="w-5 h-5" /></button>
                          </div>
                        ) : (
                          <select value={selectedFrictionId} onChange={(e) => setSelectedFrictionId(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none font-medium truncate pr-8">
                            {FRICTION_OPTIONS.map((opt) => (<option key={opt.id} value={opt.id}>{opt.label}</option>))}
-                           <option disabled>──────────</option>
+                           <option disabled>----------</option>
                            <option value="CUSTOM">Eigener Wert...</option>
                          </select>
                       )}
                    </div>
   
                    <div className="relative col-span-2">
-                       <label className="block text-xs font-bold text-slate-400 uppercase mb-0.5 ml-1">Vertikalwinkel α</label>
+                       <label className="block text-xs font-bold text-slate-400 uppercase mb-0.5 ml-1">Vertikalwinkel a</label>
                        <div className="flex gap-1.5">
                            <div className="relative w-full">
                                  <input type="number" min="0" max="90" value={angle} onChange={(e) => setAngle(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium" placeholder="z.B. 30" />
@@ -3491,7 +3494,7 @@ function LashingCalculator({ onOpenKnowledge }) {
                    </div>
   
                    <div className="relative col-span-2 bg-slate-50 p-3 rounded-xl border border-slate-200 mt-1">
-                       <label className="block text-xs font-bold text-slate-700 uppercase mb-3 flex items-center gap-1.5"><Calculator className="w-4 h-4 text-indigo-500"/> Längswinkel β (Tangens-Berechnung)</label>
+                       <label className="block text-xs font-bold text-slate-700 uppercase mb-3 flex items-center gap-1.5"><Calculator className="w-4 h-4 text-indigo-500"/> Längswinkel ß (Tangens-Berechnung)</label>
                        
                        <div className="grid grid-cols-2 gap-3 mb-3 items-start">
                            <div className="flex flex-col h-full">
@@ -3529,7 +3532,7 @@ function LashingCalculator({ onOpenKnowledge }) {
                        </div>
                        
                        <div className="flex gap-2 items-center bg-white p-2 rounded-xl border border-slate-200 shadow-sm">
-                           <label className="text-xs font-bold text-slate-500 uppercase ml-1 shrink-0 flex-1">Resultierender Winkel β:</label>
+                           <label className="text-xs font-bold text-slate-500 uppercase ml-1 shrink-0 flex-1">Resultierender Winkel ß:</label>
                            <div className="relative w-24 shrink-0">
                                  <input type="number" min="0" max="90" value={angleBeta} onChange={(e) => { setAngleBeta(e.target.value); setDistX(''); setDistY(''); }} className="w-full bg-indigo-50 border border-indigo-200 text-indigo-700 rounded-lg px-2 py-1.5 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 font-black text-center" placeholder="45" />
                                  <span className="absolute right-2 top-1.5 text-indigo-400 font-bold pointer-events-none">°</span>
@@ -4042,7 +4045,7 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                                             </ul>
                                             <div className="bg-amber-50 border border-amber-200 text-amber-800 p-3 rounded-xl text-xs mt-3 flex gap-2 shadow-sm">
                                                 <Info className="w-5 h-5 shrink-0 text-amber-500" />
-                                                <span>Die Wirkung kann jedoch auch schon <strong>unterhalb des Grenzwerts</strong> vorliegen, wenn eine Ausfallerscheinung hinzukommt.<br/><span className="text-[10px] opacity-70 block mt-1">(OLG Celle, Beschluss v. 30. 3. 2009 – 322 Ss Bs 57/09)</span></span>
+                                                <span>Die Wirkung kann jedoch auch schon <strong>unterhalb des Grenzwerts</strong> vorliegen, wenn eine Ausfallerscheinung hinzukommt.<br/><span className="text-[10px] opacity-70 block mt-1">(OLG Celle, Beschluss v. 30. 3. 2009 - 322 Ss Bs 57/09)</span></span>
                                             </div>
                                         </div>
                                     </li>
@@ -4817,7 +4820,7 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                                                 <Sign1010_66 className="w-14 h-10 shrink-0" />
                                                 <span className="text-[10px] font-bold">VZ 1010-68</span>
                                             </div>
-                                            <span className="text-red-700 font-bold block mt-2">WICHTIG: Das Verkehrszeichen „Radverkehr frei“ VZ 1022-10 reicht hierfür nicht aus!</span>
+                                            <span className="text-red-700 font-bold block mt-2">WICHTIG: Das Verkehrszeichen "Radverkehr frei" VZ 1022-10 reicht hierfür nicht aus!</span>
                                             <div className="mt-2 text-[10px] text-emerald-700 font-normal leading-snug">
                                                 Hinweis: ab dem 01.03.2027 fallen Elektrokleinstfahrzeuge unter das Verkehrszeichen VZ 1022-10. Das VZ 1010-68 wird somit obsolet.
                                             </div>
@@ -5355,7 +5358,7 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                                                 <span className="font-bold text-slate-500 w-4 sm:w-6 shrink-0 mt-0.5 text-[9px] sm:text-[11px]">§ 11</span>
                                                 <div className="flex flex-col">
                                                     <span className="font-bold text-slate-700 text-[9px] sm:text-[11px] leading-tight">Kinobesuche<br/>Nur bei Freigabe des Films und Vorspanns: "ohne Altersbeschr. / ab 6/12/16 Jahren"</span>
-                                                    <span className="text-[7.5px] sm:text-[9px] text-slate-500 mt-0.5 leading-tight">(Kinder unter 6 Jahren nur mit einer erziehungsbeauftragten Person. Die Anwesenheit ist grundsätzlich an die Altersfreigabe gebunden! Ausnahme: „Filme ab 12 Jahren": Anwesenheit ab 6 Jahren in Begleitung einer personensorgeberechtigten Person [Eltern] gestattet.)</span>
+                                                    <span className="text-[7.5px] sm:text-[9px] text-slate-500 mt-0.5 leading-tight">(Kinder unter 6 Jahren nur mit einer erziehungsbeauftragten Person. Die Anwesenheit ist grundsätzlich an die Altersfreigabe gebunden! Ausnahme: "Filme ab 12 Jahren": Anwesenheit ab 6 Jahren in Begleitung einer personensorgeberechtigten Person [Eltern] gestattet.)</span>
                                                 </div>
                                             </div>
                                         </td>
@@ -5599,7 +5602,7 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                                     <Info className="w-5 h-5 shrink-0 text-teal-600 mt-0.5" />
                                     <div>
                                         Müssen <strong>nicht fest</strong> mit dem Fahrzeug verbunden sein.<br/>
-                                        ➔ Eine Urkundenfälschung ist in diesem Fall <strong>nicht</strong> möglich.
+                                        ? Eine Urkundenfälschung ist in diesem Fall <strong>nicht</strong> möglich.
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-3 bg-amber-50 p-3 rounded-xl border border-amber-100 mb-5 text-xs text-amber-900 font-medium shadow-sm">
@@ -5635,7 +5638,7 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                                     <AlertTriangle className="w-5 h-5 shrink-0 text-red-600 mt-0.5" />
                                     <div>
                                         Müssen <strong>fest</strong> mit dem Fahrzeug verbunden sein!<br/>
-                                        ➔ Eine Urkundenfälschung ist hier <strong>MÖGLICH</strong>.
+                                        ? Eine Urkundenfälschung ist hier <strong>MÖGLICH</strong>.
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-3 bg-amber-50 p-3 rounded-xl border border-amber-100 mb-5 text-xs text-amber-900 font-medium shadow-sm">
@@ -5992,8 +5995,8 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                                         <span className="font-bold text-slate-800 text-xs uppercase block mb-1">Drei-Punkt-Zurrgurte & Controller</span>
                                         <ul className="text-[11px] text-slate-600 list-disc list-inside space-y-0.5">
                                             <li><strong className="text-slate-700">LC:</strong> mind. 1500 daN | <strong className="text-slate-700">STF:</strong> mind. 330 daN</li>
-                                            <li><strong className="text-slate-700">Gurtband-Dehnung:</strong> ≤ 4 %</li>
-                                            <li><strong className="text-slate-700">Controller (ETA-Wert):</strong> Übertragungswert η ≥ 0,5</li>
+                                            <li><strong className="text-slate-700">Gurtband-Dehnung:</strong> = 4 %</li>
+                                            <li><strong className="text-slate-700">Controller (ETA-Wert):</strong> Übertragungswert ? = 0,5</li>
                                             <li><strong className="text-slate-700">Controller-Länge:</strong> mind. halber Radumfang (180°)</li>
                                         </ul>
                                     </div>
@@ -6003,8 +6006,8 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                                     <div>
                                         <span className="font-bold text-slate-800 text-xs uppercase block mb-1">Radvorleger (Anfahrbügel)</span>
                                         <ul className="text-[11px] text-slate-600 list-disc list-inside space-y-0.5">
-                                            <li><strong className="text-slate-700">Höhe:</strong> ≥ 1/6 des Raddurchmessers (mind. 120 mm)</li>
-                                            <li><strong className="text-slate-700">Blockierkraft (BC):</strong> ≥ 500 daN</li>
+                                            <li><strong className="text-slate-700">Höhe:</strong> = 1/6 des Raddurchmessers (mind. 120 mm)</li>
+                                            <li><strong className="text-slate-700">Blockierkraft (BC):</strong> = 500 daN</li>
                                         </ul>
                                     </div>
                                 </div>
@@ -6261,7 +6264,7 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                                 <span className="text-[10px] text-slate-500 leading-tight">Herstellungsdatum:<br/>14. Kalenderwoche 2023</span>
                             </div>
                             <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl flex flex-col items-center text-center">
-                                <span className="font-black text-slate-700 text-sm mb-1 bg-white px-2 py-0.5 rounded shadow-sm">M+S / ⛰️❄️</span>
+                                <span className="font-black text-slate-700 text-sm mb-1 bg-white px-2 py-0.5 rounded shadow-sm">M+S / ????</span>
                                 <span className="text-[10px] text-slate-500 leading-tight">Winterreifen<br/>(Alpine-Symbol Pflicht ab 10/24)</span>
                             </div>
                         </div>
@@ -6735,18 +6738,18 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
             {/* ÜBERSETZUNGEN (3-Stufen Assistent) */}
             {view === 'uebersetzungen' && (() => {
                 const LANGS = [
-                    { id: 'EN', label: 'Englisch', flag: '🇬🇧' },
-                    { id: 'FR', label: 'Französisch', flag: '🇫🇷' },
-                    { id: 'ES', label: 'Spanisch', flag: '🇪🇸' },
-                    { id: 'IT', label: 'Italienisch', flag: '🇮🇹' },
-                    { id: 'RU', label: 'Russisch', flag: '🇷🇺' },
-                    { id: 'PL', label: 'Polnisch', flag: '🇵🇱' },
-                    { id: 'RO', label: 'Rumänisch', flag: '🇷🇴' },
-                    { id: 'TR', label: 'Türkisch', flag: '🇹🇷' },
-                    { id: 'SLO', label: 'Slowenisch', flag: '🇸🇮' },
-                    { id: 'HU', label: 'Ungarisch', flag: '🇭🇺' },
-                    { id: 'UK', label: 'Ukrainisch', flag: '🇺🇦' },
-                    { id: 'HI', label: 'Hindi (Indisch)', flag: '🇮🇳' },
+                    { id: 'EN', label: 'Englisch', flag: '????' },
+                    { id: 'FR', label: 'Französisch', flag: '????' },
+                    { id: 'ES', label: 'Spanisch', flag: '????' },
+                    { id: 'IT', label: 'Italienisch', flag: '????' },
+                    { id: 'RU', label: 'Russisch', flag: '????' },
+                    { id: 'PL', label: 'Polnisch', flag: '????' },
+                    { id: 'RO', label: 'Rumänisch', flag: '????' },
+                    { id: 'TR', label: 'Türkisch', flag: '????' },
+                    { id: 'SLO', label: 'Slowenisch', flag: '????' },
+                    { id: 'HU', label: 'Ungarisch', flag: '????' },
+                    { id: 'UK', label: 'Ukrainisch', flag: '????' },
+                    { id: 'HI', label: 'Hindi (Indisch)', flag: '????' },
                 ];
 
                 const TRANSLATIONS = {
@@ -6757,14 +6760,14 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                             FR: "Votre chargement n'est pas suffisamment arrimé.",
                             ES: "Su carga no está suficientemente asegurada.",
                             IT: "Il suo carico non è fissato adeguatamente.",
-                            RU: "Ваш груз недостаточно закреплен.",
-                            PL: "Pana ładunek nie jest odpowiednio zabezpieczony.",
-                            RO: "Încărcătura dvs. nu este asigurată corespunzător.",
-                            TR: "Yükünüz yeterince sabitlenmemiş.",
+                            RU: "??? ???? ???????????? ?????????.",
+                            PL: "Pana ladunek nie jest odpowiednio zabezpieczony.",
+                            RO: "Încarcatura dvs. nu este asigurata corespunzator.",
+                            TR: "Yükünüz yeterince sabitlenmemis.",
                             SLO: "Vaš tovor ni ustrezno pritrjen.",
-                            HU: "A rakománya nincs megfelelően rögzítve.",
-                            UK: "Ваш вантаж недостатньо закріплений.",
-                            HI: "आपका माल ठीक से सुरक्षित नहीं है।"
+                            HU: "A rakománya nincs megfeleloen rögzítve.",
+                            UK: "??? ?????? ??????????? ???????????.",
+                            HI: "???? ??? ??? ?? ???????? ???? ???"
                         },
                         {
                             de: "Sie müssen weitere Zurrgurte anbringen.",
@@ -6772,14 +6775,14 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                             FR: "Vous devez attacher des sangles d'arrimage supplémentaires.",
                             ES: "Debe colocar eslingas adicionales.",
                             IT: "Deve applicare cinghie di ancoraggio aggiuntive.",
-                            RU: "Вы должны закрепить дополнительные ремни.",
-                            PL: "Musi pan założyć dodatkowe pasy mocujące.",
-                            RO: "Trebuie să atașați chingi suplimentare.",
-                            TR: "Ekstra gergi kayışı takmalısınız.",
+                            RU: "?? ?????? ????????? ?????????????? ?????.",
+                            PL: "Musi pan zalozyc dodatkowe pasy mocujace.",
+                            RO: "Trebuie sa ata?a?i chingi suplimentare.",
+                            TR: "Ekstra gergi kayisi takmalisiniz.",
                             SLO: "Pritrditi morate dodatne povezovalne trakove.",
-                            HU: "További rögzítő hevedereket kell felhelyeznie.",
-                            UK: "Ви повинні закріпити додаткові ремені.",
-                            HI: "आपको अतिरिक्त पट्टियाँ लगानी होंगी।"
+                            HU: "További rögzíto hevedereket kell felhelyeznie.",
+                            UK: "?? ??????? ????????? ????????? ??????.",
+                            HI: "???? ???????? ???????? ????? ??????"
                         },
                         {
                             de: "Weiterfahrt untersagt, bis die Ladung gesichert ist.",
@@ -6787,14 +6790,14 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                             FR: "Interdiction de poursuivre la route jusqu'à ce que le chargement soit arrimé.",
                             ES: "Prohibido continuar el viaje hasta que la carga esté asegurada.",
                             IT: "Divieto di proseguire il viaggio finché il carico non è fissato.",
-                            RU: "Дальнейшее движение запрещено до закрепления груза.",
-                            PL: "Zakaz dalszej jazdy do momentu zabezpieczenia ładunku.",
-                            RO: "Continuarea călătoriei este interzisă până la asigurarea încărcăturii.",
-                            TR: "Yük sabitlenene kadar yola devam etmeniz yasaktır.",
+                            RU: "?????????? ???????? ????????? ?? ??????????? ?????.",
+                            PL: "Zakaz dalszej jazdy do momentu zabezpieczenia ladunku.",
+                            RO: "Continuarea calatoriei este interzisa pâna la asigurarea încarcaturii.",
+                            TR: "Yük sabitlenene kadar yola devam etmeniz yasaktir.",
                             SLO: "Nadaljnja vožnja je prepovedana, dokler tovor ni pritrjen.",
                             HU: "A továbbhaladás tilos, amíg a rakomány nincs rögzítve.",
-                            UK: "Подальший рух заборонено до закріплення вантажу.",
-                            HI: "माल सुरक्षित होने तक आगे की यात्रा वर्जित है।"
+                            UK: "????????? ??? ?????????? ?? ??????????? ???????.",
+                            HI: "??? ???????? ???? ?? ??? ?? ?????? ?????? ???"
                         }
                     ],
                     ueberladung: [
@@ -6804,14 +6807,14 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                             FR: "Votre véhicule est en surcharge.",
                             ES: "Su vehículo está sobrecargado.",
                             IT: "Il suo veicolo è sovraccarico.",
-                            RU: "Ваше транспортное средство перегружено.",
-                            PL: "Pana pojazd jest przeładowany.",
-                            RO: "Vehiculul dumneavoastră este supraîncărcat.",
-                            TR: "Aracınız aşırı yüklü.",
+                            RU: "???? ???????????? ???????? ???????????.",
+                            PL: "Pana pojazd jest przeladowany.",
+                            RO: "Vehiculul dumneavoastra este supraîncarcat.",
+                            TR: "Araciniz asiri yüklü.",
                             SLO: "Vaše vozilo je preobremenjeno.",
-                            HU: "A járműve túl van terhelve.",
-                            UK: "Ваш транспортний засіб перевантажений.",
-                            HI: "आपका वाहन ओवरलोड है।"
+                            HU: "A jármuve túl van terhelve.",
+                            UK: "??? ???????????? ????? ??????????????.",
+                            HI: "???? ???? ?????? ???"
                         },
                         {
                             de: "Sie müssen Ladung abladen oder umladen.",
@@ -6819,14 +6822,14 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                             FR: "Vous devez transborder ou décharger.",
                             ES: "Debe recargar o descargar.",
                             IT: "Deve ricaricare o scaricare il carico.",
-                            RU: "Вы должны перегрузить или выгрузить груз.",
-                            PL: "Musi pan przeładować lub rozładować ładunek.",
-                            RO: "Trebuie să reîncărcați sau să descărcați.",
-                            TR: "Yükü aktarmalı veya indirmelisiniz.",
+                            RU: "?? ?????? ??????????? ??? ????????? ????.",
+                            PL: "Musi pan przeladowac lub rozladowac ladunek.",
+                            RO: "Trebuie sa reîncarca?i sau sa descarca?i.",
+                            TR: "Yükü aktarmali veya indirmelisiniz.",
                             SLO: "Tovor morate preložiti ali razložiti.",
                             HU: "Át kell raknia vagy le kell pakolnia a rakományt.",
-                            UK: "Ви повинні перевантажити або вивантажити вантаж.",
-                            HI: "आपको माल उतारना या फिर से लोड करना होगा।"
+                            UK: "?? ??????? ????????????? ??? ??????????? ??????.",
+                            HI: "???? ??? ?????? ?? ??? ?? ??? ???? ?????"
                         },
                         {
                             de: "Sie müssen eine Sicherheitsleistung (Kaution) bezahlen.",
@@ -6834,14 +6837,14 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                             FR: "Vous devez payer une amende (caution).",
                             ES: "Debe pagar una multa (fianza).",
                             IT: "Deve pagare una multa (cauzione).",
-                            RU: "Вы должны уплатить штраф (залог).",
-                            PL: "Musi pan zapłacić mandat (kaucję).",
-                            RO: "Trebuie să plătiți o amendă (cauțiune).",
-                            TR: "Para cezası (depozito) ödemelisiniz.",
-                            SLO: "Plačati morate globo (kavcijo).",
+                            RU: "?? ?????? ???????? ????? (?????).",
+                            PL: "Musi pan zaplacic mandat (kaucje).",
+                            RO: "Trebuie sa plati?i o amenda (cau?iune).",
+                            TR: "Para cezasi (depozito) ödemelisiniz.",
+                            SLO: "Placati morate globo (kavcijo).",
                             HU: "Bírságot (kauciót) kell fizetnie.",
-                            UK: "Ви повинні сплатити штраф (заставу).",
-                            HI: "आपको जुर्माना (जमानत) देना होगा।"
+                            UK: "?? ??????? ???????? ????? (???????).",
+                            HI: "???? ???????? (?????) ???? ?????"
                         }
                     ],
                     mangel: [
@@ -6851,14 +6854,14 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                             FR: "Il y a un défaut technique sur votre véhicule.",
                             ES: "Hay un defecto técnico en su vehículo.",
                             IT: "C'è un difetto tecnico nel suo veicolo.",
-                            RU: "В вашем транспортном средстве имеется техническая неисправность.",
-                            PL: "W pańskim pojeździe wystąpiła usterka techniczna.",
-                            RO: "Există o defecțiune tehnică la vehiculul dumneavoastră.",
-                            TR: "Aracınızda teknik bir arıza var.",
-                            SLO: "Na vašem vozilu je tehnična napaka.",
-                            HU: "Műszaki hiba van a járművén.",
-                            UK: "У вашому транспортному засобі є технічна несправність.",
-                            HI: "आपके वाहन में एक तकनीकी खराबी है।"
+                            RU: "? ????? ???????????? ???????? ??????? ??????????? ?????????????.",
+                            PL: "W panskim pojezdzie wystapila usterka techniczna.",
+                            RO: "Exista o defec?iune tehnica la vehiculul dumneavoastra.",
+                            TR: "Aracinizda teknik bir ariza var.",
+                            SLO: "Na vašem vozilu je tehnicna napaka.",
+                            HU: "Muszaki hiba van a jármuvén.",
+                            UK: "? ?????? ????????????? ?????? ? ???????? ????????????.",
+                            HI: "???? ???? ??? ?? ?????? ????? ???"
                         },
                         {
                             de: "Die Reifen haben zu wenig Profil.",
@@ -6866,14 +6869,14 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                             FR: "Les pneus n'ont pas assez de bande de roulement.",
                             ES: "Los neumáticos no tienen suficiente banda de rodadura.",
                             IT: "I pneumatici non hanno abbastanza battistrada.",
-                            RU: "Шины имеют недостаточный протектор.",
-                            PL: "Opony mają za mało bieżnika.",
+                            RU: "???? ????? ????????????? ?????????.",
+                            PL: "Opony maja za malo bieznika.",
                             RO: "Anvelopele nu au suficient profil.",
-                            TR: "Lastiklerin diş derinliği yetersiz.",
+                            TR: "Lastiklerin dis derinligi yetersiz.",
                             SLO: "Pnevmatike nimajo dovolj profila.",
-                            HU: "A gumiabroncsok profilmélysége nem elegendő.",
-                            UK: "Шини мають недостатній протектор.",
-                            HI: "टायरों में पर्याप्त ट्रेड नहीं है।"
+                            HU: "A gumiabroncsok profilmélysége nem elegendo.",
+                            UK: "???? ????? ??????????? ?????????.",
+                            HI: "?????? ??? ???????? ????? ???? ???"
                         },
                         {
                             de: "Die Bremsen sind defekt, die Weiterfahrt ist untersagt.",
@@ -6881,14 +6884,14 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                             FR: "Les freins sont défectueux, il est interdit de continuer à rouler.",
                             ES: "Los frenos están defectuosos, se prohíbe continuar el viaje.",
                             IT: "I freni sono difettosi, è vietato proseguire il viaggio.",
-                            RU: "Тормоза неисправны, дальнейшее движение запрещено.",
-                            PL: "Hamulce są uszkodzone, zakaz dalszej jazdy.",
-                            RO: "Frânele sunt defecte, continuarea călătoriei este interzisă.",
-                            TR: "Frenler arızalı, yola devam etmeniz yasaktır.",
+                            RU: "??????? ??????????, ?????????? ???????? ?????????.",
+                            PL: "Hamulce sa uszkodzone, zakaz dalszej jazdy.",
+                            RO: "Frânele sunt defecte, continuarea calatoriei este interzisa.",
+                            TR: "Frenler arizali, yola devam etmeniz yasaktir.",
                             SLO: "Zavore so pokvarjene, nadaljnja vožnja je prepovedana.",
                             HU: "A fékek hibásak, a továbbhaladás tilos.",
-                            UK: "Гальма несправні, подальший рух заборонено.",
-                            HI: "ब्रेक खराब हैं, आगे की यात्रा वर्जित है।"
+                            UK: "?????? ?????????, ????????? ??? ??????????.",
+                            HI: "????? ???? ???, ??? ?? ?????? ?????? ???"
                         }
                     ]
                 };
@@ -7416,14 +7419,14 @@ const HomeView = ({ onSelect }) => {
     const dateTime = useDateTime();
     
     // --- HIER UPDATE TEXT EINTRAGEN ---
-    const updateText = "🚀 Update 3.5: Geschwindigkeitsreiter innerorts/außerorts auf PKW mit Anhänger und LKW erweitert";
+    const updateText = "?? Update 3.5: Geschwindigkeitsreiter innerorts/außerorts auf PKW mit Anhänger und LKW erweitert";
 
     const tiles = [
         { id: 'age', title: 'Altersrechner', icon: Calendar, color: 'text-purple-500', bg: 'bg-purple-50', desc: '' },
-        { id: 'license', title: 'Führerschein', icon: CreditCard, color: 'text-sky-500', bg: 'bg-sky-50', desc: 'Schlüsselzahlen • Klassen' },
-        { id: 'speed', title: 'Geschwindigkeit', icon: Gauge, color: 'text-amber-500', bg: 'bg-amber-50', desc: 'Laser • Hinterherfahren' },
-        { id: 'weight', title: 'Gewichte & Holz', icon: Scale, color: 'text-blue-500', bg: 'bg-blue-50', desc: 'Überladung • Holzgewicht' },
-        { id: 'lashing', title: 'Ladungssicherung', icon: Truck, color: 'text-indigo-500', bg: 'bg-indigo-50', desc: 'Niederzurren • Diagonalzurren • PKW-Transporter' },
+        { id: 'license', title: 'Führerschein', icon: CreditCard, color: 'text-sky-500', bg: 'bg-sky-50', desc: 'Schlüsselzahlen o Klassen' },
+        { id: 'speed', title: 'Geschwindigkeit', icon: Gauge, color: 'text-amber-500', bg: 'bg-amber-50', desc: 'Laser o Hinterherfahren' },
+        { id: 'weight', title: 'Gewichte & Holz', icon: Scale, color: 'text-blue-500', bg: 'bg-blue-50', desc: 'Überladung o Holzgewicht' },
+        { id: 'lashing', title: 'Ladungssicherung', icon: Truck, color: 'text-indigo-500', bg: 'bg-indigo-50', desc: 'Niederzurren o Diagonalzurren o PKW-Transporter' },
         { id: 'knowledge', title: 'Wissensdatenbank', icon: BookOpen, color: 'text-teal-500', bg: 'bg-teal-50', desc: '' }
     ];
 
