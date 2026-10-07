@@ -2744,10 +2744,39 @@ function LashingCalculator({ onOpenKnowledge }) {
        }
     };
   
-    const nForward = calculateN(accFwd, fitFront ? wallFront : 0, 'forward');
-    const nSide = calculateN(accSide, fitSide ? wallSide : 0, 'side');
-    const nRear = calculateN(accRear, fitRear ? wallRear : 0, 'rear');
+    let nForward = calculateN(accFwd, fitFront ? wallFront : 0, 'forward');
+    let nSide = calculateN(accSide, fitSide ? wallSide : 0, 'side');
+    let nRear = calculateN(accRear, fitRear ? wallRear : 0, 'rear');
   
+    // --- VERDREHSCHUTZ & NIEDERHALTEPFLICHT ---
+    let twistProtectionActive = false;
+    let twistUpgradedFrom0 = false;
+    let twistUpgradedFrom1 = false;
+    let niederhaltePflichtActive = false;
+    const hasAnyFormFit = fitFront || fitSide || fitRear;
+    const hasAllFormFit = fitFront && fitSide && fitRear;
+
+    let maxRaw = Math.max(nForward, nSide, nRear);
+
+    if (!hasAnyFormFit && maxRaw < 2) {
+        // Freistehend: Immer mindestens 2 Gurte, wenn rechnerisch (Maximalwert über alle Richtungen) 0 oder 1 rauskommt
+        twistProtectionActive = true;
+        if (maxRaw === 0) twistUpgradedFrom0 = true;
+        if (maxRaw === 1) twistUpgradedFrom1 = true;
+
+        if (nForward < 2) nForward = 2;
+        if (nSide < 2) nSide = 2;
+        if (nRear < 2) nRear = 2;
+    } else if (hasAnyFormFit && !hasAllFormFit && maxRaw < 1) {
+        // Mindestens zu einer Seite Formschluss, aber NICHT zu allen, UND maximal errechneter Wert === 0: Mindestens 1 Gurt (Niederhaltepflicht)
+        niederhaltePflichtActive = true;
+        
+        // Nur die Seiten auf 1 setzen, die KEINEN Formschluss haben
+        if (!fitFront && nForward < 1) nForward = 1;
+        if (!fitSide && nSide < 1) nSide = 1;
+        if (!fitRear && nRear < 1) nRear = 1;
+    }
+
     // --- BERECHNUNG FÜR KONTROLL-MODUS (ROHKRÄFTE) ---
     const getStrapForce = (direction) => {
         const base = stfInNewton * mu * Math.sin(alphaRad);
@@ -2802,6 +2831,10 @@ function LashingCalculator({ onOpenKnowledge }) {
       strapForceFwd, strapForceSide, strapForceRear,
       lcDiagFwd, lcDiagSide, lcDiagRear,
       diagonalLC: diagLC,
+      twistProtectionActive,
+      twistUpgradedFrom0,
+      twistUpgradedFrom1,
+      niederhaltePflichtActive,
       detailRows: [
         { label: 'Vorne', mu: mu, c: accFwd, angle: angle, hasFit: fitFront, force: fitFront ? wallFront : 0, result: nForward },
         { label: 'Seite', mu: mu, c: accSide, angle: angle, hasFit: fitSide, force: fitSide ? wallSide : 0, result: nSide },
@@ -3374,6 +3407,25 @@ function LashingCalculator({ onOpenKnowledge }) {
                    
                   <LashingFormulaDisplay values={lashingResult.displayValues} details={lashingResult.detailRows} weightClass={lashingResult.weightClass} />
                   
+                  {lashingResult.twistProtectionActive && (
+                      <div className="mt-3 bg-amber-50 p-2.5 rounded-xl border border-amber-200 text-xs text-amber-800 flex items-start gap-2 shadow-sm animate-in fade-in">
+                          <Info className="w-4 h-4 shrink-0 mt-0.5 text-amber-500" />
+                          <span>
+                              <strong>Verdrehschutz:</strong> Rechnerisch {
+                                  (lashingResult.twistUpgradedFrom0 && !lashingResult.twistUpgradedFrom1) ? "wäre eigentlich gar kein Gurt erforderlich." :
+                                  (!lashingResult.twistUpgradedFrom0 && lashingResult.twistUpgradedFrom1) ? "wäre eigentlich 1 Gurt ausreichend." :
+                                  "wären je nach Richtung 0 oder 1 Gurt ausreichend."
+                              } Damit die Ladung sich aber nicht verdrehen kann, müssen es bei komplett freistehender Ladung mindestens 2 Gurte sein.
+                          </span>
+                      </div>
+                  )}
+                  {lashingResult.niederhaltePflichtActive && (
+                      <div className="mt-3 bg-blue-50 p-2.5 rounded-xl border border-blue-200 text-xs text-blue-800 flex items-start gap-2 shadow-sm animate-in fade-in">
+                          <Info className="w-4 h-4 shrink-0 mt-0.5 text-blue-500" />
+                          <span><strong>Niederhaltepflicht:</strong> Rechnerisch wäre eigentlich gar kein Gurt erforderlich. Da die Ladung jedoch zu mindestens einer Seite (aber nicht zu allen) Formschluss hat, reicht 1 Gurt aus, um sie vorschriftsmäßig niederzuhalten.</span>
+                      </div>
+                  )}
+
                   {/* KONTROLL-MODUS (UNGESICHERTE LADUNG IN %) */}
                   <div className="mt-5 pt-4 border-t border-slate-200">
                       <label className="flex items-center gap-3 cursor-pointer mb-3 bg-slate-50 p-3 rounded-xl border border-slate-200 hover:bg-slate-100 transition-colors shadow-sm">
