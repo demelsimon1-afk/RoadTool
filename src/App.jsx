@@ -4711,8 +4711,8 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                     {/* Speed Navigation */}
                     <div className="flex gap-2">
                         {[
-                            { id: 'bis22', label: 'bbH bis 23 km/h' },
-                            { id: 'ab23', label: 'bbH ab 24 km/h' }
+                            { id: 'bis22', label: 'bbH bis 22 km/h' },
+                            { id: 'ab23', label: 'bbH ab 23 km/h' }
                         ].map(sub => (
                             <button
                                 key={sub.id}
@@ -4742,17 +4742,17 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
 
                     <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-100">
                         
-                        {/* 1. bis 23 km/h (DE) */}
+                        {/* 1. bis 22 km/h (DE) */}
                         {escooterSpeed === 'bis22' && escooterOrigin === 'de' && (
                             <div className="animate-in fade-in">
                                 <div className="flex items-center gap-2 mb-4 text-yellow-600 pb-2 border-b border-slate-50">
                                     <Zap className="w-5 h-5" />
-                                    <h3 className="font-black uppercase tracking-wide text-xs">E-Scooter bis 23 km/h (eKFV) - DE</h3>
+                                    <h3 className="font-black uppercase tracking-wide text-xs">E-Scooter bis 22 km/h (eKFV) - DE</h3>
                                 </div>
                                 <div className="space-y-4">
                                     <div className="bg-slate-800 text-white p-4 rounded-xl shadow-sm text-sm leading-relaxed">
                                         Fahrzeuge in dieser Kategorie fallen unter die Elektrokleinstfahrzeuge-Verordnung (eKFV).<br/>
-                                        <strong>Rechtliche Einstufung:</strong> E-Scooter mit bbH mehr als 6 km/h und max. 20 km/h (inkl. Toleranz 23 km/h). Leistung max. 500 W.
+                                        <strong>Rechtliche Einstufung:</strong> E-Scooter mit bbH mehr als 6 km/h und max. 20 km/h (inkl. Toleranz 22 km/h vgl. Anlage 2 Ziff. 2.1.4 eKFV). Leistung max. 500 W. Nichtvorhandensein seines Sitzes (nach Art. 2 (2) VO (EG) Nr. 168/2013). Abmessungen nach § 1(1) Nr. 4 eKFV: Breite max. 700 mm, Höhe max. 1.400 mm, Länge max 2.000 mm
                                     </div>
                                     <div className="bg-blue-50 border border-blue-200 p-3 rounded-xl flex items-center gap-3 shadow-sm">
                                         <User className="w-5 h-5 text-blue-500 shrink-0" />
@@ -4827,7 +4827,7 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                                         </div>
                                     </div>
 
-                                    <h4 className="font-bold text-xs uppercase text-slate-500 mb-2 mt-4">Wichtige Tatbestände (bis 23 km/h)</h4>
+                                    <h4 className="font-bold text-xs uppercase text-slate-500 mb-2 mt-4">Wichtige Tatbestände (bis 22 km/h)</h4>
                                     <div className="bg-slate-50 p-2 sm:p-3 rounded-xl border border-slate-200 space-y-1">
                                         <BkatRow title="Fahren ohne Licht (bei Dämmerung/Dunkelheit)" fines={[{ role: 'Fahrer', tbnr: '117100', cost: '20 €' }]} />
                                         <BkatRow title="E-Scooter mit defekter Bremse" fines={[{ role: 'Fahrer', tbnr: '602018', cost: '25 €' }, { role: 'Halter', tbnr: '602024', cost: '25 €' }]} />
@@ -4867,18 +4867,19 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                             </div>
                         )}
 
-                        {/* 2. bis 23 km/h (Ausland) */}
+                        {/* 2. bis 22 km/h (Ausland) */}
                         {escooterSpeed === 'bis22' && escooterOrigin === 'aus' && (
                             <div className="animate-in fade-in">
                                 <div className="flex items-center gap-2 mb-4 text-yellow-600 pb-2 border-b border-slate-50">
                                     <Zap className="w-5 h-5" />
-                                    <h3 className="font-black uppercase tracking-wide text-xs">E-Scooter bis 23 km/h (eKFV) - Ausland</h3>
+                                    <h3 className="font-black uppercase tracking-wide text-xs">E-Scooter bis 22 km/h (eKFV) - Ausland</h3>
                                 </div>
                                 <div className="space-y-4">
                                      <div className="bg-slate-800 text-white p-4 rounded-xl shadow-sm text-sm leading-relaxed">
                                         Fahrzeuge in dieser Kategorie fallen im Grundsatz unter die Vorgaben für Elektrokleinstfahrzeuge in Deutschland, sofern sie hier betrieben werden. 
 <br/>
-                                        <strong>Rechtliche Einstufung:</strong> E-Scooter mit bbH mehr als 6 km/h und max. 20 km/h (inkl. Toleranz 23 km/h). Leistung max. 500 W.
+-	                                        <strong>Rechtliche Einstufung:</strong> E-Scooter mit bbH mehr als 6 km/h und max. 20 km/h (inkl. Toleranz 22 km/h vgl. Anlage 2 Ziff. 2.1.4 eKFV). Leistung max. 500 W. Nichtvorhandensein seines Sitzes (nach Art. 2 (2) VO (EG) Nr. 168/2013). Abmessungen nach § 1(1) Nr. 4 eKFV: Breite max. 700 mm, Höhe max. 1.400 mm, Länge max 2.000 mm
+
 
                                     </div>
 
@@ -4950,19 +4951,19 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                             </div>
                         )}
 
-                        {/* 3. ab 24 km/h (DE) */}
+                        {/* 3. ab 23 km/h (DE) */}
                         {escooterSpeed === 'ab23' && escooterOrigin === 'de' && (
                             <div className="animate-in fade-in">
                                 <div className="flex items-center gap-2 mb-4 text-yellow-600 pb-2 border-b border-slate-50">
                                     <Zap className="w-5 h-5" />
-                                    <h3 className="font-black uppercase tracking-wide text-xs">E-Scooter ab 24 km/h - DE</h3>
+                                    <h3 className="font-black uppercase tracking-wide text-xs">E-Scooter ab 23 km/h - DE</h3>
                                 </div>
                                 <div className="space-y-4">
                                     <div className="bg-slate-800 text-white p-3.5 rounded-xl shadow-sm text-xs flex items-start gap-3">
                                         <Gauge className="w-6 h-6 shrink-0 text-yellow-400 mt-0.5" />
                                         <div>
                                             <span className="font-bold text-sm text-yellow-400">eKFV gilt nicht mehr!</span>
-                                            <p className="font-normal opacity-90 mt-1 leading-relaxed">Fahrzeuge mit einer bbH über 20 km/h fallen aus der eKFV heraus. Es gilt allerdings eine Messtoleranz von 3 km/h zu beachten (somit ab 24 km/h brutto).</p>
+                                            <p className="font-normal opacity-90 mt-1 leading-relaxed">Fahrzeuge mit einer bbH über 20 km/h fallen aus der eKFV heraus. Es gilt allerdings eine Messtoleranz von 2 km/h zu beachten vgl. Anlage 2 Ziff. 2.1.4 eKFV (somit ab 23 km/h brutto).</p>
                                         </div>
                                     </div>
 
@@ -4997,7 +4998,7 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                                         <p className="text-xs text-slate-600 mb-2">Fahrten auf den folgenden Verkehrsflächen sind jedoch zudem bußgeldbewährt: Radweg, Gemeinsamer Geh-/Radweg, Getrennter Rad-/Gehweg, Fußgängerzone, Gehweg, Autobahn, Kraftfahrstraße.</p>
                                     </div>
 
-                                    <h4 className="font-bold text-xs uppercase text-slate-500 mb-2 mt-4">Wichtige Tatbestände (über 23 km/h Inland)</h4>
+                                    <h4 className="font-bold text-xs uppercase text-slate-500 mb-2 mt-4">Wichtige Tatbestände (über 22 km/h Inland)</h4>
                                     <div className="bg-slate-50 p-2 sm:p-3 rounded-xl border border-slate-200 space-y-1">
                                         <BkatRow title="Fahren ohne Licht (bei Dämmerung/Dunkelheit)" fines={[{ role: 'Fahrer', tbnr: '117100', cost: '20 €' }]} />
                                         <BkatRow title="Kleinkraftrad mit defekter Bremse" fines={[{ role: 'Fahrer', tbnr: '341000', cost: '25 €' }, { role: 'Halter', tbnr: '331024', cost: '35 €' }]} />
@@ -5040,19 +5041,19 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                             </div>
                         )}
 
-                        {/* 4. ab 24 km/h (Ausland) */}
+                        {/* 4. ab 23 km/h (Ausland) */}
                         {escooterSpeed === 'ab23' && escooterOrigin === 'aus' && (
                             <div className="animate-in fade-in">
                                 <div className="flex items-center gap-2 mb-4 text-yellow-600 pb-2 border-b border-slate-50">
                                     <Zap className="w-5 h-5" />
-                                    <h3 className="font-black uppercase tracking-wide text-xs">E-Scooter ab 24 km/h - Ausland (z.B. Schweiz)</h3>
+                                    <h3 className="font-black uppercase tracking-wide text-xs">E-Scooter ab 23 km/h - Ausland (z.B. Schweiz)</h3>
                                 </div>
                                 <div className="space-y-4">
                                      <div className="bg-slate-800 text-white p-3.5 rounded-xl shadow-sm text-xs flex items-start gap-3">
                                         <Gauge className="w-6 h-6 shrink-0 text-yellow-400 mt-0.5" />
                                         <div>
                                             <span className="font-bold text-sm text-yellow-400">eKFV gilt nicht mehr!</span>
-                                            <p className="font-normal opacity-90 mt-1 leading-relaxed">Fahrzeuge mit einer bbH über 20 km/h fallen aus der eKFV heraus. Es gilt allerdings eine Messtoleranz von 3 km/h zu beachten (somit ab 24 km/h brutto).</p>
+                                            <p className="font-normal opacity-90 mt-1 leading-relaxed">Fahrzeuge mit einer bbH über 20 km/h fallen aus der eKFV heraus. Es gilt allerdings eine Messtoleranz von 2 km/h zu beachten vgl. Anlage 2 Ziff. 2.1.4 eKFV (somit ab 23 km/h brutto).</p>
                                         </div>
                                     </div>
 
@@ -5087,7 +5088,7 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                                         <p className="text-xs text-slate-600 mb-2">Fahrten auf den folgenden Verkehrsflächen sind jedoch zudem bußgeldbewährt: Radweg, Gemeinsamer Geh-/Radweg, Getrennter Rad-/Gehweg, Fußgängerzone, Gehweg, Autobahn, Kraftfahrstraße.</p>
                                     </div>
 
-                                    <h4 className="font-bold text-xs uppercase text-slate-500 mb-2 mt-4">Wichtige Tatbestände (über 23 km/h Ausland)</h4>
+                                    <h4 className="font-bold text-xs uppercase text-slate-500 mb-2 mt-4">Wichtige Tatbestände (über 22 km/h Ausland)</h4>
                                     <div className="bg-slate-50 p-2 sm:p-3 rounded-xl border border-slate-200 space-y-1">
                                         <div className="mb-2 p-2 bg-yellow-50 border border-yellow-200 rounded-lg text-[10px] text-yellow-800 leading-snug">
                                             <strong>Ahndung von Ausstattungsverstößen:</strong> Die StVZO ist in der Regel auf ausländische Fahrzeuge nicht anwendbar. Es muss auf die StVO ausgewichen werden (Auffangtatbestand TBNr. 123112). Bußgeld manuell anpassen!
