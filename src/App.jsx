@@ -2792,8 +2792,28 @@ function LashingCalculator({ onOpenKnowledge }) {
     // Die benötigte LC ist der Maximalwert aus allen Richtungen
     const diagLC = Math.ceil(Math.max(lcDiagFwd, lcDiagSide, lcDiagRear));
   
+    // --- NEU: LOGIK FÜR FREISTEHENDE LADUNG (MINDESTGURTE GEGEN VERDREHEN) ---
+    let rawMax = Math.max(nForward, nSide, nRear);
+    let finalMinStraps = rawMax;
+    let rotationHint = null;
+
+    if (!fitFront && !fitSide && !fitRear) {
+        if (finalMinStraps < 2) {
+            finalMinStraps = 2;
+            rotationHint = "Da die Ladung freistehend (ohne Formschluss) transportiert wird, sind mindestens 2 Zurrgurte erforderlich, um ein Verdrehen zu verhindern.";
+        }
+    } else if (fitFront && fitSide && fitRear) {
+        // Vollständiger Formschluss: Kein zusätzlicher Gurt gegen Verdrehen nötig
+    } else {
+        if (finalMinStraps < 1) {
+            finalMinStraps = 1;
+            rotationHint = "Da die Ladung nicht zu allen Seiten Formschluss hat, ist mindestens 1 Zurrgurt erforderlich, um ein Verdrehen zu verhindern.";
+        }
+    }
+
     setLashingResult({
       forward: nForward, side: nSide, rear: nRear,
+      finalMinStraps, rotationHint,
       factorForward: accFwd, factorSide: accSide, factorRear: accRear,
       weightClassInfo: !maxWeight ? '< 2000 kg (Standard)' : maxWeight <= 1999 ? '< 2000 kg' : maxWeight <= 3500 ? '2000 - 3500 kg' : '> 3500 kg',
       displayValues: { weightForceN: m * g, c: accFwd, formForceN: (parseFloat(fitFront ? wallFront : 0) * 10), mu, alphaRad, stfNewton: stfInNewton },
@@ -2906,7 +2926,12 @@ function LashingCalculator({ onOpenKnowledge }) {
            </table>
             <div className="print-result-box">
                <div className="print-result-header">Gesamtempfehlung</div>
-               <div>Es sind mindestens <strong>{Math.max(lashingResult.forward, lashingResult.side, lashingResult.rear)}</strong> Zurrgurte (Niederzurren) bei einem Vertikalwinkel von <strong>{angle}°</strong> zu verwenden, um die Ladung in alle Richtungen zu sichern.</div>
+               <div>Es sind mindestens <strong>{lashingResult.finalMinStraps}</strong> Zurrgurte (Niederzurren) bei einem Vertikalwinkel von <strong>{angle}°</strong> zu verwenden, um die Ladung in alle Richtungen zu sichern.</div>
+               {lashingResult.rotationHint && (
+                   <div style={{ marginTop: '8px', fontSize: '11px', color: '#dc2626', fontWeight: 'bold' }}>
+                       Hinweis: {lashingResult.rotationHint}
+                   </div>
+               )}
            </div>
 
            {/* --- START: NEUER BERECHNUNGSNACHWEIS FÜR AUSDRUCK (NIEDERZURREN) --- */}
@@ -3365,11 +3390,21 @@ function LashingCalculator({ onOpenKnowledge }) {
                    ))}
                  </div>
   
-                  <div className="mt-4 p-3 rounded-xl flex items-center justify-between bg-indigo-50 text-indigo-900">
-                    <span className="text-xs font-bold uppercase tracking-wide opacity-70">Minimum:</span>
-                    <div className="text-3xl font-black">
-                       {Math.max(lashingResult.forward, lashingResult.side, lashingResult.rear)} <span className="text-base font-bold opacity-60">Gurte</span>
-                     </div>
+                  <div className="mt-4 p-3 rounded-xl flex flex-col bg-indigo-50 text-indigo-900 border border-indigo-100 shadow-sm">
+                    <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold uppercase tracking-wide opacity-70">Gesamtempfehlung:</span>
+                        <div className="text-3xl font-black">
+                           {lashingResult.finalMinStraps} <span className="text-base font-bold opacity-60">Gurte</span>
+                         </div>
+                    </div>
+                    {lashingResult.rotationHint && (
+                        <div className="mt-3 pt-2 border-t border-indigo-200/60 flex items-start gap-2">
+                            <Info className="w-5 h-5 shrink-0 text-indigo-500 mt-0.5" />
+                            <span className="text-[11px] leading-snug font-medium text-indigo-800">
+                                {lashingResult.rotationHint}
+                            </span>
+                        </div>
+                    )}
                   </div>
                    
                   <LashingFormulaDisplay values={lashingResult.displayValues} details={lashingResult.detailRows} weightClass={lashingResult.weightClass} />
