@@ -424,7 +424,7 @@ const HeaderLogo = () => {
             {isDarkMode ? <Sun className="w-4 h-4 text-yellow-300" /> : <Moon className="w-4 h-4 text-white" />}
         </button>
         <span className="text-base font-black text-white/50 tracking-wider italic select-none border border-white/20 px-3 py-1 rounded-md backdrop-blur-sm">
-            Demel
+           POK Demel
         </span>
     </div>
   );
@@ -432,7 +432,7 @@ const HeaderLogo = () => {
 
 const AppVersionFooter = () => (
     <div className="text-center text-[10px] text-slate-300 font-mono py-2 select-none no-print">
-        RoadTool v. 3.5
+        RoadTool v. 3.6
     </div>
 );
 
