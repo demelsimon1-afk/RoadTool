@@ -584,7 +584,7 @@ const BkatRow = ({ title, fines }) => (
                     <div className="flex items-center gap-1.5 text-[10px] font-mono px-2 py-1">
                         {fine.role && <span className="font-bold text-slate-400 uppercase">{fine.role}</span>}
                         <span>{fine.tbnr}</span>
-                        <span>? <strong className={`${fine.cost === 'Straftat' ? 'text-purple-600' : 'text-red-600'}`}>{fine.cost}</strong></span>
+                        <span>- <strong className={`${fine.cost === 'Straftat' ? 'text-purple-600' : 'text-red-600'}`}>{fine.cost}</strong></span>
                         {fine.points && fine.points !== '' && fine.points !== '-' && (
                             <span className="text-[9px] font-bold text-amber-500 uppercase ml-0.5">{fine.points}</span>
                         )}
@@ -1348,7 +1348,7 @@ function SpeedCalculator() {
                 tolerance = Math.ceil(measured * 0.03);
                 const tolRaw = (measured * 0.03).toFixed(2).replace('.', ',');
                 calcDetails.push({ label: 'Bruttowert', value: `${measured} km/h` });
-                calcDetails.push({ label: `Toleranz (3% von ${measured})`, value: `${tolRaw} ? - ${tolerance} km/h` });
+                calcDetails.push({ label: `Toleranz (3% von ${measured})`, value: `${tolRaw} ➔ - ${tolerance} km/h` });
                 calcDetails.push({ label: 'Vorwerfbar (Netto)', value: `= ${measured - tolerance} km/h`, isBold: true });
             }
             netSpeed = measured - tolerance;
@@ -2242,7 +2242,7 @@ function OverloadCalculator({ onSwitch }) {
                 
                <PrintFormulaDisplay result={result.vehicle1} />
  
-               {checkConfiscation(result.vehicle1) && <div className="print-warning" style={{marginTop: '5px'}}>?? Einziehung möglich!</div>}
+               {checkConfiscation(result.vehicle1) && <div className="print-warning" style={{marginTop: '5px'}}>⚠️ Einziehung möglich!</div>}
                <PrintFineDisplay result={result.vehicle1} isTrailer={false} isCombination={false} />
            </div>
  
@@ -2254,7 +2254,7 @@ function OverloadCalculator({ onSwitch }) {
                 
                <PrintFormulaDisplay result={result.vehicle2} />
  
-               {checkConfiscation(result.vehicle2) && <div className="print-warning" style={{marginTop: '5px'}}>?? Einziehung möglich!</div>}
+               {checkConfiscation(result.vehicle2) && <div className="print-warning" style={{marginTop: '5px'}}>⚠️ Einziehung möglich!</div>}
                <PrintFineDisplay result={result.vehicle2} isTrailer={true} isCombination={false} />
            </div>
             )}
@@ -2273,7 +2273,7 @@ function OverloadCalculator({ onSwitch }) {
                 
                <PrintFormulaDisplay result={result.total} />
  
-               {checkConfiscation(result.total) && <div className="print-warning" style={{marginTop: '5px'}}>?? Einziehung möglich!</div>}
+               {checkConfiscation(result.total) && <div className="print-warning" style={{marginTop: '5px'}}>⚠️ Einziehung möglich!</div>}
                <PrintFineDisplay result={result.total} isTrailer={false} isCombination={true} />
            </div>
             )}
@@ -2442,7 +2442,7 @@ function OverloadCalculator({ onSwitch }) {
                         {checkConfiscation(result.vehicle1) && (
                             <div className="mt-2 bg-red-100 border border-red-300 text-red-800 px-2 py-1.5 rounded-lg text-[10px] font-bold flex items-center justify-center gap-1.5 animate-pulse uppercase tracking-wide shadow-sm">
                                 <AlertTriangle className="w-4 h-4 shrink-0" />
-                                 <span>?? Einziehung möglich!</span>
+                                 <span>⚠️ Einziehung möglich!</span>
                             </div>
                         )}
  
@@ -2474,7 +2474,7 @@ function OverloadCalculator({ onSwitch }) {
                         {checkConfiscation(result.vehicle2) && (
                             <div className="mt-2 bg-red-100 border border-red-300 text-red-800 px-2 py-1.5 rounded-lg text-[10px] font-bold flex items-center justify-center gap-1.5 animate-pulse uppercase tracking-wide shadow-sm">
                                 <AlertTriangle className="w-4 h-4 shrink-0" />
-                                 <span>?? Einziehung möglich!</span>
+                                 <span>⚠️ Einziehung möglich!</span>
                             </div>
                         )}
  
@@ -2522,7 +2522,7 @@ function OverloadCalculator({ onSwitch }) {
                     {checkConfiscation(result.total) && (
                         <div className="mt-4 bg-red-100 border border-red-400 text-red-800 px-3 py-2.5 rounded-xl text-xs font-black flex items-center justify-center gap-2 animate-pulse uppercase tracking-widest shadow-inner">
                             <AlertTriangle className="w-5 h-5 shrink-0" />
-                            <span>?? Einziehung möglich!</span>
+                            <span>⚠️ Einziehung möglich!</span>
                         </div>
                     )}
  
@@ -2972,7 +2972,7 @@ function LashingCalculator({ onOpenKnowledge }) {
                                            <td>{Math.round(numN / 10).toLocaleString()} daN</td>
                                            <td>{Math.round((appliedStraps * strapForceN) / 10).toLocaleString()} daN</td>
                                            <td className={isEinziehung ? 'print-warning' : ''}><strong>{percentage.toFixed(1)} %</strong></td>
-                                           <td className={isEinziehung ? 'print-warning' : ''}><strong>{isEinziehung ? '?? JA (= 30%)' : 'NEIN'}</strong></td>
+                                           <td className={isEinziehung ? 'print-warning' : ''}><strong>{isEinziehung ? '⚠️ JA (≥ 30%)' : 'NEIN'}</strong></td>
                                        </tr>
                                    );
                                };
@@ -3867,10 +3867,6 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
   const [taxiView, setTaxiView] = useState('taxi'); 
   const [sozialView, setSozialView] = useState('gueterverkehr'); 
   
-  // NEUE STATES FÜR DEN ÜBERSETZUNGS-ASSISTENTEN
-  const [transTopic, setTransTopic] = useState(null); 
-  const [transLang, setTransLang] = useState(null); 
-  
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [reifenExpanded, setReifenExpanded] = useState({ profil: true, winter: false, spikes: false });
 
@@ -3881,7 +3877,7 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
   // Automatisches Scrollen nach ganz oben, wenn das Register gewechselt wird
   useEffect(() => {
       window.scrollTo(0, 0);
-  }, [view, kzView, alkDroView, kcangView, lasiAblegereife, escooterSpeed, escooterOrigin, kindersitzView, ebikeView, taxiView, sozialView, transTopic, transLang]);
+  }, [view, kzView, alkDroView, kcangView, lasiAblegereife, escooterSpeed, escooterOrigin, kindersitzView, ebikeView, taxiView, sozialView]);
 
   const tabs = [
       { id: 'blut', label: 'Blutentnahme', icon: Syringe, color: 'text-red-500', bg: 'bg-red-50' },
@@ -3900,8 +3896,7 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
       { id: 'rauchverbot', label: 'Rauchverbot', icon: CigaretteOff, color: 'text-slate-500', bg: 'bg-slate-100' },
       { id: 'reifen', label: 'Reifen', icon: CircleDashed, color: 'text-slate-600', bg: 'bg-slate-100' },
       { id: 'sozial', label: 'Sozialvorschriften', icon: Truck, color: 'text-orange-500', bg: 'bg-orange-50' },
-      { id: 'taxi', label: 'Taxi / Mietwagen', icon: Briefcase, color: 'text-blue-500', bg: 'bg-blue-50' },
-      { id: 'uebersetzungen', label: 'Übersetzungen', icon: Globe, color: 'text-sky-500', bg: 'bg-sky-50' }
+      { id: 'taxi', label: 'Taxi / Mietwagen', icon: Briefcase, color: 'text-blue-500', bg: 'bg-blue-50' }
   ];
 
   return (
@@ -5603,7 +5598,7 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                                     <Info className="w-5 h-5 shrink-0 text-teal-600 mt-0.5" />
                                     <div>
                                         Müssen <strong>nicht fest</strong> mit dem Fahrzeug verbunden sein.<br/>
-                                        ? Eine Urkundenfälschung ist in diesem Fall <strong>nicht</strong> möglich.
+                                        ➔ Eine Urkundenfälschung ist in diesem Fall <strong>nicht</strong> möglich.
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-3 bg-amber-50 p-3 rounded-xl border border-amber-100 mb-5 text-xs text-amber-900 font-medium shadow-sm">
@@ -5639,7 +5634,7 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                                     <AlertTriangle className="w-5 h-5 shrink-0 text-red-600 mt-0.5" />
                                     <div>
                                         Müssen <strong>fest</strong> mit dem Fahrzeug verbunden sein!<br/>
-                                        ? Eine Urkundenfälschung ist hier <strong>MÖGLICH</strong>.
+                                        ➔ Eine Urkundenfälschung ist hier <strong>MÖGLICH</strong>.
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-3 bg-amber-50 p-3 rounded-xl border border-amber-100 mb-5 text-xs text-amber-900 font-medium shadow-sm">
@@ -5996,8 +5991,8 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                                         <span className="font-bold text-slate-800 text-xs uppercase block mb-1">Drei-Punkt-Zurrgurte & Controller</span>
                                         <ul className="text-[11px] text-slate-600 list-disc list-inside space-y-0.5">
                                             <li><strong className="text-slate-700">LC:</strong> mind. 1500 daN | <strong className="text-slate-700">STF:</strong> mind. 330 daN</li>
-                                            <li><strong className="text-slate-700">Gurtband-Dehnung:</strong> = 4 %</li>
-                                            <li><strong className="text-slate-700">Controller (ETA-Wert):</strong> Übertragungswert ? = 0,5</li>
+                                            <li><strong className="text-slate-700">Gurtband-Dehnung:</strong> ≤ 4 %</li>
+                                            <li><strong className="text-slate-700">Controller (ETA-Wert):</strong> Übertragungswert k ≥ 0,5</li>
                                             <li><strong className="text-slate-700">Controller-Länge:</strong> mind. halber Radumfang (180°)</li>
                                         </ul>
                                     </div>
@@ -6735,285 +6730,6 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                     </div>
                  </div>
             )}
-
-            {/* ÜBERSETZUNGEN (3-Stufen Assistent) */}
-            {view === 'uebersetzungen' && (() => {
-                const LANGS = [
-                    { id: 'EN', label: 'Englisch', flag: '????' },
-                    { id: 'FR', label: 'Französisch', flag: '????' },
-                    { id: 'ES', label: 'Spanisch', flag: '????' },
-                    { id: 'IT', label: 'Italienisch', flag: '????' },
-                    { id: 'RU', label: 'Russisch', flag: '????' },
-                    { id: 'PL', label: 'Polnisch', flag: '????' },
-                    { id: 'RO', label: 'Rumänisch', flag: '????' },
-                    { id: 'TR', label: 'Türkisch', flag: '????' },
-                    { id: 'SLO', label: 'Slowenisch', flag: '????' },
-                    { id: 'HU', label: 'Ungarisch', flag: '????' },
-                    { id: 'UK', label: 'Ukrainisch', flag: '????' },
-                    { id: 'HI', label: 'Hindi (Indisch)', flag: '????' },
-                ];
-
-                const TRANSLATIONS = {
-                    lasi: [
-                        {
-                            de: "Ihre Ladung ist nicht ausreichend gesichert.",
-                            EN: "Your load is not adequately secured.",
-                            FR: "Votre chargement n'est pas suffisamment arrimé.",
-                            ES: "Su carga no está suficientemente asegurada.",
-                            IT: "Il suo carico non è fissato adeguatamente.",
-                            RU: "??? ???? ???????????? ?????????.",
-                            PL: "Pana ladunek nie jest odpowiednio zabezpieczony.",
-                            RO: "Încarcatura dvs. nu este asigurata corespunzator.",
-                            TR: "Yükünüz yeterince sabitlenmemis.",
-                            SLO: "Vaš tovor ni ustrezno pritrjen.",
-                            HU: "A rakománya nincs megfeleloen rögzítve.",
-                            UK: "??? ?????? ??????????? ???????????.",
-                            HI: "???? ??? ??? ?? ???????? ???? ???"
-                        },
-                        {
-                            de: "Sie müssen weitere Zurrgurte anbringen.",
-                            EN: "You must attach additional lashing straps.",
-                            FR: "Vous devez attacher des sangles d'arrimage supplémentaires.",
-                            ES: "Debe colocar eslingas adicionales.",
-                            IT: "Deve applicare cinghie di ancoraggio aggiuntive.",
-                            RU: "?? ?????? ????????? ?????????????? ?????.",
-                            PL: "Musi pan zalozyc dodatkowe pasy mocujace.",
-                            RO: "Trebuie sa ata?a?i chingi suplimentare.",
-                            TR: "Ekstra gergi kayisi takmalisiniz.",
-                            SLO: "Pritrditi morate dodatne povezovalne trakove.",
-                            HU: "További rögzíto hevedereket kell felhelyeznie.",
-                            UK: "?? ??????? ????????? ????????? ??????.",
-                            HI: "???? ???????? ???????? ????? ??????"
-                        },
-                        {
-                            de: "Weiterfahrt untersagt, bis die Ladung gesichert ist.",
-                            EN: "Further travel is prohibited until the load is secured.",
-                            FR: "Interdiction de poursuivre la route jusqu'à ce que le chargement soit arrimé.",
-                            ES: "Prohibido continuar el viaje hasta que la carga esté asegurada.",
-                            IT: "Divieto di proseguire il viaggio finché il carico non è fissato.",
-                            RU: "?????????? ???????? ????????? ?? ??????????? ?????.",
-                            PL: "Zakaz dalszej jazdy do momentu zabezpieczenia ladunku.",
-                            RO: "Continuarea calatoriei este interzisa pâna la asigurarea încarcaturii.",
-                            TR: "Yük sabitlenene kadar yola devam etmeniz yasaktir.",
-                            SLO: "Nadaljnja vožnja je prepovedana, dokler tovor ni pritrjen.",
-                            HU: "A továbbhaladás tilos, amíg a rakomány nincs rögzítve.",
-                            UK: "????????? ??? ?????????? ?? ??????????? ???????.",
-                            HI: "??? ???????? ???? ?? ??? ?? ?????? ?????? ???"
-                        }
-                    ],
-                    ueberladung: [
-                        {
-                            de: "Ihr Fahrzeug ist überladen.",
-                            EN: "Your vehicle is overloaded.",
-                            FR: "Votre véhicule est en surcharge.",
-                            ES: "Su vehículo está sobrecargado.",
-                            IT: "Il suo veicolo è sovraccarico.",
-                            RU: "???? ???????????? ???????? ???????????.",
-                            PL: "Pana pojazd jest przeladowany.",
-                            RO: "Vehiculul dumneavoastra este supraîncarcat.",
-                            TR: "Araciniz asiri yüklü.",
-                            SLO: "Vaše vozilo je preobremenjeno.",
-                            HU: "A jármuve túl van terhelve.",
-                            UK: "??? ???????????? ????? ??????????????.",
-                            HI: "???? ???? ?????? ???"
-                        },
-                        {
-                            de: "Sie müssen Ladung abladen oder umladen.",
-                            EN: "You must reload or unload the cargo.",
-                            FR: "Vous devez transborder ou décharger.",
-                            ES: "Debe recargar o descargar.",
-                            IT: "Deve ricaricare o scaricare il carico.",
-                            RU: "?? ?????? ??????????? ??? ????????? ????.",
-                            PL: "Musi pan przeladowac lub rozladowac ladunek.",
-                            RO: "Trebuie sa reîncarca?i sau sa descarca?i.",
-                            TR: "Yükü aktarmali veya indirmelisiniz.",
-                            SLO: "Tovor morate preložiti ali razložiti.",
-                            HU: "Át kell raknia vagy le kell pakolnia a rakományt.",
-                            UK: "?? ??????? ????????????? ??? ??????????? ??????.",
-                            HI: "???? ??? ?????? ?? ??? ?? ??? ???? ?????"
-                        },
-                        {
-                            de: "Sie müssen eine Sicherheitsleistung (Kaution) bezahlen.",
-                            EN: "You have to pay a security deposit (fine).",
-                            FR: "Vous devez payer une amende (caution).",
-                            ES: "Debe pagar una multa (fianza).",
-                            IT: "Deve pagare una multa (cauzione).",
-                            RU: "?? ?????? ???????? ????? (?????).",
-                            PL: "Musi pan zaplacic mandat (kaucje).",
-                            RO: "Trebuie sa plati?i o amenda (cau?iune).",
-                            TR: "Para cezasi (depozito) ödemelisiniz.",
-                            SLO: "Placati morate globo (kavcijo).",
-                            HU: "Bírságot (kauciót) kell fizetnie.",
-                            UK: "?? ??????? ???????? ????? (???????).",
-                            HI: "???? ???????? (?????) ???? ?????"
-                        }
-                    ],
-                    mangel: [
-                        {
-                            de: "An Ihrem Fahrzeug liegt ein technischer Mangel vor.",
-                            EN: "There is a technical defect on your vehicle.",
-                            FR: "Il y a un défaut technique sur votre véhicule.",
-                            ES: "Hay un defecto técnico en su vehículo.",
-                            IT: "C'è un difetto tecnico nel suo veicolo.",
-                            RU: "? ????? ???????????? ???????? ??????? ??????????? ?????????????.",
-                            PL: "W panskim pojezdzie wystapila usterka techniczna.",
-                            RO: "Exista o defec?iune tehnica la vehiculul dumneavoastra.",
-                            TR: "Aracinizda teknik bir ariza var.",
-                            SLO: "Na vašem vozilu je tehnicna napaka.",
-                            HU: "Muszaki hiba van a jármuvén.",
-                            UK: "? ?????? ????????????? ?????? ? ???????? ????????????.",
-                            HI: "???? ???? ??? ?? ?????? ????? ???"
-                        },
-                        {
-                            de: "Die Reifen haben zu wenig Profil.",
-                            EN: "The tires do not have enough tread.",
-                            FR: "Les pneus n'ont pas assez de bande de roulement.",
-                            ES: "Los neumáticos no tienen suficiente banda de rodadura.",
-                            IT: "I pneumatici non hanno abbastanza battistrada.",
-                            RU: "???? ????? ????????????? ?????????.",
-                            PL: "Opony maja za malo bieznika.",
-                            RO: "Anvelopele nu au suficient profil.",
-                            TR: "Lastiklerin dis derinligi yetersiz.",
-                            SLO: "Pnevmatike nimajo dovolj profila.",
-                            HU: "A gumiabroncsok profilmélysége nem elegendo.",
-                            UK: "???? ????? ??????????? ?????????.",
-                            HI: "?????? ??? ???????? ????? ???? ???"
-                        },
-                        {
-                            de: "Die Bremsen sind defekt, die Weiterfahrt ist untersagt.",
-                            EN: "The brakes are defective, further travel is prohibited.",
-                            FR: "Les freins sont défectueux, il est interdit de continuer à rouler.",
-                            ES: "Los frenos están defectuosos, se prohíbe continuar el viaje.",
-                            IT: "I freni sono difettosi, è vietato proseguire il viaggio.",
-                            RU: "??????? ??????????, ?????????? ???????? ?????????.",
-                            PL: "Hamulce sa uszkodzone, zakaz dalszej jazdy.",
-                            RO: "Frânele sunt defecte, continuarea calatoriei este interzisa.",
-                            TR: "Frenler arizali, yola devam etmeniz yasaktir.",
-                            SLO: "Zavore so pokvarjene, nadaljnja vožnja je prepovedana.",
-                            HU: "A fékek hibásak, a továbbhaladás tilos.",
-                            UK: "?????? ?????????, ????????? ??? ??????????.",
-                            HI: "????? ???? ???, ??? ?? ?????? ?????? ???"
-                        }
-                    ]
-                };
-
-                // SCHRITT 1: Themengebiet wählen
-                if (!transTopic) {
-                    return (
-                        <div className="space-y-4 animate-in fade-in">
-                            <div className="flex items-center gap-2 mb-4 text-sky-700 pb-2 border-b border-slate-200">
-                                <Globe className="w-5 h-5" />
-                                <h3 className="font-black uppercase tracking-wide text-xs">Schritt 1: Thema wählen</h3>
-                            </div>
-                            
-                            <div className="grid grid-cols-1 gap-3">
-                                <button onClick={() => setTransTopic('lasi')} className="bg-white border-2 border-slate-100 hover:border-indigo-400 p-4 rounded-2xl flex items-center gap-4 transition-all shadow-sm active:scale-95 group">
-                                    <div className="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform"><LashingStrapIcon className="w-7 h-7" /></div>
-                                    <div className="text-left">
-                                        <h4 className="font-black text-slate-800 text-lg uppercase tracking-wide">Ladungssicherung</h4>
-                                        <p className="text-xs text-slate-500 font-medium">Gurte, Antirutschmatte, Weiterfahrt</p>
-                                    </div>
-                                </button>
-                                
-                                <button onClick={() => setTransTopic('ueberladung')} className="bg-white border-2 border-slate-100 hover:border-blue-400 p-4 rounded-2xl flex items-center gap-4 transition-all shadow-sm active:scale-95 group">
-                                    <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform"><Scale className="w-7 h-7" /></div>
-                                    <div className="text-left">
-                                        <h4 className="font-black text-slate-800 text-lg uppercase tracking-wide">Überladung</h4>
-                                        <p className="text-xs text-slate-500 font-medium">Abladen, Bußgeld, Kaution</p>
-                                    </div>
-                                </button>
-                                
-                                <button onClick={() => setTransTopic('mangel')} className="bg-white border-2 border-slate-100 hover:border-red-400 p-4 rounded-2xl flex items-center gap-4 transition-all shadow-sm active:scale-95 group">
-                                    <div className="w-14 h-14 bg-red-50 text-red-600 rounded-full flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform"><AlertTriangle className="w-7 h-7" /></div>
-                                    <div className="text-left">
-                                        <h4 className="font-black text-slate-800 text-lg uppercase tracking-wide">Technischer Mangel</h4>
-                                        <p className="text-xs text-slate-500 font-medium">Reifen, Bremsen, Defekte</p>
-                                    </div>
-                                </button>
-                            </div>
-                        </div>
-                    );
-                }
-
-                // SCHRITT 2: Sprache wählen
-                if (transTopic && !transLang) {
-                    const topicName = transTopic === 'lasi' ? 'Ladungssicherung' : transTopic === 'ueberladung' ? 'Überladung' : 'Technischer Mangel';
-                    const iconColor = transTopic === 'lasi' ? 'text-indigo-600 bg-indigo-50' : transTopic === 'ueberladung' ? 'text-blue-600 bg-blue-50' : 'text-red-600 bg-red-50';
-                    
-                    return (
-                        <div className="space-y-4 animate-in slide-in-from-right-2">
-                            <button onClick={() => setTransTopic(null)} className="flex items-center gap-2 text-slate-500 hover:text-slate-800 text-sm font-bold bg-white px-3 py-2 rounded-xl shadow-sm border border-slate-200 w-full transition-colors">
-                                <ChevronLeft className="w-5 h-5" /> Zurück zur Themenauswahl
-                            </button>
-                            
-                            <div className="flex items-center gap-3 mb-4 bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${iconColor}`}>
-                                    {transTopic === 'lasi' ? <LashingStrapIcon className="w-5 h-5" /> : transTopic === 'ueberladung' ? <Scale className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />}
-                                </div>
-                                <div>
-                                    <span className="text-[10px] text-slate-400 font-bold uppercase block mb-0.5">Schritt 2: Sprache wählen für</span>
-                                    <h3 className="font-black uppercase tracking-wide text-slate-800 text-sm">{topicName}</h3>
-                                </div>
-                            </div>
-                            
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                                {LANGS.map(lang => (
-                                    <button
-                                        key={lang.id}
-                                        onClick={() => setTransLang(lang.id)}
-                                        className="bg-white border-2 border-slate-100 hover:border-sky-400 p-3 rounded-xl flex flex-col items-center justify-center gap-2 shadow-sm transition-all active:scale-95"
-                                    >
-                                        <span className="text-3xl drop-shadow-sm">{lang.flag}</span>
-                                        <span className="font-bold text-slate-700 text-xs">{lang.label}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    );
-                }
-
-                // SCHRITT 3: Fertige Sätze anzeigen
-                if (transTopic && transLang) {
-                    const topicName = transTopic === 'lasi' ? 'Ladungssicherung' : transTopic === 'ueberladung' ? 'Überladung' : 'Technischer Mangel';
-                    const currentLangObj = LANGS.find(l => l.id === transLang);
-                    const sentences = TRANSLATIONS[transTopic];
-
-                    return (
-                        <div className="space-y-4 animate-in slide-in-from-right-2">
-                            <button onClick={() => setTransLang(null)} className="flex items-center gap-2 text-slate-500 hover:text-slate-800 text-sm font-bold bg-white px-3 py-2 rounded-xl shadow-sm border border-slate-200 w-full transition-colors">
-                                <ChevronLeft className="w-5 h-5" /> Zurück zur Sprachauswahl
-                            </button>
-                            
-                            <div className="flex items-center justify-between mb-4 bg-sky-50 border border-sky-200 p-3 rounded-xl shadow-sm">
-                                <div className="flex flex-col">
-                                    <span className="text-[10px] text-sky-600 font-bold uppercase block mb-0.5">{topicName}</span>
-                                    <h3 className="font-black text-sky-900 text-lg flex items-center gap-2">
-                                        <span className="text-2xl leading-none">{currentLangObj.flag}</span> {currentLangObj.label}
-                                    </h3>
-                                </div>
-                                <Globe className="w-8 h-8 text-sky-200" />
-                            </div>
-                            
-                            <div className="space-y-3">
-                                {sentences.map((sentence, idx) => (
-                                    <div key={idx} className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
-                                        <div className="text-xs text-slate-500 font-medium mb-3 pb-2 border-b border-slate-100 flex items-start gap-2">
-                                            <span className="text-slate-300 font-black">DE</span>
-                                            {sentence.de}
-                                        </div>
-                                        <div className="flex items-start gap-3">
-                                            <span className="text-sky-600 font-black mt-0.5">{currentLangObj.id}</span>
-                                            <div className="font-black text-slate-800 text-base leading-snug">
-                                                {sentence[transLang]}
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    );
-                }
-            })()}
       </div>
       <AppVersionFooter />
     </div>
@@ -7420,7 +7136,7 @@ const HomeView = ({ onSelect }) => {
     const dateTime = useDateTime();
     
     // --- HIER UPDATE TEXT EINTRAGEN ---
-    const updateText = "?? Update 3.5: Geschwindigkeitsreiter innerorts/außerorts auf PKW mit Anhänger und LKW erweitert";
+    const updateText = "‼️ Update 3.5: Geschwindigkeitsreiter innerorts/außerorts auf PKW mit Anhänger und LKW erweitert";
 
     const tiles = [
         { id: 'age', title: 'Altersrechner', icon: Calendar, color: 'text-purple-500', bg: 'bg-purple-50', desc: '' },
