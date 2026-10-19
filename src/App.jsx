@@ -424,7 +424,7 @@ const HeaderLogo = () => {
             {isDarkMode ? <Sun className="w-4 h-4 text-yellow-300" /> : <Moon className="w-4 h-4 text-white" />}
         </button>
         <span className="text-base font-black text-white/50 tracking-wider italic select-none border border-white/20 px-3 py-1 rounded-md backdrop-blur-sm">
-            Demel
+            POK Demel
         </span>
     </div>
   );
@@ -432,7 +432,7 @@ const HeaderLogo = () => {
 
 const AppVersionFooter = () => (
     <div className="text-center text-[10px] text-slate-300 font-mono py-2 select-none no-print">
-        RoadTool v. 3.5
+        RoadTool v. 3.6
     </div>
 );
 
@@ -4703,11 +4703,12 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
             {view === 'escooter' && (
                 <div className="space-y-3 animate-in fade-in">
                     
-                    {/* Speed Navigation */}
+                    {/* Speed / Category Navigation */}
                     <div className="flex gap-2">
                         {[
                             { id: 'bis22', label: 'bbH bis 22 km/h' },
-                            { id: 'ab23', label: 'bbH ab 23 km/h' }
+                            { id: 'ab23', label: 'bbH ab 23 km/h' },
+                            { id: 'tuning', label: 'Tuning' }
                         ].map(sub => (
                             <button
                                 key={sub.id}
@@ -4719,21 +4720,23 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                         ))}
                     </div>
 
-                    {/* Origin Navigation */}
-                    <div className="flex gap-2 mb-2">
-                        {[
-                            { id: 'de', label: 'Deutschland' },
-                            { id: 'aus', label: 'Ausland' }
-                        ].map(sub => (
-                            <button
-                                key={sub.id}
-                                onClick={() => setEscooterOrigin(sub.id)}
-                                className={`flex-1 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all border ${escooterOrigin === sub.id ? 'bg-slate-700 text-white border-slate-700 shadow-sm' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}`}
-                            >
-                                {sub.label}
-                            </button>
-                        ))}
-                    </div>
+                    {/* Origin Navigation (nur bei Geschwindigkeits-Reitern anzeigen) */}
+                    {escooterSpeed !== 'tuning' && (
+                        <div className="flex gap-2 mb-2">
+                            {[
+                                { id: 'de', label: 'Deutschland' },
+                                { id: 'aus', label: 'Ausland' }
+                            ].map(sub => (
+                                <button
+                                    key={sub.id}
+                                    onClick={() => setEscooterOrigin(sub.id)}
+                                    className={`flex-1 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all border ${escooterOrigin === sub.id ? 'bg-slate-700 text-white border-slate-700 shadow-sm' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}`}
+                                >
+                                    {sub.label}
+                                </button>
+                            ))}
+                        </div>
+                    )}
 
                     <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-100">
                         
@@ -5126,6 +5129,19 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                                             </ul>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* 5. Tuning (Noch ohne Inhalt) */}
+                        {escooterSpeed === 'tuning' && (
+                            <div className="animate-in fade-in">
+                                <div className="flex items-center gap-2 mb-4 text-yellow-600 pb-2 border-b border-slate-50">
+                                    <Settings className="w-5 h-5" />
+                                    <h3 className="font-black uppercase tracking-wide text-xs">E-Scooter - Tuning</h3>
+                                </div>
+                                <div className="py-8 text-center text-slate-400 text-xs font-medium italic">
+                                    Inhalt folgt...
                                 </div>
                             </div>
                         )}
