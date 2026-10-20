@@ -432,7 +432,7 @@ const HeaderLogo = () => {
 
 const AppVersionFooter = () => (
     <div className="text-center text-[10px] text-slate-300 font-mono py-2 select-none no-print">
-        RoadTool v. 3.5
+        RoadTool v. 3.7
     </div>
 );
 
@@ -469,6 +469,7 @@ const LashingDetailTable = ({ data }) => (
           <th className="pb-1 font-bold hidden sm:table-cell">Winkel a</th>
           <th className="pb-1 font-bold">Formschluss</th>
           <th className="pb-1 font-bold">F<sub>Form</sub> (daN)</th>
+          <th className="pb-1 font-bold">f<sub>s</sub></th>
           <th className="pb-1 text-right font-black">Ergebnis</th>
         </tr>
       </thead>
@@ -481,6 +482,7 @@ const LashingDetailTable = ({ data }) => (
                 <td className="py-1.5 hidden sm:table-cell">{row.angle}°</td>
                 <td className="py-1.5">{row.hasFit ? <span className="text-emerald-600 font-bold flex items-center gap-1"><CheckCircle className="w-3 h-3"/> Ja</span> : <span className="text-slate-400 text-[10px]">Nein</span>}</td>
                 <td className="py-1.5">{row.force}</td>
+                <td className="py-1.5 font-mono">{row.safetyFactor ? row.safetyFactor.toString().replace('.', ',') : '-'}</td>
                 <td className="py-1.5 text-right font-black">{row.result} Gurte</td>
             </tr>
         ))}
@@ -508,7 +510,8 @@ const CalculationToggle = ({ children, label = "Rechenweg anzeigen", forceOpen =
 const LashingFormulaDisplay = ({ values, details, weightClass }) => {
   if (!values) return null;
   const { weightForceN, c, formForceN, mu, alphaRad, stfNewton } = values;
-  const factor = (!weightClass || weightClass <= 3500) ? "1,8" : "2";
+  const isSpecial = !weightClass || weightClass <= 3500;
+  const factor = isSpecial ? "1,8" : "2";
 
   return (
     <CalculationToggle>
@@ -516,9 +519,19 @@ const LashingFormulaDisplay = ({ values, details, weightClass }) => {
             <div className="flex items-center gap-2 mb-2 font-bold text-slate-500 uppercase text-[10px]"><Calculator className="w-3 h-3" /><span>Berechnungsformel (Niederzurren)</span></div>
             <div className="mb-2 pb-3">
                 <div className="text-[10px] text-slate-400 font-bold mb-1 text-center uppercase">
-                    {(!weightClass || weightClass <= 3500) ? 'Berechnung nach Spezialformel (< 3,5t)' : 'Berechnung nach VDI 2700 / DIN EN 12195-1'}
+                    {isSpecial ? 'Berechnung nach Spezialformel (≤ 3,5t)' : 'Berechnung nach VDI 2700 / DIN EN 12195-1 (> 3,5t)'}
                 </div>
-                <FormulaFraction label={<span className="italic">n</span>} equals="=" numerator={<span>(F<sub>G</sub> · c) - F<sub>Form</sub> - (F<sub>G</sub> · µ)</span>} denominator={<span>{factor} · µ · sin(a) · STF</span>} />
+                <FormulaFraction 
+                    label={<span className="italic">n</span>} 
+                    equals="=" 
+                    numerator={<span>((F<sub>G</sub> · c) - F<sub>Form</sub> - (F<sub>G</sub> · µ)){!isSpecial && <span> · f<sub>s</sub></span>}</span>} 
+                    denominator={<span>{factor} · µ · sin(a) · STF</span>} 
+                />
+                {!isSpecial && (
+                    <div className="text-[10px] text-slate-500 text-center mt-2 bg-white py-1 px-2 rounded border border-slate-200 mx-auto w-max font-mono">
+                        Sicherheitsbeiwert f<sub>s</sub>: Vorne = <strong>1,25</strong> | Seite & Hinten = <strong>1,1</strong>
+                    </div>
+                )}
             </div>
             {details && <LashingDetailTable data={details} />}
         </div>
@@ -2792,6 +2805,8 @@ function LashingCalculator({ onOpenKnowledge }) {
     // Die benötigte LC ist der Maximalwert aus allen Richtungen
     const diagLC = Math.ceil(Math.max(lcDiagFwd, lcDiagSide, lcDiagRear));
   
+    const isSpecialFormula = !maxWeight || maxWeight <= 3500;
+
     setLashingResult({
       forward: nForward, side: nSide, rear: nRear,
       factorForward: accFwd, factorSide: accSide, factorRear: accRear,
@@ -2803,9 +2818,9 @@ function LashingCalculator({ onOpenKnowledge }) {
       lcDiagFwd, lcDiagSide, lcDiagRear,
       diagonalLC: diagLC,
       detailRows: [
-        { label: 'Vorne', mu: mu, c: accFwd, angle: angle, hasFit: fitFront, force: fitFront ? wallFront : 0, result: nForward },
-        { label: 'Seite', mu: mu, c: accSide, angle: angle, hasFit: fitSide, force: fitSide ? wallSide : 0, result: nSide },
-        { label: 'Hinten', mu: mu, c: accRear, angle: angle, hasFit: fitRear, force: fitRear ? wallRear : 0, result: nRear },
+        { label: 'Vorne', mu: mu, c: accFwd, angle: angle, hasFit: fitFront, force: fitFront ? wallFront : 0, safetyFactor: isSpecialFormula ? 1.0 : 1.25, result: nForward },
+        { label: 'Seite', mu: mu, c: accSide, angle: angle, hasFit: fitSide, force: fitSide ? wallSide : 0, safetyFactor: isSpecialFormula ? 1.0 : 1.1, result: nSide },
+        { label: 'Hinten', mu: mu, c: accRear, angle: angle, hasFit: fitRear, force: fitRear ? wallRear : 0, safetyFactor: isSpecialFormula ? 1.0 : 1.1, result: nRear },
       ]
     });
   }, [loadWeight, friction, stf, angle, angleBeta, allowedWeight, emptyWeight, fitFront, fitSide, fitRear, wallFront, wallSide, wallRear, bodyCert]);
@@ -2897,16 +2912,28 @@ function LashingCalculator({ onOpenKnowledge }) {
         <>
             <h2 className="print-section">Ergebnis: Erforderliche Gurte</h2>
             <table className="print-table">
-               <thead><tr><th>Richtung</th><th>Berechnungsfaktor (c)</th><th>Winkel (a)</th><th>Mindestanzahl Gurte</th></tr></thead>
+               <thead><tr><th>Richtung</th><th>Berechnungsfaktor (c)</th><th>Sicherheitsbeiwert (f<sub>s</sub>)</th><th>Winkel (a)</th><th>Mindestanzahl Gurte</th></tr></thead>
                <tbody>
-                   <tr><td>Sicherung nach Vorne</td><td>{lashingResult.factorForward}g</td><td>{angle}°</td><td><strong>{lashingResult.forward}</strong></td></tr>
-                   <tr><td>Sicherung zur Seite</td><td>{lashingResult.factorSide}g</td><td>{angle}°</td><td><strong>{lashingResult.side}</strong></td></tr>
-                   <tr><td>Sicherung nach Hinten</td><td>{lashingResult.factorRear}g</td><td>{angle}°</td><td><strong>{lashingResult.rear}</strong></td></tr>
+                   <tr><td>Sicherung nach Vorne</td><td>{lashingResult.factorForward}g</td><td>{(!allowedWeight || allowedWeight <= 3500) ? '1,0' : '1,25'}</td><td>{angle}°</td><td><strong>{lashingResult.forward}</strong></td></tr>
+                   <tr><td>Sicherung zur Seite</td><td>{lashingResult.factorSide}g</td><td>{(!allowedWeight || allowedWeight <= 3500) ? '1,0' : '1,1'}</td><td>{angle}°</td><td><strong>{lashingResult.side}</strong></td></tr>
+                   <tr><td>Sicherung nach Hinten</td><td>{lashingResult.factorRear}g</td><td>{(!allowedWeight || allowedWeight <= 3500) ? '1,0' : '1,1'}</td><td>{angle}°</td><td><strong>{lashingResult.rear}</strong></td></tr>
                </tbody>
            </table>
             <div className="print-result-box">
                <div className="print-result-header">Gesamtempfehlung</div>
-               <div>Es sind mindestens <strong>{Math.max(lashingResult.forward, lashingResult.side, lashingResult.rear)}</strong> Zurrgurte (Niederzurren) bei einem Vertikalwinkel von <strong>{angle}°</strong> zu verwenden, um die Ladung in alle Richtungen zu sichern.</div>
+               <div>Es sind rechnerisch mindestens <strong>{Math.max(lashingResult.forward, lashingResult.side, lashingResult.rear)}</strong> Zurrgurte (Niederzurren) bei einem Vertikalwinkel von <strong>{angle}°</strong> erforderlich.</div>
+               {(() => {
+                   const maxCalc = Math.max(lashingResult.forward, lashingResult.side, lashingResult.rear);
+                   const anyFit = fitFront || fitSide || fitRear;
+                   const allFit = fitFront && fitSide && fitRear;
+                   if (!anyFit && maxCalc <= 1) {
+                       return <div style={{ marginTop: '6px', color: '#b45309', fontWeight: 'bold' }}>⚠️ Hinweis (Verdrehschutz): Da kein Formschluss vorliegt (freistehende Ladung), müssen insgesamt mindestens 2 Gurte verwendet werden, damit sich die Ladung nicht verdreht!</div>;
+                   }
+                   if (anyFit && !allFit && maxCalc === 0) {
+                       return <div style={{ marginTop: '6px', color: '#b45309', fontWeight: 'bold' }}>⚠️ Hinweis (Verdrehschutz): Trotz teilweisem Formschluss sollte insgesamt mindestens 1 Gurt als Verdrehschutz verwendet werden!</div>;
+                   }
+                   return null;
+               })()}
            </div>
 
            {/* --- START: NEUER BERECHNUNGSNACHWEIS FÜR AUSDRUCK (NIEDERZURREN) --- */}
@@ -2918,11 +2945,11 @@ function LashingCalculator({ onOpenKnowledge }) {
                <p className="font-semibold">Verfahren: Kraftschlüssige Ladungssicherung (Niederzurren)</p>
                <div className="font-mono text-sm p-4 bg-slate-50 rounded border border-slate-200">
                  <p className="font-bold mb-1 text-slate-500">Angewandte Formel:</p>
-                 <p className="text-base mb-4">n = ((m · g · c) - F_Form - (m · g · µ)) / (k · µ · STF · sin(a))</p>
+                 <p className="text-base mb-4">n = (((m · g · c) - F_Form - (m · g · µ)){(!allowedWeight || allowedWeight <= 3500) ? '' : ' · f_s'}) / (k · µ · STF · sin(a))</p>
                  
                  <div className="pt-4 border-t border-slate-300">
                    <p className="font-bold mb-1 text-slate-500">Eingesetzte Werte (z.B. Sicherung nach vorn, Winkel a = {angle}°):</p>
-                   <p>n = (({loadWeight || 0} · 9,81 · {lashingResult.factorForward}) - {fitFront ? wallFront * 10 : 0} - ({loadWeight || 0} · 9,81 · {friction.toFixed(2)})) / ({(!allowedWeight || allowedWeight <= 3500) ? '1,8' : '2'} · {friction.toFixed(2)} · {(stf || 0) * 10} · sin({angle || 0}°))</p>
+                   <p>n = ((({loadWeight || 0} · 9,81 · {lashingResult.factorForward}) - {fitFront ? wallFront * 10 : 0} - ({loadWeight || 0} · 9,81 · {friction.toFixed(2)})){(!allowedWeight || allowedWeight <= 3500) ? '' : ' · 1,25'}) / ({(!allowedWeight || allowedWeight <= 3500) ? '1,8' : '2'} · {friction.toFixed(2)} · {(stf || 0) * 10} · sin({angle || 0}°))</p>
                  </div>
                </div>
              </div>
@@ -3366,11 +3393,44 @@ function LashingCalculator({ onOpenKnowledge }) {
                  </div>
   
                   <div className="mt-4 p-3 rounded-xl flex items-center justify-between bg-indigo-50 text-indigo-900">
-                    <span className="text-xs font-bold uppercase tracking-wide opacity-70">Minimum:</span>
+                    <span className="text-xs font-bold uppercase tracking-wide opacity-70">Minimum (rechnerisch):</span>
                     <div className="text-3xl font-black">
                        {Math.max(lashingResult.forward, lashingResult.side, lashingResult.rear)} <span className="text-base font-bold opacity-60">Gurte</span>
                      </div>
                   </div>
+
+                  {/* HINWEIS VERDREHSCHUTZ */}
+                  {(() => {
+                      const maxCalcStraps = Math.max(lashingResult.forward, lashingResult.side, lashingResult.rear);
+                      const hasAnyFormFit = fitFront || fitSide || fitRear;
+                      const hasAllFormFit = fitFront && fitSide && fitRear;
+
+                      if (!hasAnyFormFit && maxCalcStraps <= 1) {
+                          return (
+                              <div className="mt-3 p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 flex gap-2.5 items-start shadow-sm animate-in fade-in">
+                                  <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                                  <div className="text-xs leading-relaxed">
+                                      <strong className="font-black uppercase tracking-wide block mb-0.5 text-amber-800">Hinweis zum Verdrehschutz (Freistehend)</strong>
+                                      Da kein Formschluss vorliegt und rechnerisch {maxCalcStraps === 0 ? '0 Gurte' : 'nur 1 Gurt'} ermittelt {maxCalcStraps === 0 ? 'wurden' : 'wurde'}, {maxCalcStraps === 0 ? 'sollten dennoch' : 'sollte 1 weiterer Gurt (also'} insgesamt <strong>mindestens 2 Gurte</strong>{maxCalcStraps === 1 ? ')' : ''} benutzt werden, damit sich die Ladung nicht verdreht!
+                                  </div>
+                              </div>
+                          );
+                      }
+
+                      if (hasAnyFormFit && !hasAllFormFit && maxCalcStraps === 0) {
+                          return (
+                              <div className="mt-3 p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 flex gap-2.5 items-start shadow-sm animate-in fade-in">
+                                  <Info className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                                  <div className="text-xs leading-relaxed">
+                                      <strong className="font-black uppercase tracking-wide block mb-0.5 text-amber-800">Hinweis zum Verdrehschutz (Teil-Formschluss)</strong>
+                                      Da nur ein teilweiser Formschluss besteht, reicht es aus, wenn insgesamt <strong>mindestens 1 Gurt</strong> als Verdrehschutz benutzt wird.
+                                  </div>
+                              </div>
+                          );
+                      }
+
+                      return null;
+                  })()}
                    
                   <LashingFormulaDisplay values={lashingResult.displayValues} details={lashingResult.detailRows} weightClass={lashingResult.weightClass} />
                   
@@ -7136,7 +7196,7 @@ const HomeView = ({ onSelect }) => {
     const dateTime = useDateTime();
     
     // --- HIER UPDATE TEXT EINTRAGEN ---
-    const updateText = "‼️ Update 3.5: Geschwindigkeitsreiter innerorts/außerorts auf PKW mit Anhänger und LKW erweitert";
+    const updateText = "‼️ Update 3.7: E-Scooter Tuning implementiert";
 
     const tiles = [
         { id: 'age', title: 'Altersrechner', icon: Calendar, color: 'text-purple-500', bg: 'bg-purple-50', desc: '' },
