@@ -424,7 +424,7 @@ const HeaderLogo = () => {
             {isDarkMode ? <Sun className="w-4 h-4 text-yellow-300" /> : <Moon className="w-4 h-4 text-white" />}
         </button>
         <span className="text-base font-black text-white/50 tracking-wider italic select-none border border-white/20 px-3 py-1 rounded-md backdrop-blur-sm">
-            Demel
+            POK Demel
         </span>
     </div>
   );
@@ -3913,22 +3913,62 @@ const FahrtzweckeDropdown = ({ purposes }) => {
     );
 };
 
-function KnowledgeBaseView({ initialView = 'overview', onBack }) {
-  const dateTime = useDateTime();
-  const [view, setView] = useState(initialView); 
-  const [kzView, setKzView] = useState('kurzzeit'); 
-  const [alkDroView, setAlkDroView] = useState('ph1'); 
-  const [kcangView, setKcangView] = useState('besitz'); 
-  const [lasiAblegereife, setLasiAblegereife] = useState('gurte'); 
-  const [escooterSpeed, setEscooterSpeed] = useState('bis22'); 
-  const [escooterOrigin, setEscooterOrigin] = useState('de'); 
-  const [kindersitzView, setKindersitzView] = useState('sitz'); 
-  const [ebikeView, setEbikeView] = useState('pedelec25'); 
-  const [taxiView, setTaxiView] = useState('taxi'); 
-  const [sozialView, setSozialView] = useState('gueterverkehr'); 
+const ESCOOTER_TUNING_MODELS = [
+    { brand: 'Segway-Ninebot', model: 'ZT3 Pro D', method: 'Lizenzcode, eingespielt über eine Web-App im Browser per Bluetooth', speed: '35-40 km/h', detection: 'Freischaltung durch selbst festgelegte Anzahl Druck Knöpfe und Hebel' },
+    { brand: 'Segway-Ninebot', model: 'Max G3 D', method: 'Lizenzcode, eingespielt über eine Web-App im Browser per Bluetooth', speed: '45 km/h', detection: 'Freischaltung durch selbst festgelegte Anzahl Druck Knöpfe und Hebel' },
+    { brand: 'Segway-Ninebot', model: 'GT3 D', method: 'Lizenzcode, eingespielt über eine Web-App im Browser per Bluetooth', speed: '50 km/h', detection: 'Freischaltung durch selbst festgelegte Anzahl Druck Knöpfe und Hebel' },
+    { brand: 'Segway-Ninebot', model: 'F3 / F3 Pro D', method: 'Lizenzcode, eingespielt über eine Web-App im Browser per Bluetooth', speed: '35 km/h', detection: 'Freischaltung durch selbst festgelegte Anzahl Druck Knöpfe und Hebel' },
+    { brand: 'Segway-Ninebot', model: 'F2 / F2 Pro D', method: 'Lizenzcode, eingespielt über eine Web-App im Browser per Bluetooth', speed: '35 km/h', detection: 'Freischaltung durch selbst festgelegte Anzahl Druck Knöpfe und Hebel' },
+    { brand: 'Segway-Ninebot', model: 'E2 Pro D', method: '-', speed: '-', detection: '-' },
+    { brand: 'Segway-Ninebot', model: 'E3 Pro D', method: 'Controller-Tausch gegen eine umprogrammierte Ausführung, Scooter wird geöffnet', speed: '32 km/h', detection: 'Controller ist im Trittbrett verbaut' },
+    { brand: 'Segway-Ninebot', model: 'G30 D / G2 D', method: 'Lizenzcode, eingespielt über eine Web-App im Browser per Bluetooth, oder per Chip / SHFW per App bis DRV 1.7.3, darüber nur mit ST-Link', speed: '32-35 km/h', detection: 'Lizenzcode: Freischaltung durch selbst festgelegte Anzahl Druck Knöpfe und Hebel / Chip: ist im Trittbrett / SHFW: neue Firmware wird aufgespielt.' },
+    { brand: 'Xiaomi', model: 'Scooter 3 / 4', method: 'Tuning Chip steckt in Lenkstange', speed: '30-35 km/h', detection: 'Chip ist in der Lenkstange eingebaut' },
+    { brand: 'Xiaomi', model: 'Scooter 5 / 5 Pro / 5 Max', method: 'Tuning Chip steckt in Lenkstange', speed: '30-35 km/h', detection: 'Chip ist in der Lenkstange eingebaut' },
+    { brand: 'Xiaomi', model: 'Scooter 6 Pro / 6 Ultra', method: 'Tuning Chip steckt in Lenkstange', speed: '34 km/h', detection: 'Chip ist in der Lenkstange eingebaut' },
+    { brand: 'NAVEE', model: 'ST3 / ST3 Pro', method: 'Lizenzcode per Smartphone aufspielen', speed: '40 km/h', detection: 'Einschalten, linke Bremse drücken und Power Button 7 Sekunden drücken, Display ändert sich. Dann linke Bremse betätigen und dann nochmal Power Button betätigen. Dann diesen nochmals für 2 Sekunden halten. Dann ist der Scooter unlockt' },
+    { brand: 'NAVEE', model: 'GT3 / GT3 Pro / GT3 Max', method: 'APK Datei per App übertragen', speed: '32 km/h', detection: '5 x bremsen + 5 x Gas geben (Roller darf noch nicht über 7 km/h laufen)' },
+    { brand: 'NAVEE', model: 'XT5 Pro / XT5 Max', method: 'Lizenzcode per App', speed: '32 km/h', detection: 'Fahrmodus 4 aktivieren oder auf Handyapp den Speed release drücken' },
+    { brand: 'NAVEE', model: 'XT5 Ultra', method: '-', speed: '-', detection: '-' },
+    { brand: 'NAVEE', model: 'UT5 Max / NT5 Max', method: '-', speed: '-', detection: '-' },
+    { brand: 'Kukirin', model: 'G2, G3, G4, G2 Ultra', method: 'Tastenkombination vom Hersteller', speed: '45 km/h', detection: 'Linker Bremshebel gedrückt halten + Ein-/Ausschalter 4 mal schnell hintereinander drücken' },
+    { brand: 'Kukirin', model: 'G2 Pro, G2 Max, G2 Master, G3 Pro, A1, G4 Max', method: 'Tastenkombination vom Hersteller', speed: '55 km/h', detection: 'Bremshebel gedrückt halten und zweimal auf den Ein-/Ausschalter drücken.' },
+    { brand: 'Kukirin', model: 'T3', method: 'Tastenkombination vom Hersteller', speed: 'unbekannt', detection: 'Bremshebel gedrückt halten und den Ein-/Ausschalter 6 Mal schnell hintereinander drücken.' },
+    { brand: 'Kukirin', model: 'M4 Max', method: 'Tastenkombination vom Hersteller', speed: 'unbekannt', detection: 'M-Taste fünf Sekunden lang gedrückt halten' },
+    { brand: 'Kukirin', model: 'S1 Max', method: 'Tastenkombination vom Hersteller', speed: 'unbekannt', detection: 'Durch sechsmaliges schnelles Drücken des Ein-/Ausschalters kann die Geschwindigkeitsbegrenzungsfunktion aktiviert werden' },
+    { brand: 'Kukirin', model: 'G2 Pro VMP', method: 'Tastenkombination vom Hersteller', speed: 'unbekannt', detection: 'Geschwindigkeitsbegrenzung kann nicht aufgehoben werden' },
+    { brand: 'iScooter', model: 'T4 / T8', method: '-', speed: '-', detection: '-' },
+    { brand: 'Joyor', model: 'S5 / S5 Pro', method: '-', speed: '-', detection: '-' },
+    { brand: 'Evercross', model: 'EV10K Pro / H5', method: 'Controller + Display und Kabeltausch', speed: 'bis 45 km/h', detection: 'Drück den "M"-Button 5 Mal um zwischen den Geschwindigkeitsmodi hin und her zu schalten' },
+    { brand: 'Teverun', model: 'Fighter Mini / Blade Mini', method: 'Fernbedienung mit Relais am Controller', speed: 'bis zu 65 km/h', detection: 'Grünes Symbol bedeutet Speedlimit ist an. Fernbedienung an Oberkante des Displays, offenes Schloss drücken und halten, zusätzlich das geschlossene Schloss drücken und halten, loslassen und auf Display sollte das Schloss weg sein. (Unter dem Trittbrett ist ein zusätzliches Kabel am Controller eingebaut)' },
+    { brand: 'Teverun', model: 'divers', method: 'rote / grüne Tags', speed: '25 km/h', detection: 'Grüner Tag an Display halten und schon ist Geschwindigkeitslimit aufgehoben' },
+    { brand: 'RCB', model: 'EV85F / D7 NFC / R15', method: 'Tastenkombination am Power Knopf', speed: '30 km/h', detection: 'Einschalten und 6x schnell hintereinander den Einschaltknopf drücken (muss sofort geschehen, während der Controller hochfährt) ODER Bremshebel ziehen und halten und Power-Knopf fünfmal zügig drücken' },
+    { brand: 'Egret', model: 'X / X Core / X Prime / GT', method: 'Tuning Controller im Trittbrett verbaut', speed: '32 km/h', detection: 'unbekannte Kombination von Bremse und Tasten am Lenker' },
+    { brand: 'SoFlow', model: 'SO4 Pro / SO5 / SO6 / SO One', method: 'App schickt eine neue bbH an Scooter', speed: '30 km/h', detection: 'bbH wurde dauerhaft verändert' },
+    { brand: 'Ausom', model: 'L1 ABE', method: 'Controller-Tausch, gegen den des L2', speed: '38 km/h', detection: 'bbH wurde dauerhaft verändert' },
+    { brand: 'VMAX', model: 'VX2 / VX3 GT / R25', method: '-', speed: '-', detection: '-' },
+    { brand: 'ePowerFun', model: 'ePF-2 / ePF-2 PRO / PULSE / PULSE+', method: 'Controller und Display tausch', speed: '28-34 km/h', detection: 'Sportmodus bis 34 km/h, Normalmodus bis 25 km/h' }
+  ];
   
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [reifenExpanded, setReifenExpanded] = useState({ profil: true, winter: false, spikes: false });
+  function KnowledgeBaseView({ initialView = 'overview', onBack }) {
+    const dateTime = useDateTime();
+    const [view, setView] = useState(initialView); 
+    const [kzView, setKzView] = useState('kurzzeit'); 
+    const [alkDroView, setAlkDroView] = useState('ph1'); 
+    const [kcangView, setKcangView] = useState('besitz'); 
+    const [lasiAblegereife, setLasiAblegereife] = useState('gurte'); 
+    const [escooterSpeed, setEscooterSpeed] = useState('bis22'); 
+    const [escooterOrigin, setEscooterOrigin] = useState('de'); 
+    const [kindersitzView, setKindersitzView] = useState('sitz'); 
+    const [ebikeView, setEbikeView] = useState('pedelec25'); 
+    const [taxiView, setTaxiView] = useState('taxi'); 
+    const [sozialView, setSozialView] = useState('gueterverkehr'); 
+    const [escooterTuningTab, setEscooterTuningTab] = useState('allgemein');
+    const [selectedTuningBrand, setSelectedTuningBrand] = useState('Alle');
+    const [expandedTuningIdx, setExpandedTuningIdx] = useState(null);
+    
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [reifenExpanded, setReifenExpanded] = useState({ profil: true, winter: false, spikes: false });
+  
 
   useEffect(() => {
       if (initialView) setView(initialView);
@@ -3937,7 +3977,7 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
   // Automatisches Scrollen nach ganz oben, wenn das Register gewechselt wird
   useEffect(() => {
       window.scrollTo(0, 0);
-  }, [view, kzView, alkDroView, kcangView, lasiAblegereife, escooterSpeed, escooterOrigin, kindersitzView, ebikeView, taxiView, sozialView]);
+  }, [view, kzView, alkDroView, kcangView, lasiAblegereife, escooterSpeed, escooterOrigin, escooterTuningTab, kindersitzView, ebikeView, taxiView, sozialView]);
 
   const tabs = [
       { id: 'blut', label: 'Blutentnahme', icon: Syringe, color: 'text-red-500', bg: 'bg-red-50' },
@@ -4740,21 +4780,32 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
 
             {/* EINZIEHUNG */}
             {view === 'einziehung' && (
-                <div className="space-y-4">
+                <div className="space-y-4 animate-in fade-in">
                     <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-                        <div className="flex items-center gap-2 mb-4 text-teal-700 pb-2 border-b border-slate-50">
+                        <div className="flex items-center gap-2 mb-4 text-amber-600 pb-2 border-b border-slate-50">
                             <ScaleLaw className="w-5 h-5" />
-                            <h3 className="font-black uppercase tracking-wide text-xs">Voraussetzungen Einziehung</h3>
+                            <h3 className="font-black uppercase tracking-wide text-xs">Einziehung von Taterträgen (§ 29a OWiG)</h3>
                         </div>
-                        <p className="text-xs text-slate-400 font-bold uppercase mb-3">Folgende Kriterien rechtfertigen eine Einziehung:</p>
-                        <ul className="space-y-2.5 text-sm text-slate-700 font-medium">
-                            <li className="flex gap-2"><div className="w-1.5 h-1.5 rounded-full bg-teal-500 mt-1.5 shrink-0"></div><span><strong>Überladung ab 15 %</strong> (LKW) bzw. bei Fahrzeugen bis 3,5 t zGM ab 20 %</span></li>
-                            <li className="flex gap-2"><div className="w-1.5 h-1.5 rounded-full bg-teal-500 mt-1.5 shrink-0"></div><span><strong>Überhöhe</strong> ab 4,20 m</span></li>
-                            <li className="flex gap-2"><div className="w-1.5 h-1.5 rounded-full bg-teal-500 mt-1.5 shrink-0"></div><span><strong>Überbreite</strong> ab 4,20 m</span></li>
-                            <li className="flex gap-2"><div className="w-1.5 h-1.5 rounded-full bg-teal-500 mt-1.5 shrink-0"></div><span>Fahrzeuge <strong>ohne Zulassung</strong></span></li>
-                            <li className="flex gap-2"><div className="w-1.5 h-1.5 rounded-full bg-teal-500 mt-1.5 shrink-0"></div><span>Mehr als <strong>30 % der Ladung ungesichert</strong> <br/><span className="text-xs text-slate-500 font-normal">(nur wenn kein rutschhemmendes Material mitgeführt wird)</span></span></li>
-                            <li className="flex gap-2"><div className="w-1.5 h-1.5 rounded-full bg-teal-500 mt-1.5 shrink-0"></div><span>Verstoß gegen das <strong>Sonntags-/Feiertagsfahrverbot</strong></span></li>
-                        </ul>
+                        <div className="space-y-3 text-sm text-slate-700 leading-relaxed">
+                            <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl text-amber-900">
+                                <strong className="block mb-1 font-black">Grundsatz bei gewerblichen Transporten:</strong>
+                                Hat der Täter oder ein Dritter (Unternehmer) durch eine mit Geldbuße bedrohte Handlung etwas erlangt (z. B. ersparte Aufwendungen für ein größeres Fahrzeug oder korrekte Sicherungsmittel), kann die Einziehung eines Geldbetrages angeordnet werden.
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                                <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                                    <span className="text-xs font-bold text-slate-400 uppercase block mb-1">Überladung (&gt; 3,5 t zGM)</span>
+                                    <span className="font-black text-slate-800 text-base">ab 15 % Überladung</span>
+                                </div>
+                                <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                                    <span className="text-xs font-bold text-slate-400 uppercase block mb-1">Überladung (≤ 3,5 t zGM)</span>
+                                    <span className="font-black text-slate-800 text-base">ab 20 % Überladung</span>
+                                </div>
+                                <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 sm:col-span-2">
+                                    <span className="text-xs font-bold text-slate-400 uppercase block mb-1">Mangelhafte Ladungssicherung</span>
+                                    <span className="font-black text-slate-800 text-base">ab 30 % ungesicherter Ladung</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}
@@ -4771,8 +4822,11 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                         ].map(sub => (
                             <button
                                 key={sub.id}
-                                onClick={() => setEscooterSpeed(sub.id)}
-                                className={`flex-1 px-3 py-2 rounded-xl text-xs font-bold transition-all border ${escooterSpeed === sub.id ? 'bg-yellow-500 text-white border-yellow-500 shadow-md' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}`}
+                                onClick={() => {
+                                    setEscooterSpeed(sub.id);
+                                    if (escooterOrigin === 'tuning') setEscooterOrigin('de');
+                                }}
+                                className={`flex-1 px-3 py-2 rounded-xl text-xs font-bold transition-all border ${escooterSpeed === sub.id && escooterOrigin !== 'tuning' ? 'bg-yellow-500 text-white border-yellow-500 shadow-md' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}`}
                             >
                                 {sub.label}
                             </button>
@@ -4783,7 +4837,8 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                     <div className="flex gap-2 mb-2">
                         {[
                             { id: 'de', label: 'Deutschland' },
-                            { id: 'aus', label: 'Ausland' }
+                            { id: 'aus', label: 'Ausland' },
+                            { id: 'tuning', label: 'Tuning' }
                         ].map(sub => (
                             <button
                                 key={sub.id}
@@ -5190,9 +5245,224 @@ function KnowledgeBaseView({ initialView = 'overview', onBack }) {
                             </div>
                         )}
 
+                        {/* 5. Tuning */}
+                        {escooterOrigin === 'tuning' && (
+                            <div className="animate-in fade-in">
+                                <div className="flex items-center gap-2 mb-3 text-yellow-600 pb-2 border-b border-slate-50">
+                                    <Settings className="w-5 h-5" />
+                                    <h3 className="font-black uppercase tracking-wide text-xs">E-Scooter mit Verdacht auf illegales Tuning</h3>
+                                </div>
+
+                                {/* Sub-Navigation für Tuning */}
+                                <div className="flex gap-1.5 mb-4 bg-slate-100 p-1 rounded-xl">
+                                    {[
+                                        { id: 'allgemein', label: 'Allgemein & Erkennen' },
+                                        { id: 'kombis', label: 'Tastenkombis' },
+                                        { id: 'modelle', label: 'Hersteller-Liste' }
+                                    ].map(sub => (
+                                        <button
+                                            key={sub.id}
+                                            onClick={() => setEscooterTuningTab(sub.id)}
+                                            className={`flex-1 py-2 px-2 rounded-lg text-[11px] font-bold transition-all ${escooterTuningTab === sub.id ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                        >
+                                            {sub.label}
+                                        </button>
+                                    ))}
+                                </div>
+                                
+                                {/* Unterreiter 1: Allgemein & Erkennen */}
+                                {escooterTuningTab === 'allgemein' && (
+                                    <div className="space-y-4 animate-in fade-in duration-200">
+                                        {/* Wie erfolgt das Tuning */}
+                                        <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl shadow-sm">
+                                            <h4 className="font-black text-slate-800 text-sm mb-2 flex items-center gap-2">
+                                                <Zap className="w-4 h-4 text-yellow-500 shrink-0" />
+                                                Wie erfolgt das Tuning bei E-Scootern?
+                                            </h4>
+                                            <p className="text-xs text-slate-600 mb-3">
+                                                Eine unzulässige Erhöhung der bauartbedingten Höchstgeschwindigkeit (bbH) kann auf unterschiedliche Weise erfolgen:
+                                            </p>
+                                            <div className="space-y-2.5 text-xs text-slate-700">
+                                                <div className="bg-white p-3 rounded-lg border border-slate-100 shadow-sm">
+                                                    <strong className="text-slate-900 block mb-0.5">1. Ab Werk:</strong>
+                                                    Das Fahrzeug hat bereits herstellerbedingt eine höhere bbH als in Deutschland erlaubt. <span className="italic text-slate-500">(per se kein Tuning, da nichts verändert)</span>
+                                                </div>
+                                                <div className="bg-white p-3 rounded-lg border border-slate-100 shadow-sm">
+                                                    <strong className="text-slate-900 block mb-0.5">2. Software-Tuning per App:</strong>
+                                                    Verbindung per Bluetooth. Oft kostenlos und reversibel, wird jedoch durch Hersteller-Updates regelmäßig blockiert.
+                                                </div>
+                                                <div className="bg-white p-3 rounded-lg border border-slate-100 shadow-sm">
+                                                    <strong className="text-slate-900 block mb-0.5">3. Lizenz-Codes / Browser-Tuning:</strong>
+                                                    Neuestes Verfahren. Ein gekaufter Code wird über einen Web-Bluetooth-Browser (z. B. Chrome…) ohne App-Installation eingespielt.
+                                                </div>
+                                                <div className="bg-white p-3 rounded-lg border border-slate-100 shadow-sm">
+                                                    <strong className="text-slate-900 block mb-0.5">4. Tuning-Chips & Module:</strong>
+                                                    Zwischenstecker, die im Lenker oder Trittbrett verbaut werden. Aktivierung meist per Tastenkombination, der Tacho zeigt weiterhin korrekte Werte an. Einbau einer zusätzlichen Spule ➔ Erzeugung eines Magnetfelds am Antriebsrad, wirkt dem bestehenden entgegen, wodurch die bbH erhöht wird.
+                                                </div>
+                                                <div className="bg-white p-3 rounded-lg border border-slate-100 shadow-sm">
+                                                    <strong className="text-slate-900 block mb-0.5">5. Controller- / Display-Tausch:</strong>
+                                                    Komplettaustausch der Steuereinheit. Ermöglicht maximale Geschwindigkeiten (40–60 km/h), ist jedoch teuer und aufwendig.
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Woran erkennt man eine Manipulation */}
+                                        <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm">
+                                            <h4 className="font-black text-slate-800 text-sm mb-2 flex items-center gap-2">
+                                                <Search className="w-4 h-4 text-teal-600 shrink-0" />
+                                                Woran erkennt man eine Manipulation?
+                                            </h4>
+                                            <p className="text-xs text-slate-600 mb-3">
+                                                Oft ergeben sich erste Verdachtsmomente bereits im laufenden Verkehr.
+                                            </p>
+                                            <ul className="space-y-2 text-xs text-slate-700">
+                                                <li className="flex gap-2.5 items-start bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-teal-500 mt-1.5 shrink-0"></div>
+                                                    <div><strong>Im Verkehr:</strong> Das Fahrzeug fällt durch eine augenscheinlich zu hohe Geschwindigkeit auf.</div>
+                                                </li>
+                                                <li className="flex gap-2.5 items-start bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-teal-500 mt-1.5 shrink-0"></div>
+                                                    <div><strong>Am Fahrzeug:</strong> Werkzeugspuren an Schrauben der Lenkstange oder dem Trittbrett.</div>
+                                                </li>
+                                                <li className="flex gap-2.5 items-start bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-teal-500 mt-1.5 shrink-0"></div>
+                                                    <div><strong>Durch Aussagen:</strong> Der Fahrer räumt die Manipulation in seiner Einlassung selbst ein.</div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Unterreiter 2: Tastenkombinationen / Temporäres Tuning */}
+                                {escooterTuningTab === 'kombis' && (
+                                    <div className="animate-in fade-in duration-200">
+                                        <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl shadow-sm">
+                                            <h4 className="font-black text-amber-900 text-sm mb-2 flex items-center gap-2">
+                                                <Key className="w-4 h-4 text-amber-600 shrink-0" />
+                                                Temporäres Tuning („German Maneuver“)
+                                            </h4>
+                                            <p className="text-xs text-amber-900 leading-relaxed mb-4">
+                                                Viele technische oder softwareseitige Veränderungen sind so programmiert, dass sie sich beim Ausschalten des E-Scooters automatisch deaktivieren. Wird das Fahrzeug wieder eingeschaltet, fährt es zunächst mit der gesetzmäßig erlaubten Geschwindigkeit. Das Tuning muss dann durch bestimmte Abläufe neu aktiviert werden.
+                                            </p>
+                                            <div className="text-[11px] font-bold text-amber-800 uppercase tracking-wide mb-2">Häufige Kombinationen zum Prüfen:</div>
+                                            <ul className="space-y-2 text-xs text-amber-950 font-medium">
+                                                <li className="flex gap-2 items-start bg-white p-2.5 rounded-lg border border-amber-200/80 shadow-sm">
+                                                    <ChevronRight className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                                                    <span><strong>6x Einschaltknopf</strong> schnell drücken</span>
+                                                </li>
+                                                <li className="flex gap-2 items-start bg-white p-2.5 rounded-lg border border-amber-200/80 shadow-sm">
+                                                    <ChevronRight className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                                                    <span><strong>6x Gashebel + 6x Bremshebel</strong> betätigen</span>
+                                                </li>
+                                                <li className="flex gap-2 items-start bg-white p-2.5 rounded-lg border border-amber-200/80 shadow-sm">
+                                                    <ChevronRight className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                                                    <span><strong>Bremshebel und Gashebel gleichzeitig</strong> betätigen</span>
+                                                </li>
+                                                <li className="flex gap-2 items-start bg-white p-2.5 rounded-lg border border-amber-200/80 shadow-sm">
+                                                    <ChevronRight className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                                                    <span>Zündung aus, Gasdrehgriff und rechten Bremshebel voll ziehen, Zündung an und warten, bis die Ganganzeige aufleuchtet.</span>
+                                                </li>
+                                                <li className="flex gap-2 items-start bg-white p-2.5 rounded-lg border border-amber-200/80 shadow-sm">
+                                                    <ChevronRight className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                                                    <span>Zündung aus, Gasdrehgriff und rechten Bremshebel voll ziehen, Gangwechseltaster drücken, Zündung an und warten auf die Ganganzeige.</span>
+                                                </li>
+                                                <li className="flex gap-2 items-start bg-white p-2.5 rounded-lg border border-amber-200/80 shadow-sm">
+                                                    <ChevronRight className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                                                    <span>Während der Fahrt den Gasdrehgriff schnell loslassen und sofort wieder betätigen.</span>
+                                                </li>
+                                                <li className="flex gap-2 items-start bg-white p-2.5 rounded-lg border border-amber-200/80 shadow-sm">
+                                                    <ChevronRight className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                                                    <span>Aktivierung über eine <strong>Funkfernbedienung</strong> nach dem Ausschalten der Zündung (diverse Varianten).</span>
+                                                </li>
+                                                <li className="flex gap-2 items-start bg-white p-2.5 rounded-lg border border-amber-200/80 shadow-sm">
+                                                    <ChevronRight className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                                                    <span>Je nach Hersteller kann auch eine <strong>freie Kombination</strong> vergeben werden.</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Unterreiter 3: Bekannte Tuningvarianten nach Hersteller & Modell */}
+                                {escooterTuningTab === 'modelle' && (
+                                    <div className="animate-in fade-in duration-200">
+                                        <div className="mb-3">
+                                            <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1.5">Nach Hersteller filtern:</label>
+                                            <div className="flex overflow-x-auto gap-1.5 pb-2 custom-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }}>
+                                                {['Alle', ...Array.from(new Set(ESCOOTER_TUNING_MODELS.map(m => m.brand)))].map(brand => (
+                                                    <button
+                                                        key={brand}
+                                                        onClick={() => { setSelectedTuningBrand(brand); setExpandedTuningIdx(null); }}
+                                                        className={`whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${selectedTuningBrand === brand ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}
+                                                    >
+                                                        {brand}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <p className="text-[11px] text-slate-500 mb-2.5">
+                                            Tippe auf ein Modell, um Methode und Erkennungsmerkmale aufzuklappen:
+                                        </p>
+
+                                        <div className="space-y-2">
+                                            {ESCOOTER_TUNING_MODELS
+                                                .filter(item => selectedTuningBrand === 'Alle' || item.brand === selectedTuningBrand)
+                                                .map((item, idx) => {
+                                                    const isOpen = expandedTuningIdx === idx;
+                                                    const hasData = item.method !== '-';
+                                                    return (
+                                                        <div key={idx} className={`border rounded-xl transition-all overflow-hidden ${isOpen ? 'border-indigo-400 bg-indigo-50/20 shadow-sm' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'}`}>
+                                                            <button
+                                                                onClick={() => setExpandedTuningIdx(isOpen ? null : idx)}
+                                                                className="w-full p-3 text-left flex items-center justify-between gap-2"
+                                                            >
+                                                                <div className="flex flex-col">
+                                                                    <span className="text-[10px] font-black uppercase tracking-wider text-indigo-500">{item.brand}</span>
+                                                                    <span className="text-xs font-bold text-slate-800">{item.model}</span>
+                                                                </div>
+                                                                <div className="flex items-center gap-2 shrink-0">
+                                                                    {hasData ? (
+                                                                        <span className="text-[10px] font-black bg-amber-100 text-amber-800 px-2 py-0.5 rounded-md border border-amber-200">
+                                                                            {item.speed}
+                                                                        </span>
+                                                                    ) : (
+                                                                        <span className="text-[10px] font-bold bg-slate-200 text-slate-500 px-2 py-0.5 rounded-md">
+                                                                            Keine Daten
+                                                                        </span>
+                                                                    )}
+                                                                    {isOpen ? <ChevronUp className="w-4 h-4 text-slate-500" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                                                                </div>
+                                                            </button>
+                                                            {isOpen && (
+                                                                <div className="px-3 pb-3 pt-2 border-t border-slate-200/80 bg-white text-xs space-y-2.5 animate-in fade-in duration-200">
+                                                                    <div>
+                                                                        <span className="font-bold text-slate-400 uppercase text-[10px] block mb-0.5">Methode:</span>
+                                                                        <span className="text-slate-800 font-medium">{item.method === '-' ? 'Derzeit keine bekannte Tuning-Methode hinterlegt' : item.method}</span>
+                                                                    </div>
+                                                                    <div>
+                                                                        <span className="font-bold text-slate-400 uppercase text-[10px] block mb-0.5">Tempo (getunt):</span>
+                                                                        <span className="text-red-600 font-bold">{item.speed}</span>
+                                                                    </div>
+                                                                    <div className="bg-amber-50/70 p-2.5 rounded-lg border border-amber-100">
+                                                                        <span className="font-bold text-amber-800 uppercase text-[10px] block mb-0.5">Erkennen / Aktivierung:</span>
+                                                                        <span className="text-slate-800 font-medium leading-relaxed block">{item.detection === '-' ? '-' : item.detection}</span>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
                     </div>
                 </div>
             )}
+            
             {/* HAUPTUNTERSUCHUNG (HU) */}
             {view === 'hu' && (
                 <div className="space-y-4 animate-in fade-in">
