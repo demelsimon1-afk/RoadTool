@@ -7502,7 +7502,7 @@ const HomeView = ({ onSelect }) => {
     const dateTime = useDateTime();
     
     // --- HIER UPDATE TEXT EINTRAGEN ---
-    const updateText = "‼️ Update 3.8: E-Scooter Tuning implementiert";
+    const updateText = "‼️ Update 3.9: E-Scooter Tuning implementiert";
 
     const tiles = [
         { id: 'age', title: 'Altersrechner', icon: Calendar, color: 'text-purple-500', bg: 'bg-purple-50', desc: '' },
