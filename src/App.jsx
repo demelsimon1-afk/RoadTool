@@ -432,7 +432,7 @@ const HeaderLogo = () => {
 
 const AppVersionFooter = () => (
     <div className="text-center text-[10px] text-slate-300 font-mono py-2 select-none no-print">
-        RoadTool v. 3.7
+        RoadTool v. 3.8
     </div>
 );
 
@@ -681,28 +681,54 @@ const getRecommendedCarConfig = (car) => {
         if (rec.orientation === 'backward') {
             setWheels({ strap: false, chock: 'none' }, { strap: true, chock: 'both' }, { strap: true, chock: 'both' }, { strap: true, chock: 'both' });
         }
-        return rec;
-    }
-
-    if (w === '3000') {
+    } else if (w === '3000') {
         // Grundsätzlich VB 6 empfehlen für Fahrzeuge > 2.000 - 3.000 kg, unabhängig vom Winkel
         setWheels({ strap: true, chock: 'front' }, { strap: false, chock: 'none' }, { strap: true, chock: 'both' }, { strap: true, chock: 'both' });
         if (rec.orientation === 'backward') {
             // Spiegelverkehrt: 1 Rad in FR mit 1 Keil, BEIDE Räder gegen FR mit Gurt & 2 Keilen
             setWheels({ strap: false, chock: 'none' }, { strap: true, chock: 'front' }, { strap: true, chock: 'both' }, { strap: true, chock: 'both' });
         }
-        return rec;
+    } else {
+        // 2000 kg - Default
+        // Grundsätzlich VB 1 empfehlen für Fahrzeuge bis 2.000 kg, unabhängig vom Winkel
+        setWheels({ strap: true, chock: 'front' }, { strap: false, chock: 'none' }, { strap: false, chock: 'none' }, { strap: true, chock: 'both' });
+        if (rec.orientation === 'backward') {
+            // VB 1 spiegelverkehrt (1 Rad in FR mit 1 Keil, 1 Rad diag. gegen FR mit 2 Keilen)
+            setWheels({ strap: false, chock: 'none' }, { strap: true, chock: 'front' }, { strap: true, chock: 'both' }, { strap: false, chock: 'none' });
+        }
     }
 
-    // 2000 kg - Default
-    // Grundsätzlich VB 1 empfehlen für Fahrzeuge bis 2.000 kg, unabhängig vom Winkel
-    setWheels({ strap: true, chock: 'front' }, { strap: false, chock: 'none' }, { strap: false, chock: 'none' }, { strap: true, chock: 'both' });
-    if (rec.orientation === 'backward') {
-        // VB 1 spiegelverkehrt (1 Rad in FR mit 1 Keil, 1 Rad diag. gegen FR mit 2 Keilen)
-        setWheels({ strap: false, chock: 'none' }, { strap: true, chock: 'front' }, { strap: true, chock: 'both' }, { strap: false, chock: 'none' });
-    }
+    // Prüfen, ob die seitenverkehrte (gespiegelte) Variante besser zur Nutzereingabe passt (gilt nun für alle Gewichtsklassen)
+    const mirRec = JSON.parse(JSON.stringify(rec));
+    mirRec.wheels.fl = rec.wheels.fr;
+    mirRec.wheels.fr = rec.wheels.fl;
+    mirRec.wheels.rl = rec.wheels.rr;
+    mirRec.wheels.rr = rec.wheels.rl;
 
-    return rec;
+    const calcMatchScore = (candidate) => {
+        let s = 0;
+        ['fl', 'fr', 'rl', 'rr'].forEach(w => {
+            if (car.wheels[w].strap && candidate.wheels[w].strap) s += 2;
+            const c1 = car.wheels[w].chock === 'none' ? 0 : (car.wheels[w].chock === 'both' || car.wheels[w].chock === 'mulde' ? 2 : 1);
+            const c2 = candidate.wheels[w].chock === 'none' ? 0 : (candidate.wheels[w].chock === 'both' || candidate.wheels[w].chock === 'mulde' ? 2 : 1);
+            if (c1 > 0 && c2 > 0) {
+                s += (c1 === c2 ? 2 : 1);
+            }
+        });
+        return s;
+    };
+
+    const finalRec = calcMatchScore(mirRec) > calcMatchScore(rec) ? mirRec : rec;
+
+    // Nur die Darstellung von 2 Keilen ('both') als 'mulde' übernehmen, falls vom Nutzer so gewählt.
+    // Zusätzliche Gurte oder Keile aus der Ist-Eingabe werden NICHT in das VDI-Soll-Bild übernommen!
+    ['fl', 'fr', 'rl', 'rr'].forEach(w => {
+        if (car.wheels[w].chock === 'mulde' && finalRec.wheels[w].chock === 'both') {
+            finalRec.wheels[w].chock = 'mulde';
+        }
+    });
+
+    return finalRec;
 };
 
 const validateCarSecuring = (car) => {
@@ -711,24 +737,30 @@ const validateCarSecuring = (car) => {
     }
 
     const { fl, fr, rl, rr } = car.wheels;
-    const w_fl = { strap: fl.strap, c: (fl.chock === 'both' || fl.chock === 'mulde') ? 2 : fl.chock === 'none' ? 0 : 1 };
-    const w_fr = { strap: fr.strap, c: (fr.chock === 'both' || fr.chock === 'mulde') ? 2 : fr.chock === 'none' ? 0 : 1 };
-    const w_rl = { strap: rl.strap, c: (rl.chock === 'both' || rl.chock === 'mulde') ? 2 : rl.chock === 'none' ? 0 : 1 };
-    const w_rr = { strap: rr.strap, c: (rr.chock === 'both' || rr.chock === 'mulde') ? 2 : rr.chock === 'none' ? 0 : 1 };
+    const makeW = (w) => ({
+        strap: w.strap,
+        c: (w.chock === 'both' || w.chock === 'mulde') ? 2 : w.chock === 'none' ? 0 : 1,
+        hasFrontChock: w.chock === 'front' || w.chock === 'both' || w.chock === 'mulde'
+    });
+
+    const w_fl = makeW(fl);
+    const w_fr = makeW(fr);
+    const w_rl = makeW(rl);
+    const w_rr = makeW(rr);
 
     // Orientierungsunabhängige Prüfung: Wir definieren Achse 1 und Achse 2 anhand der Position auf dem LKW
     let axleDir = [w_fl, w_fr]; // Achse in Fahrtrichtung (vorne auf dem LKW)
     let axleOpp = [w_rl, w_rr]; // Achse gegen Fahrtrichtung (hinten auf dem LKW)
 
-    // VB 1: 1 Gurt+Keil in FR, 1 Gurt+2 Keile (diagonal) gegen FR
+    // VB 1: 1 Gurt+Keil VOR dem Reifen in FR, 1 Gurt+2 Keile (diagonal) gegen FR
     const isVB1 = (
-        (axleDir[0].strap && axleDir[0].c >= 1 && axleOpp[1].strap && axleOpp[1].c >= 2) ||
-        (axleDir[1].strap && axleDir[1].c >= 1 && axleOpp[0].strap && axleOpp[0].c >= 2)
+        (axleDir[0].strap && axleDir[0].hasFrontChock && axleOpp[1].strap && axleOpp[1].c >= 2) ||
+        (axleDir[1].strap && axleDir[1].hasFrontChock && axleOpp[0].strap && axleOpp[0].c >= 2)
     );
 
-    // VB 2: Achse in FR (1 Keil). Achse gegen FR (2 Gurte + 1 Reifen beidseitig gekeilt).
+    // VB 2: Achse in FR (mind. 1 Keil VOR dem Reifen). Achse gegen FR (2 Gurte + 1 Reifen beidseitig gekeilt).
     const isVB2 = (
-        (axleDir[0].c >= 1 || axleDir[1].c >= 1) &&
+        (axleDir[0].hasFrontChock || axleDir[1].hasFrontChock) &&
         (axleOpp[0].strap && axleOpp[1].strap) &&
         (axleOpp[0].c >= 2 || axleOpp[1].c >= 2)
     );
@@ -743,8 +775,8 @@ const validateCarSecuring = (car) => {
     const wheelsVB5Count = [w_fl, w_fr, w_rl, w_rr].filter(w => w.strap && w.c >= 2).length;
     const isVB5 = wheelsVB5Count >= 3;
 
-    // VB 6: Schwere PKW (1 Gurt+Keil in FR, beide Räder Gurt+2 Keile gegen FR)
-    const isVB6 = ((axleDir[0].strap && axleDir[0].c >= 1) || (axleDir[1].strap && axleDir[1].c >= 1)) &&
+    // VB 6: Schwere PKW (1 Gurt+Keil VOR dem Reifen in FR, beide Räder Gurt+2 Keile gegen FR)
+    const isVB6 = ((axleDir[0].strap && axleDir[0].hasFrontChock) || (axleDir[1].strap && axleDir[1].hasFrontChock)) &&
                    (axleOpp[0].strap && axleOpp[0].c >= 2 && axleOpp[1].strap && axleOpp[1].c >= 2);
 
     const activeVBs = [];
@@ -795,13 +827,13 @@ const validateCarSecuring = (car) => {
 
     const validVBs = activeVBs.filter(isVBAllowed);
 
-    if (allStrapped && !car.noChocks) {
-        return { valid: false, msg: "Mangelhafte Sicherung. Nur okay, wenn keine Keile möglich." };
-    }
-
     if (validVBs.length > 0) {
         const bestVb = Math.min(...validVBs); 
         return { valid: true, msg: `Korrekt gesichert (Anforderungen für VB ${bestVb} erfüllt).` };
+    }
+
+    if (allStrapped && !car.noChocks) {
+        return { valid: false, msg: "Mangelhafte Sicherung. Nur okay, wenn keine Keile möglich." };
     }
 
     if (activeVBs.includes(3) && car.orientation === 'backward') {
@@ -812,26 +844,8 @@ const validateCarSecuring = (car) => {
     
     // Präzise Differenz-Auswertung (Ist vs. Soll)
     const getMissingMsg = () => {
-        // Bewertet, ob die Standard-Empfehlung oder die gespiegelte Variante näher dran ist
-        const score = (req) => {
-            let s = 0;
-            ['fl', 'fr', 'rl', 'rr'].forEach(w => {
-                if (car.wheels[w].strap === req.wheels[w].strap) s += 2;
-                const c1 = car.wheels[w].chock === 'none' ? 0 : (car.wheels[w].chock === 'both' || car.wheels[w].chock === 'mulde' ? 2 : 1);
-                const c2 = req.wheels[w].chock === 'none' ? 0 : (req.wheels[w].chock === 'both' || req.wheels[w].chock === 'mulde' ? 2 : 1);
-                if (c1 === c2) s += 1;
-                else if (c1 > c2) s += 1; // Übersicherung ist in Ordnung
-            });
-            return s;
-        };
-
-        const stdRec = getRecommendedCarConfig(car);
-        const mirRec = JSON.parse(JSON.stringify(stdRec));
-        // Links und Rechts tauschen für die gespiegelte Variante (Diagonalzurren)
-        let tempFl = mirRec.wheels.fl; mirRec.wheels.fl = mirRec.wheels.fr; mirRec.wheels.fr = tempFl;
-        let tempRl = mirRec.wheels.rl; mirRec.wheels.rl = mirRec.wheels.rr; mirRec.wheels.rr = tempRl;
-
-        const bestRec = score(mirRec) > score(stdRec) ? mirRec : stdRec;
+        // getRecommendedCarConfig liefert nun bereits automatisch die optimal gespiegelte Variante
+        const bestRec = getRecommendedCarConfig(car);
 
         let missing = [];
         const diffWheel = (curr, req, label) => {
@@ -842,7 +856,13 @@ const validateCarSecuring = (car) => {
 
             let m = [];
             if (!currStrap && reqStrap) m.push("+Gurt");
-            if (currChocks < reqChocks) {
+            if (req.chock === 'front') {
+                if (curr.chock === 'back') {
+                    m.push("Keil muss VOR den Reifen");
+                } else if (curr.chock === 'none') {
+                    m.push("+1 Keil (Vorne)");
+                }
+            } else if (currChocks < reqChocks) {
                 const diff = reqChocks - currChocks;
                 m.push(`+${diff} Keil${diff > 1 ? 'e' : ''}`);
             }
@@ -2625,6 +2645,7 @@ function LashingCalculator({ onOpenKnowledge }) {
   const [distY, setDistY] = useState('');
   const [showInfoX, setShowInfoX] = useState(false);
   const [showInfoY, setShowInfoY] = useState(false);
+  const [showWeightInfo, setShowWeightInfo] = useState(false);
   
   // State für die Handy-Winkelmessung
   const [isMeasureModalOpen, setIsMeasureModalOpen] = useState(false);
@@ -3262,10 +3283,25 @@ function LashingCalculator({ onOpenKnowledge }) {
   
            {/* GEWICHTE CARD */}
             <div className="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 break-inside-avoid">
-               <div className="flex items-center gap-1.5 mb-2 text-indigo-700">
-                 <Scale className="w-5 h-5" />
-                 <span className="text-sm font-black uppercase tracking-wide">Gewicht</span>
+               <div className="flex items-center justify-between mb-2">
+                 <div className="flex items-center gap-1.5 text-indigo-700">
+                   <Scale className="w-5 h-5" />
+                   <span className="text-sm font-black uppercase tracking-wide">Gewicht</span>
+                 </div>
+                 <button 
+                   onClick={() => setShowWeightInfo(!showWeightInfo)} 
+                   className="text-indigo-500 hover:text-indigo-700 p-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition-colors flex items-center gap-1 text-[10px] font-bold"
+                   title="Hinweis zu den Fahrzeuggewichten"
+                 >
+                   <Info className="w-3.5 h-3.5" />
+                   <span>Welches Fahrzeug?</span>
+                 </button>
               </div>
+              {showWeightInfo && (
+                <div className="mb-3 p-2.5 bg-indigo-50 border border-indigo-100 rounded-xl text-xs text-indigo-900 leading-relaxed animate-in fade-in slide-in-from-top-1">
+                  <strong>Wichtiger Hinweis:</strong> Tragen Sie hier das Leergewicht und die zulässige Gesamtmasse (zGM) genau des Fahrzeugteils ein, auf dem sich die Ladung tatsächlich befindet – also entweder vom <strong>LKW</strong>, vom <strong>Sattelauflieger</strong> oder vom <strong>Anhänger</strong> (nicht die Werte des gesamten Zuges!). Diese Daten sind entscheidend für die korrekte Berechnung der Aufbaubelastbarkeit (Code L / XL) und der Beschleunigungsbeiwerte.
+                </div>
+              )}
                <div className="grid grid-cols-2 gap-2 mb-2">
                 <InputWithIcon icon={Truck} label="Leergewicht (kg)" value={emptyWeight} onChange={(e) => setEmptyWeight(e.target.value)} placeholder="0" />
                 <InputWithIcon icon={ShieldCheck} label="Zul. Gesamt (kg)" value={allowedWeight} onChange={(e) => setAllowedWeight(e.target.value)} placeholder="0" />
@@ -7466,7 +7502,7 @@ const HomeView = ({ onSelect }) => {
     const dateTime = useDateTime();
     
     // --- HIER UPDATE TEXT EINTRAGEN ---
-    const updateText = "‼️ Update 3.7: E-Scooter Tuning implementiert";
+    const updateText = "‼️ Update 3.8: E-Scooter Tuning implementiert";
 
     const tiles = [
         { id: 'age', title: 'Altersrechner', icon: Calendar, color: 'text-purple-500', bg: 'bg-purple-50', desc: '' },
@@ -7474,7 +7510,8 @@ const HomeView = ({ onSelect }) => {
         { id: 'speed', title: 'Geschwindigkeit', icon: Gauge, color: 'text-amber-500', bg: 'bg-amber-50', desc: 'Laser o Hinterherfahren' },
         { id: 'weight', title: 'Gewichte & Holz', icon: Scale, color: 'text-blue-500', bg: 'bg-blue-50', desc: 'Überladung o Holzgewicht' },
         { id: 'lashing', title: 'Ladungssicherung', icon: Truck, color: 'text-indigo-500', bg: 'bg-indigo-50', desc: 'Niederzurren o Diagonalzurren o PKW-Transporter' },
-        { id: 'knowledge', title: 'Wissensdatenbank', icon: BookOpen, color: 'text-teal-500', bg: 'bg-teal-50', desc: '' }
+        { id: 'knowledge', title: 'Wissensdatenbank', icon: BookOpen, color: 'text-teal-500', bg: 'bg-teal-50', desc: '' },
+        { id: 'bkat', title: 'BKat', icon: ConstructionConeIcon, color: 'text-orange-500', bg: 'bg-orange-50', desc: 'Bußgeldkatalog' }
     ];
 
     return (
@@ -7541,6 +7578,38 @@ const HomeView = ({ onSelect }) => {
     );
 };
 
+// --- BKAT UNDER CONSTRUCTION VIEW ---
+function BkatPlaceholderView() {
+  const dateTime = useDateTime();
+
+  return (
+    <div className="max-w-md mx-auto bg-slate-50 min-h-screen flex flex-col">
+      <div className="bg-orange-600/95 backdrop-blur-md p-4 text-white flex items-center justify-between sticky top-0 z-20 shadow-lg shadow-orange-900/10 no-print">
+        <div>
+          <h1 className="text-xl font-bold flex items-center gap-2 leading-tight tracking-tight">
+            <ConstructionConeIcon className="w-6 h-6 shrink-0" /> BKat
+          </h1>
+          <p className="text-orange-100 text-xs opacity-90 mt-0.5 font-mono flex items-center gap-1.5 ml-8">
+            <Clock className="w-3 h-3" /> {dateTime}
+          </p>
+        </div>
+        <HeaderLogo />
+      </div>
+
+      <div className="flex-1 p-6 flex flex-col items-center justify-center text-center animate-in fade-in duration-300 pb-24">
+        <div className="w-24 h-24 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner border border-orange-100">
+          <ConstructionConeIcon className="w-12 h-12" />
+        </div>
+        <h3 className="font-black uppercase tracking-wide text-slate-800 mb-2 text-xl">Noch im Aufbau</h3>
+        <p className="text-slate-600 text-sm leading-relaxed max-w-xs mb-8">
+          Dieser Bereich für den Bußgeldkatalog wird derzeit für dich vorbereitet und steht bald zur Verfügung.
+        </p>
+      </div>
+      <AppVersionFooter />
+    </div>
+  );
+}
+
 // --- MAIN APP COMPONENT ---
 
 export default function App() {
@@ -7587,6 +7656,7 @@ export default function App() {
             <div className={activeTab === 'info' ? 'block' : 'hidden'}><InfoView /></div>
             <div className={activeTab === 'donate' ? 'block' : 'hidden'}><DonateView /></div>
             <div className={activeTab === 'lashing' ? 'block' : 'hidden'}><LashingCalculator onOpenKnowledge={handleNavigateKnowledge} /></div>
+            <div className={activeTab === 'bkat' ? 'block' : 'hidden'}><BkatPlaceholderView /></div>
           </div>
           <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] pb-safe z-50 no-print transition-colors duration-300">
             <div className="max-w-md mx-auto flex justify-evenly items-center p-2">
