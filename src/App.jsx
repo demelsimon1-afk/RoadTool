@@ -432,7 +432,7 @@ const HeaderLogo = () => {
 
 const AppVersionFooter = () => (
     <div className="text-center text-[10px] text-slate-300 font-mono py-2 select-none no-print">
-        RoadTool v. 3.7
+        RoadTool v. 3.8
     </div>
 );
 
@@ -702,6 +702,46 @@ const getRecommendedCarConfig = (car) => {
         setWheels({ strap: false, chock: 'none' }, { strap: true, chock: 'front' }, { strap: true, chock: 'both' }, { strap: false, chock: 'none' });
     }
 
+    // Prüfen, ob die seitenverkehrte (gespiegelte) Variante besser zur Nutzereingabe passt
+    const mirRec = JSON.parse(JSON.stringify(rec));
+    mirRec.wheels.fl = rec.wheels.fr;
+    mirRec.wheels.fr = rec.wheels.fl;
+    mirRec.wheels.rl = rec.wheels.rr;
+    mirRec.wheels.rr = rec.wheels.rl;
+
+    const calcMatchScore = (candidate) => {
+        let s = 0;
+        ['fl', 'fr', 'rl', 'rr'].forEach(w => {
+            if (car.wheels[w].strap === candidate.wheels[w].strap) s += 2;
+            const c1 = car.wheels[w].chock === 'none' ? 0 : (car.wheels[w].chock === 'both' || car.wheels[w].chock === 'mulde' ? 2 : 1);
+            const c2 = candidate.wheels[w].chock === 'none' ? 0 : (candidate.wheels[w].chock === 'both' || candidate.wheels[w].chock === 'mulde' ? 2 : 1);
+            if (c1 === c2) s += 1;
+            else if (c1 > c2) s += 1;
+        });
+        return s;
+    };
+
+    if (calcMatchScore(mirRec) > calcMatchScore(rec)) {
+        ['fl', 'fr', 'rl', 'rr'].forEach(w => {
+            if (car.wheels[w].strap) mirRec.wheels[w].strap = true;
+            if (car.wheels[w].chock === 'mulde' && mirRec.wheels[w].chock !== 'none') {
+                mirRec.wheels[w].chock = 'mulde';
+            } else if (car.wheels[w].chock === 'both' && (mirRec.wheels[w].chock === 'front' || mirRec.wheels[w].chock === 'back')) {
+                mirRec.wheels[w].chock = 'both';
+            }
+        });
+        return mirRec;
+    }
+
+    ['fl', 'fr', 'rl', 'rr'].forEach(w => {
+        if (car.wheels[w].strap) rec.wheels[w].strap = true;
+        if (car.wheels[w].chock === 'mulde' && rec.wheels[w].chock !== 'none') {
+            rec.wheels[w].chock = 'mulde';
+        } else if (car.wheels[w].chock === 'both' && (rec.wheels[w].chock === 'front' || rec.wheels[w].chock === 'back')) {
+            rec.wheels[w].chock = 'both';
+        }
+    });
+
     return rec;
 };
 
@@ -795,13 +835,13 @@ const validateCarSecuring = (car) => {
 
     const validVBs = activeVBs.filter(isVBAllowed);
 
-    if (allStrapped && !car.noChocks) {
-        return { valid: false, msg: "Mangelhafte Sicherung. Nur okay, wenn keine Keile möglich." };
-    }
-
     if (validVBs.length > 0) {
         const bestVb = Math.min(...validVBs); 
         return { valid: true, msg: `Korrekt gesichert (Anforderungen für VB ${bestVb} erfüllt).` };
+    }
+
+    if (allStrapped && !car.noChocks) {
+        return { valid: false, msg: "Mangelhafte Sicherung. Nur okay, wenn keine Keile möglich." };
     }
 
     if (activeVBs.includes(3) && car.orientation === 'backward') {
@@ -812,26 +852,8 @@ const validateCarSecuring = (car) => {
     
     // Präzise Differenz-Auswertung (Ist vs. Soll)
     const getMissingMsg = () => {
-        // Bewertet, ob die Standard-Empfehlung oder die gespiegelte Variante näher dran ist
-        const score = (req) => {
-            let s = 0;
-            ['fl', 'fr', 'rl', 'rr'].forEach(w => {
-                if (car.wheels[w].strap === req.wheels[w].strap) s += 2;
-                const c1 = car.wheels[w].chock === 'none' ? 0 : (car.wheels[w].chock === 'both' || car.wheels[w].chock === 'mulde' ? 2 : 1);
-                const c2 = req.wheels[w].chock === 'none' ? 0 : (req.wheels[w].chock === 'both' || req.wheels[w].chock === 'mulde' ? 2 : 1);
-                if (c1 === c2) s += 1;
-                else if (c1 > c2) s += 1; // Übersicherung ist in Ordnung
-            });
-            return s;
-        };
-
-        const stdRec = getRecommendedCarConfig(car);
-        const mirRec = JSON.parse(JSON.stringify(stdRec));
-        // Links und Rechts tauschen für die gespiegelte Variante (Diagonalzurren)
-        let tempFl = mirRec.wheels.fl; mirRec.wheels.fl = mirRec.wheels.fr; mirRec.wheels.fr = tempFl;
-        let tempRl = mirRec.wheels.rl; mirRec.wheels.rl = mirRec.wheels.rr; mirRec.wheels.rr = tempRl;
-
-        const bestRec = score(mirRec) > score(stdRec) ? mirRec : stdRec;
+        // getRecommendedCarConfig liefert nun bereits automatisch die optimal gespiegelte Variante
+        const bestRec = getRecommendedCarConfig(car);
 
         let missing = [];
         const diffWheel = (curr, req, label) => {
@@ -2625,6 +2647,7 @@ function LashingCalculator({ onOpenKnowledge }) {
   const [distY, setDistY] = useState('');
   const [showInfoX, setShowInfoX] = useState(false);
   const [showInfoY, setShowInfoY] = useState(false);
+  const [showWeightInfo, setShowWeightInfo] = useState(false);
   
   // State für die Handy-Winkelmessung
   const [isMeasureModalOpen, setIsMeasureModalOpen] = useState(false);
@@ -3262,10 +3285,25 @@ function LashingCalculator({ onOpenKnowledge }) {
   
            {/* GEWICHTE CARD */}
             <div className="bg-white p-3 rounded-2xl shadow-sm border border-slate-100 break-inside-avoid">
-               <div className="flex items-center gap-1.5 mb-2 text-indigo-700">
-                 <Scale className="w-5 h-5" />
-                 <span className="text-sm font-black uppercase tracking-wide">Gewicht</span>
+               <div className="flex items-center justify-between mb-2">
+                 <div className="flex items-center gap-1.5 text-indigo-700">
+                   <Scale className="w-5 h-5" />
+                   <span className="text-sm font-black uppercase tracking-wide">Gewicht</span>
+                 </div>
+                 <button 
+                   onClick={() => setShowWeightInfo(!showWeightInfo)} 
+                   className="text-indigo-500 hover:text-indigo-700 p-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition-colors flex items-center gap-1 text-[10px] font-bold"
+                   title="Hinweis zu den Fahrzeuggewichten"
+                 >
+                   <Info className="w-3.5 h-3.5" />
+                   <span>Welches Fahrzeug?</span>
+                 </button>
               </div>
+              {showWeightInfo && (
+                <div className="mb-3 p-2.5 bg-indigo-50 border border-indigo-100 rounded-xl text-xs text-indigo-900 leading-relaxed animate-in fade-in slide-in-from-top-1">
+                  <strong>Wichtiger Hinweis:</strong> Tragen Sie hier das Leergewicht und die zulässige Gesamtmasse (zGM) genau des Fahrzeugteils ein, auf dem sich die Ladung tatsächlich befindet – also entweder vom <strong>LKW</strong>, vom <strong>Sattelauflieger</strong> oder vom <strong>Anhänger</strong> (nicht die Werte des gesamten Zuges!). Diese Daten sind entscheidend für die korrekte Berechnung der Aufbaubelastbarkeit (Code L / XL) und der Beschleunigungsbeiwerte.
+                </div>
+              )}
                <div className="grid grid-cols-2 gap-2 mb-2">
                 <InputWithIcon icon={Truck} label="Leergewicht (kg)" value={emptyWeight} onChange={(e) => setEmptyWeight(e.target.value)} placeholder="0" />
                 <InputWithIcon icon={ShieldCheck} label="Zul. Gesamt (kg)" value={allowedWeight} onChange={(e) => setAllowedWeight(e.target.value)} placeholder="0" />
@@ -7466,7 +7504,7 @@ const HomeView = ({ onSelect }) => {
     const dateTime = useDateTime();
     
     // --- HIER UPDATE TEXT EINTRAGEN ---
-    const updateText = "‼️ Update 3.7: E-Scooter Tuning implementiert";
+    const updateText = "‼️ Update 3.8: E-Scooter Tuning implementiert";
 
     const tiles = [
         { id: 'age', title: 'Altersrechner', icon: Calendar, color: 'text-purple-500', bg: 'bg-purple-50', desc: '' },
