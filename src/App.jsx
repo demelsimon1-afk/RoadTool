@@ -432,7 +432,7 @@ const HeaderLogo = () => {
 
 const AppVersionFooter = () => (
     <div className="text-center text-[10px] text-slate-300 font-mono py-2 select-none no-print">
-        RoadTool v. 3.8
+        RoadTool v. 3.9
     </div>
 );
 
