@@ -9,6 +9,12 @@ import {
   Menu, Sun, Moon, Home, Search, Shield, Users, CreditCard, CircleDashed, Baby, Bike, CigaretteOff
 } from 'lucide-react';
 
+// ============================================================================
+// SCHRITT FÜR VS CODE / VERCEL:
+// Lösche in VS Code einfach die zwei Schrägstriche (//) vor der nächsten Zeile:
+ import tatbestaendeData from './Tatbestaende.json';
+// ============================================================================
+
 // --- THEME CONTEXT & STYLES ---
 const ThemeContext = React.createContext({ isDarkMode: false, toggleDarkMode: () => {} });
 
@@ -432,7 +438,7 @@ const HeaderLogo = () => {
 
 const AppVersionFooter = () => (
     <div className="text-center text-[10px] text-slate-300 font-mono py-2 select-none no-print">
-        RoadTool v. 3.9
+        RoadTool v. 4.0
     </div>
 );
 
@@ -7502,7 +7508,7 @@ const HomeView = ({ onSelect }) => {
     const dateTime = useDateTime();
     
     // --- HIER UPDATE TEXT EINTRAGEN ---
-    const updateText = "‼️ Update 3.9: E-Scooter Tuning implementiert";
+    const updateText = "‼️ Update 4.0: Bundeseinheitlicher Tatbestandskatalog integriert";
 
     const tiles = [
         { id: 'age', title: 'Altersrechner', icon: Calendar, color: 'text-purple-500', bg: 'bg-purple-50', desc: '' },
@@ -7578,16 +7584,81 @@ const HomeView = ({ onSelect }) => {
     );
 };
 
-// --- BKAT UNDER CONSTRUCTION VIEW ---
-function BkatPlaceholderView() {
+// --- BKAT MODULE (BUSSGELDKATALOG) ---
+const FALLBACK_TATBESTAENDE = [
+  {
+    "tbnr": "101000",
+    "text": "Sie kamen von der Fahrbahn ab und verursachten Sachschaden.",
+    "bussgeld": "35,00 €",
+    "paragraf": "§ 1 Abs. 2, § 49 StVO; § 24 StVG; -- BKat"
+  },
+  {
+    "tbnr": "101006",
+    "text": "Sie gerieten ins Schleudern und verursachten Sachschaden.",
+    "bussgeld": "35,00 €",
+    "paragraf": "§ 1 Abs. 2, § 49 StVO; § 24 StVG; -- BKat"
+  },
+  {
+    "tbnr": "121172",
+    "text": "Sie hatten während der Fahrt den vorgeschriebenen Sicherheitsgurt nicht angelegt.",
+    "bussgeld": "30,00 €",
+    "paragraf": "§ 21a Abs. 1, § 49 StVO; § 24 StVG; 100 BKat"
+  },
+  {
+    "tbnr": "123624",
+    "text": "Sie benutzten als Führer eines Kraftfahrzeugs ein elektronisches Gerät, das der Kommunikation, Information oder Organisation dient oder zu dienen bestimmt ist, in vorschriftswidriger Weise.",
+    "bussgeld": "100,00 €",
+    "paragraf": "§ 23 Abs. 1a, § 49 StVO; § 24 StVG; 246.1 BKat"
+  }
+];
+
+function BkatModule() {
   const dateTime = useDateTime();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [copiedTbnr, setCopiedTbnr] = useState(null);
+
+  // Nutzt automatisch deine Tatbestaende.json, sobald du oben den Import aktivierst!
+  const data = typeof tatbestaendeData !== 'undefined' 
+    ? (Array.isArray(tatbestaendeData) ? tatbestaendeData : (tatbestaendeData.tatbestaende || Object.values(tatbestaendeData)[0] || [])) 
+    : FALLBACK_TATBESTAENDE;
+
+  // Intelligente Suche (unterstützt mehrere Suchbegriffe gleichzeitig, z.B. "101 Sachschaden")
+  const filteredResults = React.useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return [];
+    
+    const terms = q.split(/\s+/);
+    
+    return data.filter(item => {
+      const tbnr = (item.tbnr || '').toLowerCase();
+      const text = (item.text || '').toLowerCase();
+      const paragraf = (item.paragraf || '').toLowerCase();
+      const bussgeld = (item.bussgeld || '').toLowerCase();
+      
+      return terms.every(term => 
+        tbnr.includes(term) || 
+        text.includes(term) || 
+        paragraf.includes(term) ||
+        bussgeld.includes(term)
+      );
+    }).slice(0, 50); // Begrenzung auf 50 Ergebnisse für flüssige Performance auf dem Smartphone
+  }, [searchQuery, data]);
+
+  const handleCopy = (tbnr) => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(tbnr);
+      setCopiedTbnr(tbnr);
+      setTimeout(() => setCopiedTbnr(null), 2000);
+    }
+  };
 
   return (
     <div className="max-w-md mx-auto bg-slate-50 min-h-screen flex flex-col">
+      {/* Header */}
       <div className="bg-orange-600/95 backdrop-blur-md p-4 text-white flex items-center justify-between sticky top-0 z-20 shadow-lg shadow-orange-900/10 no-print">
         <div>
           <h1 className="text-xl font-bold flex items-center gap-2 leading-tight tracking-tight">
-            <ConstructionConeIcon className="w-6 h-6 shrink-0" /> BKat
+            <Gavel className="w-6 h-6 shrink-0" /> Bußgeldkatalog
           </h1>
           <p className="text-orange-100 text-xs opacity-90 mt-0.5 font-mono flex items-center gap-1.5 ml-8">
             <Clock className="w-3 h-3" /> {dateTime}
@@ -7596,14 +7667,123 @@ function BkatPlaceholderView() {
         <HeaderLogo />
       </div>
 
-      <div className="flex-1 p-6 flex flex-col items-center justify-center text-center animate-in fade-in duration-300 pb-24">
-        <div className="w-24 h-24 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner border border-orange-100">
-          <ConstructionConeIcon className="w-12 h-12" />
+      {/* Main Content */}
+      <div className="flex-1 p-2 space-y-2 pb-24 no-print">
+        {/* Sticky Search Bar */}
+        <div className="bg-white p-3 rounded-2xl shadow-sm border border-slate-200 sticky top-[76px] z-10">
+          <div className="relative">
+            <Search className="absolute left-3.5 top-3 w-5 h-5 text-slate-400" />
+            <input 
+              type="text" 
+              placeholder="TBNR, Stichwort oder § suchen..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-11 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:outline-none placeholder:text-slate-400 text-slate-800 transition-all"
+            />
+            {searchQuery && (
+              <button 
+                onClick={() => setSearchQuery('')} 
+                className="absolute right-3 top-2.5 p-1 rounded-full bg-slate-200/70 hover:bg-slate-300 text-slate-500 transition-colors"
+                title="Suche löschen"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+          
+          {/* Quick Filter / Info Bar */}
+          <div className="flex items-center justify-between mt-2 px-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+            <span>Datenbestand: {data.length.toLocaleString('de-DE')} Einträge</span>
+            {searchQuery.trim() !== '' && (
+              <span className="text-orange-600">
+                {filteredResults.length >= 50 ? 'Top 50 Treffer' : `${filteredResults.length} Treffer`}
+              </span>
+            )}
+          </div>
         </div>
-        <h3 className="font-black uppercase tracking-wide text-slate-800 mb-2 text-xl">Noch im Aufbau</h3>
-        <p className="text-slate-600 text-sm leading-relaxed max-w-xs mb-8">
-          Dieser Bereich für den Bußgeldkatalog wird derzeit für dich vorbereitet und steht bald zur Verfügung.
-        </p>
+
+        {/* Results Area */}
+        <div className="space-y-2.5 pt-1">
+          {!searchQuery.trim() ? (
+            <div className="text-center p-8 mt-4 bg-white border border-slate-200 rounded-2xl shadow-sm text-slate-400 text-sm flex flex-col items-center gap-3">
+              <div className="w-16 h-16 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center shadow-inner border border-orange-100">
+                <Search className="w-8 h-8 opacity-80" />
+              </div>
+              <div className="space-y-1 max-w-[240px]">
+                <p className="text-slate-700 font-bold uppercase tracking-wide text-xs">BKat-Schnellsuche bereit</p>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Gib eine <strong>TBNR</strong> (z. B. 101000), ein <strong>Stichwort</strong> (z. B. Schleudern, Gurt) oder einen <strong>Paragrafen</strong> ein.
+                </p>
+              </div>
+              {/* Vorschläge zum schnellen Testen */}
+              <div className="flex flex-wrap justify-center gap-1.5 mt-2 pt-3 border-t border-slate-100 w-full">
+                <span className="text-[10px] text-slate-400 w-full mb-1 font-bold uppercase">Beispiele testen:</span>
+                {['101000', 'Sachschaden', 'Gurt', '§ 23'].map(term => (
+                  <button
+                    key={term}
+                    onClick={() => setSearchQuery(term)}
+                    className="px-2.5 py-1 bg-slate-100 hover:bg-orange-50 text-slate-600 hover:text-orange-700 rounded-lg text-xs font-medium transition-colors border border-slate-200/60"
+                  >
+                    {term}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : filteredResults.length > 0 ? (
+            filteredResults.map((item, idx) => (
+              <div 
+                key={item.tbnr + '-' + idx} 
+                className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 hover:border-orange-300 transition-all flex flex-col gap-2.5 animate-in fade-in duration-150"
+              >
+                {/* Top Row: TBNR & Bussgeld */}
+                <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleCopy(item.tbnr)}
+                      className="group relative flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white font-mono font-black text-sm px-3 py-1 rounded-lg shadow-sm transition-all cursor-pointer"
+                      title="Tippen zum Kopieren der TBNR"
+                    >
+                      <span>{item.tbnr}</span>
+                      {copiedTbnr === item.tbnr && (
+                        <CheckCircle className="w-3.5 h-3.5 text-emerald-400 animate-in zoom-in" />
+                      )}
+                    </button>
+                    {copiedTbnr === item.tbnr && (
+                      <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wide animate-in fade-in">
+                        Kopiert!
+                      </span>
+                    )}
+                  </div>
+
+                  {item.bussgeld && (
+                    <div className="bg-red-50 border border-red-200 text-red-700 font-black text-base px-3 py-0.5 rounded-lg shadow-sm shrink-0">
+                      {item.bussgeld}
+                    </div>
+                  )}
+                </div>
+
+                {/* Middle Row: Tatbestandstext */}
+                <p className="text-slate-800 text-xs sm:text-sm font-medium leading-relaxed">
+                  {item.text}
+                </p>
+
+                {/* Bottom Row: Paragraf */}
+                {item.paragraf && (
+                  <div className="bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-100 flex items-center gap-2 mt-0.5">
+                    <ScaleLaw className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <span className="text-[10px] font-mono text-slate-500 leading-tight">
+                      {item.paragraf}
+                    </span>
+                  </div>
+                )}
+              </div>
+            ))
+          ) : (
+            <div className="text-center p-8 bg-white border border-slate-200 rounded-2xl shadow-sm text-slate-500 text-sm font-medium">
+              Keine Tatbestände für <strong className="text-slate-800">"{searchQuery}"</strong> gefunden.
+            </div>
+          )}
+        </div>
       </div>
       <AppVersionFooter />
     </div>
@@ -7656,7 +7836,7 @@ export default function App() {
             <div className={activeTab === 'info' ? 'block' : 'hidden'}><InfoView /></div>
             <div className={activeTab === 'donate' ? 'block' : 'hidden'}><DonateView /></div>
             <div className={activeTab === 'lashing' ? 'block' : 'hidden'}><LashingCalculator onOpenKnowledge={handleNavigateKnowledge} /></div>
-            <div className={activeTab === 'bkat' ? 'block' : 'hidden'}><BkatPlaceholderView /></div>
+            <div className={activeTab === 'bkat' ? 'block' : 'hidden'}><BkatModule /></div>
           </div>
           <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] pb-safe z-50 no-print transition-colors duration-300">
             <div className="max-w-md mx-auto flex justify-evenly items-center p-2">
