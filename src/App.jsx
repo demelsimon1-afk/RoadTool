@@ -12,7 +12,7 @@ import {
 // ============================================================================
 // SCHRITT FÜR VS CODE / VERCEL:
 // Lösche in VS Code einfach die zwei Schrägstriche (//) vor der nächsten Zeile:
- import tatbestaendeData from './Tatbestaende.json';
+import tatbestaendeData from './Tatbestaende.json';
 // ============================================================================
 
 // --- THEME CONTEXT & STYLES ---
@@ -7512,12 +7512,12 @@ const HomeView = ({ onSelect }) => {
 
     const tiles = [
         { id: 'age', title: 'Altersrechner', icon: Calendar, color: 'text-purple-500', bg: 'bg-purple-50', desc: '' },
+        { id: 'bkat', title: 'BKat', icon: ConstructionConeIcon, color: 'text-orange-500', bg: 'bg-orange-50', desc: 'Bußgeldkatalog' },
         { id: 'license', title: 'Führerschein', icon: CreditCard, color: 'text-sky-500', bg: 'bg-sky-50', desc: 'Schlüsselzahlen o Klassen' },
         { id: 'speed', title: 'Geschwindigkeit', icon: Gauge, color: 'text-amber-500', bg: 'bg-amber-50', desc: 'Laser o Hinterherfahren' },
         { id: 'weight', title: 'Gewichte & Holz', icon: Scale, color: 'text-blue-500', bg: 'bg-blue-50', desc: 'Überladung o Holzgewicht' },
         { id: 'lashing', title: 'Ladungssicherung', icon: Truck, color: 'text-indigo-500', bg: 'bg-indigo-50', desc: 'Niederzurren o Diagonalzurren o PKW-Transporter' },
-        { id: 'knowledge', title: 'Wissensdatenbank', icon: BookOpen, color: 'text-teal-500', bg: 'bg-teal-50', desc: '' },
-        { id: 'bkat', title: 'BKat', icon: ConstructionConeIcon, color: 'text-orange-500', bg: 'bg-orange-50', desc: 'Bußgeldkatalog' }
+        { id: 'knowledge', title: 'Wissensdatenbank', icon: BookOpen, color: 'text-teal-500', bg: 'bg-teal-50', desc: '' }
     ];
 
     return (
@@ -7590,11 +7590,50 @@ function BkatModule() {
   const dateTime = useDateTime();
   const [searchQuery, setSearchQuery] = useState('');
   const [copiedTbnr, setCopiedTbnr] = useState(null);
+  const [expandedLaw, setExpandedLaw] = useState(null);
+  const [expandedPara, setExpandedPara] = useState(null);
 
-  // Nutzt automatisch deine Tatbestaende.json, sobald du oben den Import aktivierst!
+  // Nutzt ausschließlich deine ausgelagerte Tatbestaende.json (keine Fallbacks mehr)
   const data = typeof tatbestaendeData !== 'undefined' 
     ? (Array.isArray(tatbestaendeData) ? tatbestaendeData : (tatbestaendeData.tatbestaende || Object.values(tatbestaendeData)[0] || [])) 
-    : FALLBACK_TATBESTAENDE;
+    : [];
+
+  const LAW_DEFINITIONS = {
+    '1': { short: 'StVO', name: 'Straßenverkehrs-Ordnung' },
+    '2': { short: 'FeV', name: 'Fahrerlaubnis-Verordnung' },
+    '3': { short: 'StVZO', name: 'Straßenverkehrs-Zulassungs-Ordnung' },
+    '4': { short: 'StVG', name: 'Straßenverkehrsgesetz' },
+    '5': { short: 'Ferienreise-VO / GGVSEB', name: 'Ferienreise-VO / Gefahrgut' },
+    '6': { short: 'eKFV', name: 'Elektrokleinstfahrzeuge-Verordnung' },
+    '8': { short: 'FZV', name: 'Fahrzeug-Zulassungsverordnung' }
+  };
+
+  // Gruppierung für die Baumansicht anhand der TBNR (1. Ziffer = Gesetz, 2.+3. Ziffer = Paragraf)
+  const treeData = React.useMemo(() => {
+    const tree = {};
+    Object.keys(LAW_DEFINITIONS).forEach(key => {
+      tree[key] = { ...LAW_DEFINITIONS[key], paragraphs: {}, totalCount: 0 };
+    });
+
+    data.forEach(item => {
+      const tbnrStr = String(item.tbnr || '').trim();
+      if (tbnrStr.length >= 3) {
+        const lawCode = tbnrStr.charAt(0);
+        const paraRaw = tbnrStr.substring(1, 3);
+        const paraNum = parseInt(paraRaw, 10);
+        const paraKey = isNaN(paraNum) ? paraRaw : String(paraNum);
+
+        if (tree[lawCode]) {
+          if (!tree[lawCode].paragraphs[paraKey]) {
+            tree[lawCode].paragraphs[paraKey] = [];
+          }
+          tree[lawCode].paragraphs[paraKey].push(item);
+          tree[lawCode].totalCount++;
+        }
+      }
+    });
+    return tree;
+  }, [data]);
 
   // Intelligente Suche (unterstützt mehrere Suchbegriffe gleichzeitig, z.B. "101 Sachschaden")
   const filteredResults = React.useMemo(() => {
@@ -7604,10 +7643,10 @@ function BkatModule() {
     const terms = q.split(/\s+/);
     
     return data.filter(item => {
-      const tbnr = (item.tbnr || '').toLowerCase();
-      const text = (item.text || '').toLowerCase();
-      const paragraf = (item.paragraf || '').toLowerCase();
-      const bussgeld = (item.bussgeld || '').toLowerCase();
+      const tbnr = String(item.tbnr || '').toLowerCase();
+      const text = String(item.text || item.tatbestand || item.wortlaut || '').toLowerCase();
+      const paragraf = String(item.paragraf || item.paragraph || '').toLowerCase();
+      const bussgeld = String(item.bussgeld || item.betrag || '').toLowerCase();
       
       return terms.every(term => 
         tbnr.includes(term) || 
@@ -7624,6 +7663,90 @@ function BkatModule() {
       setCopiedTbnr(tbnr);
       setTimeout(() => setCopiedTbnr(null), 2000);
     }
+  };
+
+  // Unterstützt alle gängigen Feldnamen für Punkte, Fahrverbot, Bußgeld etc. aus der JSON-Datei
+  const renderTbnrCard = (item, idx) => {
+    const rawPoints = item.punkte ?? item.points ?? item.pkt ?? item.punkt ?? item.Punkte ?? item.Pkt;
+    const hasPoints = rawPoints !== undefined && rawPoints !== null && String(rawPoints).trim() !== '' && String(rawPoints).trim() !== '0' && String(rawPoints).trim() !== '-' && String(rawPoints).trim() !== '0 Pkt' && String(rawPoints).trim() !== '0 Pkt.';
+    const pointsLabel = hasPoints ? (String(rawPoints).toLowerCase().includes('pkt') || String(rawPoints).toLowerCase().includes('punkt') ? String(rawPoints) : `${rawPoints} Pkt.`) : null;
+
+    const rawFv = item.fv ?? item.fahrverbot ?? item.ban ?? item.FV ?? item.Fahrverbot;
+    const hasFv = rawFv !== undefined && rawFv !== null && String(rawFv).trim() !== '' && String(rawFv).trim() !== '0' && String(rawFv).trim() !== '-' && String(rawFv).trim() !== 'kein';
+    const fvLabel = hasFv ? (String(rawFv).toLowerCase().includes('monat') || String(rawFv).toLowerCase().includes('m') ? String(rawFv) : `${rawFv} Mon. FV`) : null;
+
+    const rawFap = item.fap ?? item.FaP ?? item.probezeit;
+    const hasFap = rawFap !== undefined && rawFap !== null && String(rawFap).trim() !== '' && String(rawFap).trim() !== '-' && String(rawFap).trim() !== '0';
+
+    const bussgeldVal = item.bussgeld ?? item.betrag ?? item.cost ?? item.Bussgeld ?? item.geld;
+    const textVal = item.text ?? item.tatbestand ?? item.wortlaut ?? item.beschreibung ?? item.Text;
+    const paragrafVal = item.paragraf ?? item.paragraph ?? item.norm ?? item.Paragraf;
+
+    return (
+      <div 
+        key={item.tbnr + '-' + idx} 
+        className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 hover:border-orange-300 transition-all flex flex-col gap-2.5 animate-in fade-in duration-150"
+      >
+        {/* Top Row: TBNR & Bussgeld / Punkte / FV */}
+        <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2.5 flex-wrap">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => handleCopy(item.tbnr)}
+              className="group relative flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white font-mono font-black text-sm px-3 py-1 rounded-lg shadow-sm transition-all cursor-pointer"
+              title="Tippen zum Kopieren der TBNR"
+            >
+              <span>{item.tbnr}</span>
+              {copiedTbnr === item.tbnr && (
+                <CheckCircle className="w-3.5 h-3.5 text-emerald-400 animate-in zoom-in" />
+              )}
+            </button>
+            {copiedTbnr === item.tbnr && (
+              <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wide animate-in fade-in">
+                Kopiert!
+              </span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-1.5 flex-wrap justify-end">
+            {hasFap && (
+              <div className="bg-sky-50 border border-sky-200 text-sky-800 font-black text-xs px-2 py-1 rounded-lg shadow-sm shrink-0">
+                FaP: {rawFap}
+              </div>
+            )}
+            {fvLabel && (
+              <div className="bg-purple-50 border border-purple-200 text-purple-700 font-black text-xs px-2.5 py-1 rounded-lg shadow-sm shrink-0">
+                {fvLabel}
+              </div>
+            )}
+            {pointsLabel && (
+              <div className="bg-amber-50 border border-amber-300 text-amber-800 font-black text-xs px-2.5 py-1 rounded-lg shadow-sm shrink-0 flex items-center gap-1">
+                <span>{pointsLabel}</span>
+              </div>
+            )}
+            {bussgeldVal && (
+              <div className="bg-red-50 border border-red-200 text-red-700 font-black text-base px-3 py-0.5 rounded-lg shadow-sm shrink-0">
+                {String(bussgeldVal).includes('€') ? bussgeldVal : `${bussgeldVal} €`}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Middle Row: Tatbestandstext */}
+        <p className="text-slate-800 text-xs sm:text-sm font-medium leading-relaxed">
+          {textVal}
+        </p>
+
+        {/* Bottom Row: Paragraf */}
+        {paragrafVal && (
+          <div className="bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-100 flex items-center gap-2 mt-0.5">
+            <ScaleLaw className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+            <span className="text-[10px] font-mono text-slate-500 leading-tight">
+              {paragrafVal}
+            </span>
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -7676,70 +7799,102 @@ function BkatModule() {
           </div>
         </div>
 
-        {/* Results Area */}
+        {/* Results or Tree View Area */}
         <div className="space-y-2.5 pt-1">
           {!searchQuery.trim() ? (
-            <div className="text-center p-8 mt-4 bg-white border border-slate-200 rounded-2xl shadow-sm text-slate-400 text-sm flex flex-col items-center gap-3">
-              <div className="w-16 h-16 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center shadow-inner border border-orange-100">
-                <Search className="w-8 h-8 opacity-80" />
+            <div className="space-y-2">
+              <div className="px-2 py-1 flex items-center justify-between">
+                <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                  <List className="w-3.5 h-3.5 text-orange-500" /> Katalog nach Gesetzen & Paragrafen
+                </span>
               </div>
-              <div className="space-y-1 max-w-[240px]">
-                <p className="text-slate-700 font-bold uppercase tracking-wide text-xs">BKat-Schnellsuche bereit</p>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  Gib eine <strong>TBNR</strong> (z. B. 101000), ein <strong>Stichwort</strong> (z. B. Schleudern, Gurt) oder einen <strong>Paragrafen</strong> ein.
-                </p>
-            
-              </div>
-            </div>
-          ) : filteredResults.length > 0 ? (
-            filteredResults.map((item, idx) => (
-              <div 
-                key={item.tbnr + '-' + idx} 
-                className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 hover:border-orange-300 transition-all flex flex-col gap-2.5 animate-in fade-in duration-150"
-              >
-                {/* Top Row: TBNR & Bussgeld */}
-                <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
-                  <div className="flex items-center gap-2">
+
+              {Object.entries(treeData).map(([lawCode, lawInfo]) => {
+                const isLawOpen = expandedLaw === lawCode;
+                const sortedParas = Object.keys(lawInfo.paragraphs).sort((a, b) => Number(a) - Number(b));
+
+                return (
+                  <div key={lawCode} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden transition-all">
+                    {/* Level 1: Gesetz */}
                     <button
-                      onClick={() => handleCopy(item.tbnr)}
-                      className="group relative flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white font-mono font-black text-sm px-3 py-1 rounded-lg shadow-sm transition-all cursor-pointer"
-                      title="Tippen zum Kopieren der TBNR"
+                      onClick={() => {
+                        setExpandedLaw(isLawOpen ? null : lawCode);
+                        setExpandedPara(null);
+                      }}
+                      className={`w-full p-3.5 text-left flex items-center justify-between transition-colors ${isLawOpen ? 'bg-orange-50/70 border-b border-orange-100' : 'hover:bg-slate-50'}`}
                     >
-                      <span>{item.tbnr}</span>
-                      {copiedTbnr === item.tbnr && (
-                        <CheckCircle className="w-3.5 h-3.5 text-emerald-400 animate-in zoom-in" />
-                      )}
+                      <div className="flex items-center gap-3">
+                        <div className={`w-9 h-9 rounded-xl font-mono font-black text-sm flex items-center justify-center shadow-sm transition-colors ${isLawOpen ? 'bg-orange-600 text-white' : 'bg-slate-800 text-white'}`}>
+                          {lawCode}
+                        </div>
+                        <div>
+                          <div className="font-black text-slate-800 text-sm flex items-center gap-2">
+                            <span>{lawInfo.short}</span>
+                          </div>
+                          <div className="text-[11px] text-slate-500 font-medium">{lawInfo.name}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">
+                          {lawInfo.totalCount}
+                        </span>
+                        {isLawOpen ? <ChevronUp className="w-5 h-5 text-orange-600" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
+                      </div>
                     </button>
-                    {copiedTbnr === item.tbnr && (
-                      <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wide animate-in fade-in">
-                        Kopiert!
-                      </span>
+
+                    {/* Level 2: Paragrafen */}
+                    {isLawOpen && (
+                      <div className="p-2 bg-slate-50/60 space-y-1.5 animate-in fade-in duration-150">
+                        {sortedParas.length === 0 ? (
+                          <div className="text-center py-4 text-xs text-slate-400 italic">
+                            Keine Tatbestände für dieses Gesetz geladen.
+                          </div>
+                        ) : (
+                          sortedParas.map(paraNum => {
+                            const paraKey = `${lawCode}-${paraNum}`;
+                            const isParaOpen = expandedPara === paraKey;
+                            const items = lawInfo.paragraphs[paraNum];
+
+                            return (
+                              <div key={paraKey} className="bg-white rounded-xl border border-slate-200/80 overflow-hidden shadow-sm">
+                                <button
+                                  onClick={() => setExpandedPara(isParaOpen ? null : paraKey)}
+                                  className={`w-full px-3.5 py-2.5 text-left flex items-center justify-between transition-colors ${isParaOpen ? 'bg-slate-800 text-white' : 'hover:bg-slate-50 text-slate-700'}`}
+                                >
+                                  <div className="flex items-center gap-2.5">
+                                    <span className={`font-mono text-xs font-bold px-2 py-0.5 rounded ${isParaOpen ? 'bg-slate-700 text-orange-300' : 'bg-orange-50 text-orange-700 border border-orange-200/60'}`}>
+                                      {lawCode}{String(paraNum).padStart(2, '0')}...
+                                    </span>
+                                    <span className="font-bold text-xs sm:text-sm">
+                                      {paraNum === '0' ? 'Allgemein / Sonstige (§ 00)' : `§ ${paraNum} ${lawInfo.short}`}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isParaOpen ? 'bg-slate-700 text-slate-300' : 'bg-slate-100 text-slate-500'}`}>
+                                      {items.length} {items.length === 1 ? 'Eintrag' : 'Einträge'}
+                                    </span>
+                                    {isParaOpen ? <ChevronUp className="w-4 h-4 text-orange-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                                  </div>
+                                </button>
+
+                                {/* Level 3: Tatbestände zum Paragrafen */}
+                                {isParaOpen && (
+                                  <div className="p-2 bg-slate-100/70 space-y-2 border-t border-slate-200">
+                                    {items.map((item, idx) => renderTbnrCard(item, idx))}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })
+                        )}
+                      </div>
                     )}
                   </div>
-
-                  {item.bussgeld && (
-                    <div className="bg-red-50 border border-red-200 text-red-700 font-black text-base px-3 py-0.5 rounded-lg shadow-sm shrink-0">
-                      {item.bussgeld}
-                    </div>
-                  )}
-                </div>
-
-                {/* Middle Row: Tatbestandstext */}
-                <p className="text-slate-800 text-xs sm:text-sm font-medium leading-relaxed">
-                  {item.text}
-                </p>
-
-                {/* Bottom Row: Paragraf */}
-                {item.paragraf && (
-                  <div className="bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-100 flex items-center gap-2 mt-0.5">
-                    <ScaleLaw className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                    <span className="text-[10px] font-mono text-slate-500 leading-tight">
-                      {item.paragraf}
-                    </span>
-                  </div>
-                )}
-              </div>
-            ))
+                );
+              })}
+            </div>
+          ) : filteredResults.length > 0 ? (
+            filteredResults.map((item, idx) => renderTbnrCard(item, idx))
           ) : (
             <div className="text-center p-8 bg-white border border-slate-200 rounded-2xl shadow-sm text-slate-500 text-sm font-medium">
               Keine Tatbestände für <strong className="text-slate-800">"{searchQuery}"</strong> gefunden.
