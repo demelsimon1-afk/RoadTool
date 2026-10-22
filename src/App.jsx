@@ -430,7 +430,7 @@ const HeaderLogo = () => {
             {isDarkMode ? <Sun className="w-4 h-4 text-yellow-300" /> : <Moon className="w-4 h-4 text-white" />}
         </button>
         <span className="text-base font-black text-white/50 tracking-wider italic select-none border border-white/20 px-3 py-1 rounded-md backdrop-blur-sm">
-            POK Demel
+            Demel
         </span>
     </div>
   );
@@ -5182,7 +5182,7 @@ const ESCOOTER_TUNING_MODELS = [
                                             <ul className="list-disc list-inside space-y-1 font-normal">
                                                 <li>Promille-/ BTM-Grenzen sind gleich wie beim PKW (§§ 24a, 24c StVG, § 316 StGB)</li>
                                                 <li>Führerscheinrechtliche Maßnahmen (z.B. Beschlagnahme FS) sind ebenfalls anwendbar</li>
-                                                <li>Eine Deckung innerhalb der Haftpflichtversicherung ist ausreichend, um keinen Verstoß nach dem PflVG zu begehen. Im Zweifelsfall Polizei/Versicherung prüfen.</li>
+                                                <li>Eine Deckung innerhalb der Haftpflichtversicherung ist ausreichend, um keinen Verstoß nach dem PflVG zu begehen. Im Zweifelsfall Versicherung prüfen.</li>
                                                 <li> Das bloße Tunen eines E-Scooters zur Erhöhung der Geschwindigkeit führt <strong>nicht automatisch</strong> zu einem Fahren ohne Versicherungsschutz. Eine solche Straftat liegt erst dann vor, wenn der Versicherer von der technischen Veränderung Kenntnis erlangt und den Versicherungsvertrag daraufhin wirksam kündigt.</li>
 
                                                 <li>Sobald ein Mangel beim Fahrzeugführer festgestellt wird, sollte nach § 2 (12) StVG eine Meldung an die zuständige Führerscheinstelle erfolgen.</li>
