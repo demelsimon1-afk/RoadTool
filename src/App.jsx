@@ -7609,6 +7609,19 @@ function BkatModule() {
   };
 
   // Gruppierung für die Baumansicht anhand der TBNR (1. Ziffer = Gesetz, 2.+3. Ziffer = Paragraf)
+  const LAW_DEFINITIONS = {
+    '1': { short: 'StVO', name: 'Straßenverkehrs-Ordnung' },
+    '2': { short: 'FeV', name: 'Fahrerlaubnis-Verordnung' },
+    '3': { short: 'StVZO', name: 'Straßenverkehrs-Zulassungs-Ordnung' },
+    '4': { short: 'StVG', name: 'Straßenverkehrsgesetz' },
+    '5': { short: 'Ferienreise-VO / GGVSEB', name: 'Ferienreise-VO / Gefahrgut' },
+    '6': { short: 'eKFV', name: 'Elektrokleinstfahrzeuge-Verordnung' },
+    '8': { short: 'FZV', name: 'Fahrzeug-Zulassungsverordnung' }
+  };
+
+  // ==========================================
+  // HIER GEHÖRT DER NEUE CODE HIN (ERSETZT DEN ALTEN treeData-BLOCK)
+  // ==========================================
   const treeData = React.useMemo(() => {
     const tree = {};
     Object.keys(LAW_DEFINITIONS).forEach(key => {
@@ -7620,16 +7633,22 @@ function BkatModule() {
       if (tbnrStr.length >= 3) {
         const lawCode = tbnrStr.charAt(0);
         const paraRaw = tbnrStr.substring(1, 3);
-        const paraNum = parseInt(paraRaw, 10);
-        const paraKey = isNaN(paraNum) ? paraRaw : String(paraNum);
+        const paraKey = /^\d+$/.test(paraRaw) ? String(parseInt(paraRaw, 10)) : paraRaw;
 
-        if (tree[lawCode]) {
-          if (!tree[lawCode].paragraphs[paraKey]) {
-            tree[lawCode].paragraphs[paraKey] = [];
-          }
-          tree[lawCode].paragraphs[paraKey].push(item);
-          tree[lawCode].totalCount++;
+        if (!tree[lawCode]) {
+          tree[lawCode] = { 
+            short: `Gesetz ${lawCode}`, 
+            name: 'Weitere Tatbestände', 
+            paragraphs: {}, 
+            totalCount: 0 
+          };
         }
+
+        if (!tree[lawCode].paragraphs[paraKey]) {
+          tree[lawCode].paragraphs[paraKey] = [];
+        }
+        tree[lawCode].paragraphs[paraKey].push(item);
+        tree[lawCode].totalCount++;
       }
     });
     return tree;
