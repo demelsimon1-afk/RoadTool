@@ -7584,33 +7584,7 @@ const HomeView = ({ onSelect }) => {
     );
 };
 
-// --- BKAT MODULE (BUSSGELDKATALOG) ---
-const FALLBACK_TATBESTAENDE = [
-  {
-    "tbnr": "101000",
-    "text": "Sie kamen von der Fahrbahn ab und verursachten Sachschaden.",
-    "bussgeld": "35,00 €",
-    "paragraf": "§ 1 Abs. 2, § 49 StVO; § 24 StVG; -- BKat"
-  },
-  {
-    "tbnr": "101006",
-    "text": "Sie gerieten ins Schleudern und verursachten Sachschaden.",
-    "bussgeld": "35,00 €",
-    "paragraf": "§ 1 Abs. 2, § 49 StVO; § 24 StVG; -- BKat"
-  },
-  {
-    "tbnr": "121172",
-    "text": "Sie hatten während der Fahrt den vorgeschriebenen Sicherheitsgurt nicht angelegt.",
-    "bussgeld": "30,00 €",
-    "paragraf": "§ 21a Abs. 1, § 49 StVO; § 24 StVG; 100 BKat"
-  },
-  {
-    "tbnr": "123624",
-    "text": "Sie benutzten als Führer eines Kraftfahrzeugs ein elektronisches Gerät, das der Kommunikation, Information oder Organisation dient oder zu dienen bestimmt ist, in vorschriftswidriger Weise.",
-    "bussgeld": "100,00 €",
-    "paragraf": "§ 23 Abs. 1a, § 49 StVO; § 24 StVG; 246.1 BKat"
-  }
-];
+
 
 function BkatModule() {
   const dateTime = useDateTime();
@@ -7714,19 +7688,7 @@ function BkatModule() {
                 <p className="text-xs text-slate-500 leading-relaxed">
                   Gib eine <strong>TBNR</strong> (z. B. 101000), ein <strong>Stichwort</strong> (z. B. Schleudern, Gurt) oder einen <strong>Paragrafen</strong> ein.
                 </p>
-              </div>
-              {/* Vorschläge zum schnellen Testen */}
-              <div className="flex flex-wrap justify-center gap-1.5 mt-2 pt-3 border-t border-slate-100 w-full">
-                <span className="text-[10px] text-slate-400 w-full mb-1 font-bold uppercase">Beispiele testen:</span>
-                {['101000', 'Sachschaden', 'Gurt', '§ 23'].map(term => (
-                  <button
-                    key={term}
-                    onClick={() => setSearchQuery(term)}
-                    className="px-2.5 py-1 bg-slate-100 hover:bg-orange-50 text-slate-600 hover:text-orange-700 rounded-lg text-xs font-medium transition-colors border border-slate-200/60"
-                  >
-                    {term}
-                  </button>
-                ))}
+            
               </div>
             </div>
           ) : filteredResults.length > 0 ? (
