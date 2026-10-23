@@ -7593,10 +7593,38 @@ function BkatModule() {
   const [expandedLaw, setExpandedLaw] = useState(null);
   const [expandedPara, setExpandedPara] = useState(null);
 
-  // Nutzt ausschließlich deine ausgelagerte Tatbestaende.json (keine Fallbacks mehr)
-  const data = typeof tatbestaendeData !== 'undefined' 
-    ? (Array.isArray(tatbestaendeData) ? tatbestaendeData : (tatbestaendeData.tatbestaende || Object.values(tatbestaendeData)[0] || [])) 
-    : [];
+  // Robuste Daten-Extraktion und Normalisierung für verschiedene JSON-Strukturen
+  const data = React.useMemo(() => {
+    if (typeof tatbestaendeData === 'undefined' || !tatbestaendeData) return [];
+    
+    let rawList = [];
+    if (Array.isArray(tatbestaendeData)) {
+      rawList = tatbestaendeData;
+    } else if (Array.isArray(tatbestaendeData.tatbestaende)) {
+      rawList = tatbestaendeData.tatbestaende;
+    } else {
+      const values = Object.values(tatbestaendeData);
+      if (values.length > 0 && Array.isArray(values[0])) {
+        // Falls das JSON in mehrere Kategorien-Arrays aufgeteilt ist, alle zusammenführen
+        rawList = values.flat();
+      } else if (values.length > 0 && typeof values[0] === 'object' && values[0] !== null) {
+        // Falls das JSON ein Objekt mit TBNRs als Schlüssel ist: { "123000": { ... } }
+        rawList = Object.entries(tatbestaendeData).map(([k, v]) => ({ tbnr: k, ...v }));
+      }
+    }
+
+    return rawList.map(item => {
+      if (!item || typeof item !== 'object') return null;
+      // Findet das TBNR-Feld unabhängig von Groß-/Kleinschreibung oder alternativen Bezeichnungen
+      const rawTbnr = item.tbnr ?? item.TBNR ?? item.Tbnr ?? item.tatbestandsnummer ?? item.id ?? item.nummer ?? item.code ?? '';
+      // Entfernt Leerzeichen oder Sonderzeichen am Anfang (z.B. unsichtbare BOM-Zeichen), damit charAt(0) immer die Gesetzes-Ziffer trifft
+      const cleanTbnr = String(rawTbnr).replace(/^[^0-9a-zA-Z]+/, '').trim();
+      return {
+        ...item,
+        tbnr: cleanTbnr
+      };
+    }).filter(item => item && item.tbnr.length > 0);
+  }, []);
 
   const LAW_DEFINITIONS = {
     '1': { short: 'StVO', name: 'Straßenverkehrs-Ordnung' },
@@ -7605,7 +7633,9 @@ function BkatModule() {
     '4': { short: 'StVG', name: 'Straßenverkehrsgesetz' },
     '5': { short: 'Ferienreise-VO / GGVSEB', name: 'Ferienreise-VO / Gefahrgut' },
     '6': { short: 'eKFV', name: 'Elektrokleinstfahrzeuge-Verordnung' },
-    '8': { short: 'FZV', name: 'Fahrzeug-Zulassungsverordnung' }
+    '7': { short: 'Sonstige / StVUnfStatG', name: 'Sonstige Vorschriften' },
+    '8': { short: 'FZV', name: 'Fahrzeug-Zulassungsverordnung' },
+    '9': { short: 'Sonstige', name: 'Weitere Vorschriften' }
   };
 
   // Gruppierung für die Baumansicht anhand der TBNR (1. Ziffer = Gesetz, 2.+3. Ziffer = Paragraf)
@@ -7616,21 +7646,17 @@ function BkatModule() {
     });
 
     data.forEach(item => {
-      const tbnrStr = String(item.tbnr || '').trim();
+      const tbnrStr = item.tbnr;
       if (tbnrStr.length >= 3) {
         const lawCode = tbnrStr.charAt(0);
         const paraRaw = tbnrStr.substring(1, 3);
-        const paraKey = /^\d+$/.test(paraRaw) ? String(parseInt(paraRaw, 10)) : paraRaw;
+        const paraNum = parseInt(paraRaw, 10);
+        const paraKey = isNaN(paraNum) ? paraRaw : String(paraNum);
 
+        // Falls eine unbekannte Anfangsziffer auftaucht, trotzdem auffangen statt verschlucken
         if (!tree[lawCode]) {
-          tree[lawCode] = { 
-            short: `Gesetz ${lawCode}`, 
-            name: 'Weitere Tatbestände', 
-            paragraphs: {}, 
-            totalCount: 0 
-          };
+          tree[lawCode] = { short: `Kennziffer ${lawCode}`, name: 'Sonstige Vorschriften', paragraphs: {}, totalCount: 0 };
         }
-
         if (!tree[lawCode].paragraphs[paraKey]) {
           tree[lawCode].paragraphs[paraKey] = [];
         }
