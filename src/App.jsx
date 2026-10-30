@@ -13,7 +13,7 @@ import {
 // SCHRITT FÜR VS CODE / VERCEL:
 // Lösche in VS Code einfach die zwei Schrägstriche (//) vor der nächsten Zeile:
 import tatbestaendeData from './Tatbestaende.json';
-const tatbestaendeData = [];
+//const tatbestaendeData = [];
 // ============================================================================
 
 // --- THEME CONTEXT & STYLES ---
