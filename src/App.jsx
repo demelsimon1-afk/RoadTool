@@ -12,7 +12,7 @@ import {
 // ============================================================================
 // SCHRITT FÜR VS CODE / VERCEL:
 // Lösche in VS Code einfach die zwei Schrägstriche (//) vor der nächsten Zeile:
-//import tatbestaendeData from './Tatbestaende.json';
+import tatbestaendeData from './Tatbestaende.json';
 const tatbestaendeData = [];
 // ============================================================================
 
@@ -85,74 +85,84 @@ const PrintStyles = () => (
         max-width: 100%;
         margin: 0;
         padding: 0;
+        color: #1e293b;
       }
 
       h1.print-title {
-        font-size: 18pt;
-        font-weight: bold;
-        margin-bottom: 10px;
-        border-bottom: 2px solid #000;
-        padding-bottom: 5px;
+        font-size: 16pt;
+        font-weight: 900;
+        margin-bottom: 4px;
+        border-bottom: 2px solid #0f172a;
+        padding-bottom: 6px;
         text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #0f172a;
       }
 
       h2.print-section {
-        font-size: 14pt;
-        font-weight: bold;
-        margin-top: 20px;
-        margin-bottom: 10px;
-        background-color: #f0f0f0;
-        padding: 5px;
-        border-left: 5px solid #666;
+        font-size: 11pt;
+        font-weight: 800;
+        margin-top: 16px;
+        margin-bottom: 8px;
+        background-color: #f1f5f9 !important;
+        padding: 5px 10px;
+        border-left: 4px solid #334155;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #0f172a;
       }
 
       .print-meta {
         font-size: 9pt;
-        color: #666;
-        margin-bottom: 20px;
-        font-style: italic;
+        color: #475569;
+        margin-bottom: 16px;
       }
 
       /* PRINT TABLES */
       table.print-table {
         width: 100%;
         border-collapse: collapse;
-        margin-bottom: 15px;
-        font-size: 10pt;
+        margin-bottom: 14px;
+        font-size: 9.5pt;
         page-break-inside: avoid;
       }
       
       table.print-table th, table.print-table td {
-        border: 1px solid #ccc;
-        padding: 6px 8px;
+        border: 1px solid #cbd5e1;
+        padding: 6px 10px;
         text-align: left;
-        vertical-align: top;
+        vertical-align: middle;
       }
 
       table.print-table th {
-        background-color: #e5e5e5;
-        font-weight: bold;
-        width: 40%;
+        background-color: #f8fafc !important;
+        font-weight: 700;
+        color: #334155;
+        width: 38%;
       }
 
       /* RESULT BOX IN PRINT */
       .print-result-box {
-        border: 2px solid #000;
-        padding: 10px;
-        margin-top: 15px;
+        border: 2px solid #0f172a;
+        border-radius: 6px;
+        padding: 12px 14px;
+        margin-top: 14px;
         page-break-inside: avoid;
-        background-color: #fafafa;
+        background-color: #f8fafc !important;
       }
       
       .print-result-header {
-        font-weight: bold;
-        font-size: 12pt;
-        margin-bottom: 5px;
+        font-weight: 900;
+        font-size: 11pt;
+        margin-bottom: 6px;
         text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid #cbd5e1;
+        padding-bottom: 4px;
       }
 
       .print-warning {
-        color: #d00;
+        color: #dc2626 !important;
         font-weight: bold;
       }
 
@@ -2640,7 +2650,10 @@ function LashingCalculator({ onOpenKnowledge }) {
   const [fitSide, setFitSide] = useState(false);
   const [fitRear, setFitRear] = useState(false);
   const [bodyCert, setBodyCert] = useState('NONE'); 
-  const [hasSlats, setHasSlats] = useState(true); // Einstecklatten bei Code L (true = 30%, false = 15%)
+  const [codeLType, setCodeLType] = useState('planenauflieger'); // 'planenauflieger' | 'hamburger'
+  const [hasSlats, setHasSlats] = useState(true); // Einstecklatten bei Planenauflieger (true = 30%, false = 15%)
+  const [fitBordwand, setFitBordwand] = useState(false); // Hamburger Verdeck: Formschluss Bordwand (24%)
+  const [fitPlane, setFitPlane] = useState(false); // Hamburger Verdeck: Formschluss Planenaufbau (6%)
   const [lashingResult, setLashingResult] = useState(null);
   const [fineGroups, setFineGroups] = useState([]);
   
@@ -2707,9 +2720,15 @@ function LashingCalculator({ onOpenKnowledge }) {
     const empty = parseFloat(emptyWeight) || 0;
     const payload = Math.max(0, total - empty);
     if (bodyCert === 'L') {
+      let sideFactor = 0;
+      if (codeLType === 'planenauflieger') {
+        sideFactor = hasSlats ? 0.30 : 0.15;
+      } else if (codeLType === 'hamburger') {
+        sideFactor = (fitBordwand ? 0.24 : 0) + (fitPlane ? 0.06 : 0);
+      }
       return { 
         front: Math.min(5000, Math.round(payload * 0.40)), 
-        side: Math.round(payload * (hasSlats ? 0.30 : 0.15)), 
+        side: Math.round(payload * sideFactor), 
         rear: Math.min(3100, Math.round(payload * 0.25)) 
       };
     }
@@ -2730,16 +2749,18 @@ function LashingCalculator({ onOpenKnowledge }) {
     } else {
        setWallFront(standards.front.toString()); setWallSide(standards.side.toString()); setWallRear(standards.rear.toString());
     }
-  }, [bodyCert, hasSlats, allowedWeight, emptyWeight]);
-  
+  }, [bodyCert, codeLType, hasSlats, fitBordwand, fitPlane, allowedWeight, emptyWeight]);
+
+  // Automatische Synchronisation des seitlichen Formschlusses beim Hamburger Verdeck / Polensprinter
   useEffect(() => {
-    const standards = getStandardForces();
-    if (bodyCert === 'NONE' || bodyCert === null) {
-       setWallFront('0'); setWallSide('0'); setWallRear('0');
-    } else {
-       setWallFront(standards.front.toString()); setWallSide(standards.side.toString()); setWallRear(standards.rear.toString());
+    if (bodyCert === 'L' && codeLType === 'hamburger') {
+      if (fitBordwand || fitPlane) {
+        setFitSide(true);
+      } else {
+        setFitSide(false);
+      }
     }
-  }, [bodyCert, allowedWeight, emptyWeight]);
+  }, [bodyCert, codeLType, fitBordwand, fitPlane]);
   
   useEffect(() => {
     setFineGroups([]);
@@ -2928,101 +2949,227 @@ function LashingCalculator({ onOpenKnowledge }) {
       );
   };
 
+  const getPrintBodyCertDescription = () => {
+    if (bodyCert === 'NONE') {
+      return 'Kein geprüfter Aufbau (z. B. Kleintransporter mit geschlossenem Kastenaufbau)';
+    }
+    if (bodyCert === 'XL') {
+      return 'Code XL (Zertifizierter Aufbau nach DIN EN 12642 XL - Stirn: 50%, Seite: 30%, Heck: 40% der Nutzlast)';
+    }
+    if (bodyCert === 'L') {
+      if (codeLType === 'planenauflieger') {
+        return `Code L – Planenauflieger (${hasSlats ? 'Mit Einstecklatten: 30% der Nutzlast' : 'Ohne Einstecklatten: 15% der Nutzlast'})`;
+      } else {
+        const parts = [];
+        if (fitBordwand) parts.push('Formschluss Bordwand (24%)');
+        if (fitPlane) parts.push('Formschluss Planenaufbau (6%)');
+        const totalPct = (fitBordwand ? 24 : 0) + (fitPlane ? 6 : 0);
+        const selectionText = parts.length > 0 ? `${parts.join(' + ')} = ${totalPct}% der Nutzlast` : 'Kein seitlicher Formschluss gewählt (0%)';
+        return `Code L – Hamburger Verdeck / Planen-Transporter (${selectionText})`;
+      }
+    }
+    return '-';
+  };
+
+  const calculatedPayload = Math.max(0, (parseFloat(allowedWeight) || 0) - (parseFloat(emptyWeight) || 0));
+
   return (
     <div className="max-w-md mx-auto bg-slate-50 min-h-screen">
       
       {/* PRINT VIEW ONLY (Niederzurren) */}
       {lashingType === 'nieder' && (
       <div className="print-only print-container">
-        <h1 className="print-title">LaSi-Protokoll (Niederzurren)</h1>
-        <div className="print-meta">Erstellt am: {dateTime}</div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '3px solid #0f172a', paddingBottom: '10px', marginBottom: '18px' }}>
+          <div>
+            <div style={{ fontSize: '8.5pt', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1.5px', color: '#475569', marginBottom: '2px' }}>
+              Prüf- & Berechnungsdokumentation
+            </div>
+            <h1 className="print-title" style={{ borderBottom: 'none', marginBottom: 0, paddingBottom: 0, fontSize: '18pt' }}>
+              Ladungssicherungs-Protokoll (Niederzurren)
+            </h1>
+          </div>
+          <div style={{ textAlign: 'right', fontSize: '9pt', color: '#334155', lineHeight: '1.4' }}>
+            <div><strong>Datum / Uhrzeit:</strong> {dateTime}</div>
+            <div><strong>Berechnungsnorm:</strong> {(!allowedWeight || parseFloat(allowedWeight) <= 3500) ? 'Spezialformel (≤ 3,5 t)' : 'VDI 2700 / DIN EN 12195-1 (> 3,5 t)'}</div>
+          </div>
+        </div>
   
-        <h2 className="print-section">Eingabedaten</h2>
+        <h2 className="print-section">1. Fahrzeug- & Ladungsparameter</h2>
         <table className="print-table">
            <tbody>
-              <tr><th>Ladungsgewicht</th><td>{loadWeight || 0} kg</td></tr>
-              <tr><th>Reibbeiwert (µ)</th><td>{friction.toFixed(2)}</td></tr>
-              <tr><th>Vertikalwinkel (a)</th><td>{angle}°</td></tr>
-              <tr><th>Vorspannkraft (STF)</th><td>{stf} daN</td></tr>
-              <tr><th>Fahrzeugaufbau</th><td>{bodyCert === 'NONE' ? 'Kein geprüfter Aufbau' : bodyCert === 'L' ? `Code L (${hasSlats ? 'mit Einstecklatten - 30%' : 'ohne Einstecklatten - 15%'})` : `Code ${bodyCert}`}</td></tr>
+              <tr>
+                <th>Fahrzeugaufbau</th>
+                <td colSpan="3"><strong>{getPrintBodyCertDescription()}</strong></td>
+              </tr>
+              <tr>
+                <th style={{ width: '28%' }}>Zul. Gesamtmasse (zGM)</th>
+                <td style={{ width: '22%' }}>{allowedWeight ? `${Number(allowedWeight).toLocaleString('de-DE')} kg` : 'Nicht angegeben'}</td>
+                <th style={{ width: '28%' }}>Leergewicht Fahrzeug</th>
+                <td style={{ width: '22%' }}>{emptyWeight ? `${Number(emptyWeight).toLocaleString('de-DE')} kg` : 'Nicht angegeben'}</td>
+              </tr>
+              <tr>
+                <th>Rechnerische Nutzlast</th>
+                <td>{calculatedPayload > 0 ? `${calculatedPayload.toLocaleString('de-DE')} kg` : '-'}</td>
+                <th>Gewichtsklasse (c-Werte)</th>
+                <td>{lashingResult?.weightClassInfo || '-'}</td>
+              </tr>
+              <tr>
+                <th>Ladungsgewicht (m)</th>
+                <td><strong>{loadWeight ? `${Number(loadWeight).toLocaleString('de-DE')} kg` : '0 kg'}</strong></td>
+                <th>Gleit-Reibbeiwert (µ)</th>
+                <td><strong>{friction.toFixed(2).replace('.', ',')} µ</strong></td>
+              </tr>
+              <tr>
+                <th>Vertikalwinkel (α)</th>
+                <td><strong>{angle}°</strong></td>
+                <th>Vorspannkraft (S<sub>TF</sub>)</th>
+                <td><strong>{stf} daN</strong></td>
+              </tr>
            </tbody>
         </table>
   
-        <h2 className="print-section">Formschluss & Blockierkräfte</h2>
+        <h2 className="print-section">2. Formschluss & Aufbaubelastbarkeit</h2>
         <table className="print-table">
-           <thead><tr><th>Richtung</th><th>Formschluss aktiv</th><th>Kraft (daN)</th></tr></thead>
+           <thead>
+             <tr>
+               <th style={{ width: '25%' }}>Richtung</th>
+               <th style={{ width: '25%' }}>Formschluss gegeben</th>
+               <th style={{ width: '25%' }}>Angerechnete Haltekraft (F<sub>Form</sub>)</th>
+               <th style={{ width: '25%' }}>Bemerkung / Spezifikation</th>
+             </tr>
+           </thead>
            <tbody>
-               <tr><td>Stirnwand</td><td>{fitFront ? 'Ja' : 'Nein'}</td><td>{fitFront ? wallFront : 0} daN</td></tr>
-               <tr><td>Seite</td><td>{fitSide ? 'Ja' : 'Nein'}</td><td>{fitSide ? wallSide : 0} daN</td></tr>
-               <tr><td>Heck</td><td>{fitRear ? 'Ja' : 'Nein'}</td><td>{fitRear ? wallRear : 0} daN</td></tr>
+               <tr>
+                 <td><strong>Stirnwand (Vorne)</strong></td>
+                 <td>{fitFront ? 'Ja (Aktiv)' : 'Nein'}</td>
+                 <td><strong>{fitFront ? `${Number(wallFront || 0).toLocaleString('de-DE')} daN` : '0 daN'}</strong></td>
+                 <td>{bodyCert === 'L' ? 'Code L (40% Nutzlast, max. 5.000 daN)' : bodyCert === 'XL' ? 'Code XL (50% Nutzlast)' : 'Manuell / Kein Prüfnachweis'}</td>
+               </tr>
+               <tr>
+                 <td><strong>Seitenwand (Links/Rechts)</strong></td>
+                 <td>{fitSide ? 'Ja (Aktiv)' : 'Nein'}</td>
+                 <td><strong>{fitSide ? `${Number(wallSide || 0).toLocaleString('de-DE')} daN` : '0 daN'}</strong></td>
+                 <td>
+                   {bodyCert === 'L' && codeLType === 'planenauflieger' && (hasSlats ? 'Planenauflieger mit Einstecklatten (30%)' : 'Planenauflieger ohne Einstecklatten (15%)')}
+                   {bodyCert === 'L' && codeLType === 'hamburger' && (
+                     (fitBordwand || fitPlane)
+                       ? `Planen-Transporter: ${[fitBordwand ? 'Bordwand (24%)' : '', fitPlane ? 'Planenaufbau (6%)' : ''].filter(Boolean).join(' + ')}`
+                       : 'Planen-Transporter (Kein seitl. Formschluss)'
+                   )}
+                   {bodyCert === 'XL' && 'Code XL (30% Nutzlast)'}
+                   {bodyCert === 'NONE' && 'Manuell / Kein Prüfnachweis'}
+                 </td>
+               </tr>
+               <tr>
+                 <td><strong>Rückwand (Heck)</strong></td>
+                 <td>{fitRear ? 'Ja (Aktiv)' : 'Nein'}</td>
+                 <td><strong>{fitRear ? `${Number(wallRear || 0).toLocaleString('de-DE')} daN` : '0 daN'}</strong></td>
+                 <td>{bodyCert === 'L' ? 'Code L (25% Nutzlast, max. 3.100 daN)' : bodyCert === 'XL' ? 'Code XL (40% Nutzlast)' : 'Manuell / Kein Prüfnachweis'}</td>
+               </tr>
            </tbody>
         </table>
   
         {lashingResult && (
         <>
-            <h2 className="print-section">Ergebnis: Erforderliche Gurte</h2>
+            <h2 className="print-section">3. Berechnungsergebnis: Erforderliche Zurrgurte</h2>
             <table className="print-table">
-               <thead><tr><th>Richtung</th><th>Berechnungsfaktor (c)</th><th>Sicherheitsbeiwert (f<sub>s</sub>)</th><th>Winkel (a)</th><th>Mindestanzahl Gurte</th></tr></thead>
+               <thead>
+                 <tr>
+                   <th style={{ width: '22%' }}>Richtung</th>
+                   <th style={{ width: '16%' }}>Beschl.-Beiwert (c)</th>
+                   <th style={{ width: '16%' }}>Gleit-Reib. (µ)</th>
+                   <th style={{ width: '16%' }}>Winkel (α)</th>
+                   <th style={{ width: '15%' }}>Sicherheits-Beiwert (f<sub>s</sub>)</th>
+                   <th style={{ width: '15%' }}>Erforderliche Gurte</th>
+                 </tr>
+               </thead>
                <tbody>
-                   <tr><td>Sicherung nach Vorne</td><td>{lashingResult.factorForward}g</td><td>{(!allowedWeight || allowedWeight <= 3500) ? '1,0' : '1,25'}</td><td>{angle}°</td><td><strong>{lashingResult.forward}</strong></td></tr>
-                   <tr><td>Sicherung zur Seite</td><td>{lashingResult.factorSide}g</td><td>{(!allowedWeight || allowedWeight <= 3500) ? '1,0' : '1,1'}</td><td>{angle}°</td><td><strong>{lashingResult.side}</strong></td></tr>
-                   <tr><td>Sicherung nach Hinten</td><td>{lashingResult.factorRear}g</td><td>{(!allowedWeight || allowedWeight <= 3500) ? '1,0' : '1,1'}</td><td>{angle}°</td><td><strong>{lashingResult.rear}</strong></td></tr>
+                   <tr>
+                     <td><strong>Nach Vorne</strong></td>
+                     <td>{lashingResult.factorForward.toString().replace('.', ',')} g</td>
+                     <td>{friction.toFixed(2).replace('.', ',')}</td>
+                     <td>{angle}°</td>
+                     <td>{(!allowedWeight || allowedWeight <= 3500) ? '1,0' : '1,25'}</td>
+                     <td><strong style={{ fontSize: '11pt' }}>{lashingResult.forward} Stück</strong></td>
+                   </tr>
+                   <tr>
+                     <td><strong>Zur Seite</strong></td>
+                     <td>{lashingResult.factorSide.toString().replace('.', ',')} g</td>
+                     <td>{friction.toFixed(2).replace('.', ',')}</td>
+                     <td>{angle}°</td>
+                     <td>{(!allowedWeight || allowedWeight <= 3500) ? '1,0' : '1,1'}</td>
+                     <td><strong style={{ fontSize: '11pt' }}>{lashingResult.side} Stück</strong></td>
+                   </tr>
+                   <tr>
+                     <td><strong>Nach Hinten</strong></td>
+                     <td>{lashingResult.factorRear.toString().replace('.', ',')} g</td>
+                     <td>{friction.toFixed(2).replace('.', ',')}</td>
+                     <td>{angle}°</td>
+                     <td>{(!allowedWeight || allowedWeight <= 3500) ? '1,0' : '1,1'}</td>
+                     <td><strong style={{ fontSize: '11pt' }}>{lashingResult.rear} Stück</strong></td>
+                   </tr>
                </tbody>
            </table>
+
             <div className="print-result-box">
-               <div className="print-result-header">Gesamtempfehlung</div>
-               <div>Es sind rechnerisch mindestens <strong>{Math.max(lashingResult.forward, lashingResult.side, lashingResult.rear)}</strong> Zurrgurte (Niederzurren) bei einem Vertikalwinkel von <strong>{angle}°</strong> erforderlich.</div>
+               <div className="print-result-header">Gesamtauswertung & Mindestanzahl Zurrmittel</div>
+               <div style={{ fontSize: '10.5pt', lineHeight: '1.5' }}>
+                 Für eine ordnungsgemäße kraftschlüssige Sicherung (Niederzurren) sind rechnerisch mindestens <strong>{Math.max(lashingResult.forward, lashingResult.side, lashingResult.rear)} Zurrgurte</strong> (je {stf} daN S<sub>TF</sub> bei α = {angle}°) erforderlich.
+               </div>
                {(() => {
                    const maxCalc = Math.max(lashingResult.forward, lashingResult.side, lashingResult.rear);
                    const anyFit = fitFront || fitSide || fitRear;
                    const allFit = fitFront && fitSide && fitRear;
                    if (!anyFit && maxCalc <= 1) {
-                       return <div style={{ marginTop: '6px', color: '#b45309', fontWeight: 'bold' }}>⚠️ Hinweis (Verdrehschutz): Da kein Formschluss vorliegt (freistehende Ladung), müssen insgesamt mindestens 2 Gurte verwendet werden, damit sich die Ladung nicht verdreht!</div>;
+                       return <div style={{ marginTop: '8px', padding: '6px 10px', backgroundColor: '#fef3c7', borderLeft: '4px solid #d97706', color: '#92400e', fontWeight: 'bold', fontSize: '9.5pt' }}>⚠️ Hinweis (Verdrehschutz bei freistehender Ladung): Da kein Formschluss vorliegt, müssen insgesamt mindestens 2 Gurte verwendet werden, um ein Verdrehen oder Wandern der Ladung zu verhindern!</div>;
                    }
                    if (anyFit && !allFit && maxCalc === 0) {
-                       return <div style={{ marginTop: '6px', color: '#b45309', fontWeight: 'bold' }}>⚠️ Hinweis (Verdrehschutz): Trotz teilweisem Formschluss sollte insgesamt mindestens 1 Gurt als Verdrehschutz verwendet werden!</div>;
+                       return <div style={{ marginTop: '8px', padding: '6px 10px', backgroundColor: '#fef3c7', borderLeft: '4px solid #d97706', color: '#92400e', fontWeight: 'bold', fontSize: '9.5pt' }}>⚠️ Hinweis (Verdrehschutz bei Teil-Formschluss): Trotz teilweisem Formschluss und rechnerisch 0 erforderlichen Gurten muss insgesamt mindestens 1 Gurt als Verdrehschutz angelegt werden!</div>;
                    }
                    return null;
                })()}
            </div>
 
-           {/* --- START: NEUER BERECHNUNGSNACHWEIS FÜR AUSDRUCK (NIEDERZURREN) --- */}
-           <div className="mt-6 p-4 border-2 border-slate-300 rounded-xl bg-white text-black">
-             <h3 className="text-md font-bold mb-3 border-b-2 border-black pb-1">
-               Berechnungsnachweis nach VDI 2700
-             </h3>
-             <div className="space-y-3">
-               <p className="font-semibold">Verfahren: Kraftschlüssige Ladungssicherung (Niederzurren)</p>
-               <div className="font-mono text-sm p-4 bg-slate-50 rounded border border-slate-200">
-                 <p className="font-bold mb-1 text-slate-500">Angewandte Formel:</p>
-                 <p className="text-base mb-4">n = (((m · g · c) - F_Form - (m · g · µ)){(!allowedWeight || allowedWeight <= 3500) ? '' : ' · f_s'}) / (k · µ · STF · sin(a))</p>
-                 
-                 <div className="pt-4 border-t border-slate-300">
-                   <p className="font-bold mb-1 text-slate-500">Eingesetzte Werte (z.B. Sicherung nach vorn, Winkel a = {angle}°):</p>
-                   <p>n = ((({loadWeight || 0} · 9,81 · {lashingResult.factorForward}) - {fitFront ? wallFront * 10 : 0} - ({loadWeight || 0} · 9,81 · {friction.toFixed(2)})){(!allowedWeight || allowedWeight <= 3500) ? '' : ' · 1,25'}) / ({(!allowedWeight || allowedWeight <= 3500) ? '1,8' : '2'} · {friction.toFixed(2)} · {(stf || 0) * 10} · sin({angle || 0}°))</p>
+           {/* --- BERECHNUNGSNACHWEIS FÜR AUSDRUCK (NIEDERZURREN) --- */}
+           <div style={{ marginTop: '16px', padding: '12px 14px', border: '1px solid #cbd5e1', borderRadius: '6px', backgroundColor: '#ffffff', pageBreakInside: 'avoid' }}>
+             <div style={{ fontSize: '10pt', fontWeight: '800', textTransform: 'uppercase', borderBottom: '1px solid #e2e8f0', paddingBottom: '4px', marginBottom: '8px', color: '#334155' }}>
+               4. Mathematischer Berechnungsnachweis (VDI 2700 / DIN EN 12195-1)
+             </div>
+             <div style={{ fontSize: '9.5pt', lineHeight: '1.5' }}>
+               <div style={{ marginBottom: '6px' }}><strong>Verfahren:</strong> Kraftschlüssige Ladungssicherung (Niederzurren)</div>
+               <div style={{ fontFamily: 'monospace', padding: '8px 10px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '4px' }}>
+                 <div style={{ fontWeight: 'bold', color: '#475569', marginBottom: '2px' }}>Allgemeine Formel:</div>
+                 <div style={{ marginBottom: '8px', fontSize: '10pt' }}>n = (((m · g · c) - F_Form - (m · g · µ)){(!allowedWeight || allowedWeight <= 3500) ? '' : ' · f_s'}) / ({(!allowedWeight || allowedWeight <= 3500) ? '1,8' : '2'} · µ · sin(α) · S_TF)</div>
+                 <div style={{ borderTop: '1px dashed #cbd5e1', paddingTop: '6px', fontWeight: 'bold', color: '#475569', marginBottom: '2px' }}>
+                   Eingesetzte Werte (Beispiel Sicherung nach Vorne, α = {angle}°):
+                 </div>
+                 <div style={{ fontSize: '9.5pt' }}>
+                   n = ((({loadWeight || 0} kg · 9,81 m/s² · {lashingResult.factorForward}) - {fitFront ? (parseFloat(wallFront) || 0) * 10 : 0} N - ({loadWeight || 0} kg · 9,81 m/s² · {friction.toFixed(2)})){(!allowedWeight || allowedWeight <= 3500) ? '' : ' · 1,25'}) / ({(!allowedWeight || allowedWeight <= 3500) ? '1,8' : '2'} · {friction.toFixed(2)} · sin({angle || 0}°) · {(parseFloat(stf) || 0) * 10} N) = <strong>{lashingResult.forward} Gurte</strong>
                  </div>
                </div>
              </div>
            </div>
-           {/* --- ENDE: NEUER BERECHNUNGSNACHWEIS --- */}
 
-           {/* NEU: DRUCK-ANSICHT FÜR EINZIEHUNG */}
+           {/* DRUCK-ANSICHT FÜR EINZIEHUNG */}
            {showUnsecuredCalc && (
-               <>
-                   <h2 className="print-section" style={{ marginTop: '30px' }}>Prüfung auf Einziehung (Ungesicherte Ladung)</h2>
+               <div style={{ pageBreakInside: 'avoid' }}>
+                   <h2 className="print-section" style={{ marginTop: '20px' }}>5. Prüfung auf Einziehung (Ungesicherte Ladung in %)</h2>
                    <table className="print-table">
                        <tbody>
-                           <tr><th style={{ width: '40%' }}>Vor Ort angebrachte Gurte</th><td><strong>{actualStraps || 0}</strong></td></tr>
+                           <tr>
+                             <th style={{ width: '38%' }}>Tatsächlich vor Ort angebrachte Zurrgurte</th>
+                             <td><strong>{actualStraps || 0} Stück</strong></td>
+                           </tr>
                        </tbody>
                    </table>
-                   <table className="print-table" style={{ marginTop: '10px' }}>
+                   <table className="print-table" style={{ marginTop: '8px' }}>
                        <thead>
                            <tr>
-                               <th>Richtung</th>
-                               <th>Fehlende Kraft (Gesamt)</th>
-                               <th>Durch Gurte gedeckt</th>
-                               <th>Ungesichert in %</th>
-                               <th>Einziehung?</th>
+                               <th style={{ width: '20%' }}>Richtung</th>
+                               <th style={{ width: '20%' }}>Fehlende Kraft (Gesamt)</th>
+                               <th style={{ width: '20%' }}>Durch Gurte gedeckt</th>
+                               <th style={{ width: '20%' }}>Ungesicherter Anteil</th>
+                               <th style={{ width: '20%' }}>Einziehung (≥ 30%)</th>
                            </tr>
                        </thead>
                        <tbody>
@@ -3033,7 +3180,7 @@ function LashingCalculator({ onOpenKnowledge }) {
                                    const missingForceN = numN - (appliedStraps * strapForceN);
                                    
                                    if (missingForceN <= 0) {
-                                       return <tr key={label}><td>{label}</td><td colSpan="4" style={{textAlign:'center', color: '#16a34a', fontWeight: 'bold'}}>0 % ungesichert (Ausreichend gesichert)</td></tr>;
+                                       return <tr key={label}><td><strong>{label}</strong></td><td colSpan="4" style={{textAlign:'center', color: '#16a34a', fontWeight: 'bold'}}>0,0 % ungesichert (Ladung in diese Richtung ausreichend gesichert)</td></tr>;
                                    }
                                    
                                    const g = 9.81;
@@ -3045,11 +3192,11 @@ function LashingCalculator({ onOpenKnowledge }) {
 
                                    return (
                                        <tr key={label}>
-                                           <td>{label}</td>
-                                           <td>{Math.round(numN / 10).toLocaleString()} daN</td>
-                                           <td>{Math.round((appliedStraps * strapForceN) / 10).toLocaleString()} daN</td>
-                                           <td className={isEinziehung ? 'print-warning' : ''}><strong>{percentage.toFixed(1)} %</strong></td>
-                                           <td className={isEinziehung ? 'print-warning' : ''}><strong>{isEinziehung ? '⚠️ JA (≥ 30%)' : 'NEIN'}</strong></td>
+                                           <td><strong>{label}</strong></td>
+                                           <td>{Math.round(numN / 10).toLocaleString('de-DE')} daN</td>
+                                           <td>{Math.round((appliedStraps * strapForceN) / 10).toLocaleString('de-DE')} daN</td>
+                                           <td className={isEinziehung ? 'print-warning' : ''}><strong>{percentage.toFixed(1).replace('.', ',')} %</strong></td>
+                                           <td className={isEinziehung ? 'print-warning' : ''}><strong>{isEinziehung ? '⚠️ JA (Einziehung prüfen)' : 'NEIN (< 30%)'}</strong></td>
                                        </tr>
                                    );
                                };
@@ -3058,13 +3205,47 @@ function LashingCalculator({ onOpenKnowledge }) {
                                    <>
                                        {lashingResult.numFwd > 0 && printUnsecuredRow('Nach Vorne', lashingResult.numFwd, lashingResult.strapForceFwd, lashingResult.factorForward, friction, loadWeight)}
                                        {lashingResult.numSide > 0 && printUnsecuredRow('Zur Seite', lashingResult.numSide, lashingResult.strapForceSide, lashingResult.factorSide, friction, loadWeight)}
-                                           </>
-                                       );
-                                   })()}
-                               </tbody>
-                           </table>
-                       </>
+                                       {lashingResult.numRear > 0 && printUnsecuredRow('Nach Hinten', lashingResult.numRear, lashingResult.strapForceRear, lashingResult.factorRear, friction, loadWeight)}
+                                   </>
+                               );
+                           })()}
+                       </tbody>
+                   </table>
+               </div>
+           )}
+
+           {/* MÖGLICHE TATBESTÄNDE AUF DEM PROTOKOLL */}
+           {fineGroups.length > 0 && (
+             <div style={{ pageBreakInside: 'avoid' }}>
+               <h2 className="print-section" style={{ marginTop: '20px' }}>
+                 {showUnsecuredCalc ? '6.' : '5.'} Mögliche Bußgeldtatbestände (BKat)
+               </h2>
+               <table className="print-table">
+                 <thead>
+                   <tr>
+                     <th style={{ width: '35%' }}>Fahrzeugart</th>
+                     <th style={{ width: '15%' }}>Betroffener</th>
+                     <th style={{ width: '15%' }}>TBNR</th>
+                     <th style={{ width: '15%' }}>Regelsatz</th>
+                     <th style={{ width: '20%' }}>Punkte / Hinweis</th>
+                   </tr>
+                 </thead>
+                 <tbody>
+                   {fineGroups.map((group) =>
+                     group.items.map((item, idx) => (
+                       <tr key={`${group.title}-${idx}`}>
+                         <td>{group.title}</td>
+                         <td><strong>{item.role}</strong></td>
+                         <td style={{ fontFamily: 'monospace', fontWeight: 'bold' }}>{item.code}</td>
+                         <td><strong>{item.cost}</strong></td>
+                         <td>{[item.points, item.note].filter(Boolean).join(' – ') || '-'}</td>
+                       </tr>
+                     ))
                    )}
+                 </tbody>
+               </table>
+             </div>
+           )}
         </>
         )}
       </div>
@@ -3298,39 +3479,74 @@ function LashingCalculator({ onOpenKnowledge }) {
                    <ShieldCheck className="w-3.5 h-3.5" /> Fahrzeugaufbau wählen
                </div>
                <div className="grid grid-cols-2 gap-2">
-                    <button onClick={() => setBodyCert('NONE')} className={`col-span-2 py-2.5 rounded-xl font-bold text-xs sm:text-sm border-2 flex items-center justify-center gap-1.5 transition-all ${bodyCert === 'NONE' ? 'bg-slate-700 text-white border-slate-700 shadow-md transform scale-[1.02]' : 'bg-white text-slate-500 border-slate-100 hover:border-indigo-200'}`}>
+                    <button onClick={() => setBodyCert('NONE')} className={`col-span-2 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm border-2 flex flex-col items-center justify-center transition-all ${bodyCert === 'NONE' ? 'bg-slate-700 text-white border-slate-700 shadow-md transform scale-[1.02]' : 'bg-white text-slate-600 border-slate-100 hover:border-indigo-200'}`}>
                          <span>Kein geprüfter Aufbau</span>
+                         <span className={`text-[10px] font-normal mt-0.5 ${bodyCert === 'NONE' ? 'text-slate-200' : 'text-slate-400'}`}>(z.B.: Kleintransporter mit geschlossenem Kastenaufbau)</span>
                    </button>
-                   <button onClick={() => setBodyCert('L')} className={`py-2.5 rounded-xl font-bold text-xs sm:text-sm border-2 flex items-center justify-center gap-1.5 transition-all ${bodyCert === 'L' ? 'bg-indigo-600 text-white border-indigo-600 shadow-md transform scale-[1.02]' : 'bg-white text-slate-500 border-slate-100 hover:border-indigo-200'}`}>
+                   <button onClick={() => setBodyCert('L')} className={`py-2.5 px-2 rounded-xl font-bold text-xs sm:text-sm border-2 flex flex-col items-center justify-center text-center transition-all ${bodyCert === 'L' ? 'bg-indigo-600 text-white border-indigo-600 shadow-md transform scale-[1.02]' : 'bg-white text-slate-600 border-slate-100 hover:border-indigo-200'}`}>
                        <span>Code L</span>
+                       <span className={`text-[9px] font-normal leading-tight mt-0.5 ${bodyCert === 'L' ? 'text-indigo-100' : 'text-slate-400'}`}>(z.B. „Polensprinter, Planenauflieger, Hamburger Verdeck“)</span>
                    </button>
-                    <button onClick={() => setBodyCert('XL')} className={`py-2.5 rounded-xl font-bold text-xs sm:text-sm border-2 flex items-center justify-center gap-1.5 transition-all ${bodyCert === 'XL' ? 'bg-indigo-600 text-white border-indigo-600 shadow-md transform scale-[1.02]' : 'bg-white text-slate-500 border-slate-100 hover:border-indigo-200'}`}>
+                    <button onClick={() => setBodyCert('XL')} className={`py-2.5 px-2 rounded-xl font-bold text-xs sm:text-sm border-2 flex flex-col items-center justify-center transition-all ${bodyCert === 'XL' ? 'bg-indigo-600 text-white border-indigo-600 shadow-md transform scale-[1.02]' : 'bg-white text-slate-600 border-slate-100 hover:border-indigo-200'}`}>
                        <span>Code XL</span>
                    </button>
                </div>
 
                {bodyCert === 'L' && (
-                   <div className="mt-3 pt-2.5 border-t border-slate-100 animate-in fade-in slide-in-from-top-1 duration-200">
-                       <div className="text-[10px] font-bold text-slate-400 uppercase mb-1.5 flex items-center justify-between">
-                           <span>Seitenwand-Ausführung (Code L)</span>
-                           <span className="text-indigo-600 font-mono">Stirn: 40% (max. 5000) | Heck: 25% (max. 3100)</span>
-                       </div>
+                   <div className="mt-3 pt-2.5 border-t border-slate-100 animate-in fade-in slide-in-from-top-1 duration-200 space-y-2.5">
+                       {/* Auswahl: Planenauflieger vs. Hamburger Verdeck / Polensprinter */}
                        <div className="grid grid-cols-2 gap-2">
                            <button
-                               onClick={() => setHasSlats(true)}
-                               className={`py-2 px-2 rounded-lg font-bold text-xs border transition-all flex flex-col items-center justify-center ${hasSlats ? 'bg-indigo-50 text-indigo-800 border-indigo-300 shadow-sm' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}`}
+                               onClick={() => setCodeLType('planenauflieger')}
+                               className={`py-2 px-2 rounded-lg font-bold text-xs border transition-all flex items-center justify-center text-center ${codeLType === 'planenauflieger' ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}
                            >
-                               <span>Mit Einstecklatten</span>
-                               <span className="text-[10px] opacity-75 font-normal">Seite: 30 % Nutzlast</span>
+                               Planenauflieger
                            </button>
                            <button
-                               onClick={() => setHasSlats(false)}
-                               className={`py-2 px-2 rounded-lg font-bold text-xs border transition-all flex flex-col items-center justify-center ${!hasSlats ? 'bg-indigo-50 text-indigo-800 border-indigo-300 shadow-sm' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}`}
+                               onClick={() => setCodeLType('hamburger')}
+                               className={`py-2 px-2 rounded-lg font-bold text-xs border transition-all flex items-center justify-center text-center leading-tight ${codeLType === 'hamburger' ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}
                            >
-                               <span>Ohne Einstecklatten</span>
-                               <span className="text-[10px] opacity-75 font-normal">Seite: 15 % Nutzlast</span>
+                               Hamburger Verdeck / Polensprinter
                            </button>
                        </div>
+
+                       {/* Unterauswahl Planenauflieger */}
+                       {codeLType === 'planenauflieger' && (
+                           <div className="grid grid-cols-2 gap-2 animate-in fade-in duration-150">
+                               <button
+                                   onClick={() => setHasSlats(true)}
+                                   className={`py-2.5 px-2 rounded-lg font-bold text-xs border transition-all flex items-center justify-center text-center ${hasSlats ? 'bg-indigo-50 text-indigo-800 border-indigo-300 shadow-sm ring-1 ring-indigo-200' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}`}
+                               >
+                                   Mit Einstecklatten
+                               </button>
+                               <button
+                                   onClick={() => setHasSlats(false)}
+                                   className={`py-2.5 px-2 rounded-lg font-bold text-xs border transition-all flex items-center justify-center text-center ${!hasSlats ? 'bg-indigo-50 text-indigo-800 border-indigo-300 shadow-sm ring-1 ring-indigo-200' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}`}
+                               >
+                                   Ohne Einstecklatten
+                               </button>
+                           </div>
+                       )}
+
+                       {/* Unterauswahl Hamburger Verdeck / Polensprinter (Mehrfachauswahl möglich) */}
+                       {codeLType === 'hamburger' && (
+                           <div className="grid grid-cols-2 gap-2 animate-in fade-in duration-150">
+                               <button
+                                   onClick={() => setFitBordwand(!fitBordwand)}
+                                   className={`py-2.5 px-2 rounded-lg font-bold text-xs border transition-all flex items-center justify-center gap-1.5 text-center ${fitBordwand ? 'bg-indigo-50 text-indigo-800 border-indigo-300 shadow-sm ring-1 ring-indigo-200' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}`}
+                               >
+                                   <input type="checkbox" checked={fitBordwand} readOnly className="w-3.5 h-3.5 rounded border-slate-300 text-indigo-600 pointer-events-none" />
+                                   <span>Formschluss Bordwand</span>
+                               </button>
+                               <button
+                                   onClick={() => setFitPlane(!fitPlane)}
+                                   className={`py-2.5 px-2 rounded-lg font-bold text-xs border transition-all flex items-center justify-center gap-1.5 text-center ${fitPlane ? 'bg-indigo-50 text-indigo-800 border-indigo-300 shadow-sm ring-1 ring-indigo-200' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}`}
+                               >
+                                   <input type="checkbox" checked={fitPlane} readOnly className="w-3.5 h-3.5 rounded border-slate-300 text-indigo-600 pointer-events-none" />
+                                   <span>Formschluss Planenaufbau</span>
+                               </button>
+                           </div>
+                       )}
                    </div>
                )}
            </div>
