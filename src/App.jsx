@@ -449,7 +449,7 @@ const HeaderLogo = () => {
 
 const AppVersionFooter = () => (
     <div className="text-center text-[10px] text-slate-300 font-mono py-2 select-none no-print">
-        RoadTool v. 4.0
+        RoadTool v. 4.1
     </div>
 );
 
@@ -7772,7 +7772,7 @@ const HomeView = ({ onSelect }) => {
     const dateTime = useDateTime();
     
     // --- HIER UPDATE TEXT EINTRAGEN ---
-    const updateText = "‼️ Update 4.0: Bundeseinheitlicher Tatbestandskatalog integriert";
+    const updateText = "‼️ Update 4.1: LASI Niederzurren um Aufbaukategorien erweitert";
 
     const tiles = [
         { id: 'age', title: 'Altersrechner', icon: Calendar, color: 'text-purple-500', bg: 'bg-purple-50', desc: '' },
