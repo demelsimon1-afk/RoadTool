@@ -2753,12 +2753,8 @@ function LashingCalculator({ onOpenKnowledge }) {
 
   // Automatische Synchronisation des seitlichen Formschlusses beim Hamburger Verdeck / Polensprinter
   useEffect(() => {
-    if (bodyCert === 'L' && codeLType === 'hamburger') {
-      if (fitBordwand || fitPlane) {
-        setFitSide(true);
-      } else {
-        setFitSide(false);
-      }
+    if (bodyCert === 'L' && codeLType === 'hamburger' && (fitBordwand || fitPlane)) {
+      setFitSide(true);
     }
   }, [bodyCert, codeLType, fitBordwand, fitPlane]);
   
@@ -3532,14 +3528,22 @@ function LashingCalculator({ onOpenKnowledge }) {
                        {codeLType === 'hamburger' && (
                            <div className="grid grid-cols-2 gap-2 animate-in fade-in duration-150">
                                <button
-                                   onClick={() => setFitBordwand(!fitBordwand)}
+                                   onClick={() => {
+                                       const next = !fitBordwand;
+                                       setFitBordwand(next);
+                                       setFitSide(next || fitPlane);
+                                   }}
                                    className={`py-2.5 px-2 rounded-lg font-bold text-xs border transition-all flex items-center justify-center gap-1.5 text-center ${fitBordwand ? 'bg-indigo-50 text-indigo-800 border-indigo-300 shadow-sm ring-1 ring-indigo-200' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}`}
                                >
                                    <input type="checkbox" checked={fitBordwand} readOnly className="w-3.5 h-3.5 rounded border-slate-300 text-indigo-600 pointer-events-none" />
                                    <span>Formschluss Bordwand</span>
                                </button>
                                <button
-                                   onClick={() => setFitPlane(!fitPlane)}
+                                   onClick={() => {
+                                       const next = !fitPlane;
+                                       setFitPlane(next);
+                                       setFitSide(fitBordwand || next);
+                                   }}
                                    className={`py-2.5 px-2 rounded-lg font-bold text-xs border transition-all flex items-center justify-center gap-1.5 text-center ${fitPlane ? 'bg-indigo-50 text-indigo-800 border-indigo-300 shadow-sm ring-1 ring-indigo-200' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}`}
                                >
                                    <input type="checkbox" checked={fitPlane} readOnly className="w-3.5 h-3.5 rounded border-slate-300 text-indigo-600 pointer-events-none" />
