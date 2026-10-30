@@ -12,7 +12,8 @@ import {
 // ============================================================================
 // SCHRITT FÜR VS CODE / VERCEL:
 // Lösche in VS Code einfach die zwei Schrägstriche (//) vor der nächsten Zeile:
-import tatbestaendeData from './Tatbestaende.json';
+//import tatbestaendeData from './Tatbestaende.json';
+const tatbestaendeData = [];
 // ============================================================================
 
 // --- THEME CONTEXT & STYLES ---
@@ -2639,6 +2640,7 @@ function LashingCalculator({ onOpenKnowledge }) {
   const [fitSide, setFitSide] = useState(false);
   const [fitRear, setFitRear] = useState(false);
   const [bodyCert, setBodyCert] = useState('NONE'); 
+  const [hasSlats, setHasSlats] = useState(true); // Einstecklatten bei Code L (true = 30%, false = 15%)
   const [lashingResult, setLashingResult] = useState(null);
   const [fineGroups, setFineGroups] = useState([]);
   
@@ -2704,10 +2706,31 @@ function LashingCalculator({ onOpenKnowledge }) {
     const total = parseFloat(allowedWeight) || 0;
     const empty = parseFloat(emptyWeight) || 0;
     const payload = Math.max(0, total - empty);
-    if (bodyCert === 'L') return { front: 5000, side: Math.round(payload * 0.15), rear: 3100 };
-    if (bodyCert === 'XL') return { front: Math.round(payload * 0.50), side: Math.round(payload * 0.30), rear: Math.round(payload * 0.40) };
+    if (bodyCert === 'L') {
+      return { 
+        front: Math.min(5000, Math.round(payload * 0.40)), 
+        side: Math.round(payload * (hasSlats ? 0.30 : 0.15)), 
+        rear: Math.min(3100, Math.round(payload * 0.25)) 
+      };
+    }
+    if (bodyCert === 'XL') {
+      return { 
+        front: Math.round(payload * 0.50), 
+        side: Math.round(payload * 0.30), 
+        rear: Math.round(payload * 0.40) 
+      };
+    }
     return { front: 0, side: 0, rear: 0 };
   };
+  
+  useEffect(() => {
+    const standards = getStandardForces();
+    if (bodyCert === 'NONE' || bodyCert === null) {
+       setWallFront('0'); setWallSide('0'); setWallRear('0');
+    } else {
+       setWallFront(standards.front.toString()); setWallSide(standards.side.toString()); setWallRear(standards.rear.toString());
+    }
+  }, [bodyCert, hasSlats, allowedWeight, emptyWeight]);
   
   useEffect(() => {
     const standards = getStandardForces();
@@ -2772,7 +2795,7 @@ function LashingCalculator({ onOpenKnowledge }) {
            const denominator = 1.8 * Math.sin(alphaRad) * mu * stfInNewton;
            if (denominator <= 0) return 0; 
            n = numerator / denominator;
-           return Math.floor(n); 
+           return Math.ceil(n); 
        } else {
            let safetyFactor = (direction === 'forward') ? 1.25 : 1.1; 
            const numerator = (weightForce * acc) - blockingForce - (weightForce * mu);
@@ -2921,7 +2944,7 @@ function LashingCalculator({ onOpenKnowledge }) {
               <tr><th>Reibbeiwert (µ)</th><td>{friction.toFixed(2)}</td></tr>
               <tr><th>Vertikalwinkel (a)</th><td>{angle}°</td></tr>
               <tr><th>Vorspannkraft (STF)</th><td>{stf} daN</td></tr>
-              <tr><th>Fahrzeugaufbau</th><td>{bodyCert === 'NONE' ? 'Kein geprüfter Aufbau' : `Code ${bodyCert}`}</td></tr>
+              <tr><th>Fahrzeugaufbau</th><td>{bodyCert === 'NONE' ? 'Kein geprüfter Aufbau' : bodyCert === 'L' ? `Code L (${hasSlats ? 'mit Einstecklatten - 30%' : 'ohne Einstecklatten - 15%'})` : `Code ${bodyCert}`}</td></tr>
            </tbody>
         </table>
   
@@ -3285,6 +3308,31 @@ function LashingCalculator({ onOpenKnowledge }) {
                        <span>Code XL</span>
                    </button>
                </div>
+
+               {bodyCert === 'L' && (
+                   <div className="mt-3 pt-2.5 border-t border-slate-100 animate-in fade-in slide-in-from-top-1 duration-200">
+                       <div className="text-[10px] font-bold text-slate-400 uppercase mb-1.5 flex items-center justify-between">
+                           <span>Seitenwand-Ausführung (Code L)</span>
+                           <span className="text-indigo-600 font-mono">Stirn: 40% (max. 5000) | Heck: 25% (max. 3100)</span>
+                       </div>
+                       <div className="grid grid-cols-2 gap-2">
+                           <button
+                               onClick={() => setHasSlats(true)}
+                               className={`py-2 px-2 rounded-lg font-bold text-xs border transition-all flex flex-col items-center justify-center ${hasSlats ? 'bg-indigo-50 text-indigo-800 border-indigo-300 shadow-sm' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}`}
+                           >
+                               <span>Mit Einstecklatten</span>
+                               <span className="text-[10px] opacity-75 font-normal">Seite: 30 % Nutzlast</span>
+                           </button>
+                           <button
+                               onClick={() => setHasSlats(false)}
+                               className={`py-2 px-2 rounded-lg font-bold text-xs border transition-all flex flex-col items-center justify-center ${!hasSlats ? 'bg-indigo-50 text-indigo-800 border-indigo-300 shadow-sm' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}`}
+                           >
+                               <span>Ohne Einstecklatten</span>
+                               <span className="text-[10px] opacity-75 font-normal">Seite: 15 % Nutzlast</span>
+                           </button>
+                       </div>
+                   </div>
+               )}
            </div>
   
            {/* GEWICHTE CARD */}
