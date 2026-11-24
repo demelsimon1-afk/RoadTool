@@ -8485,7 +8485,8 @@ function StayCalculator() {
   const [showDropdown, setShowDropdown] = useState(false);
 
   const [hasBiometricPassport, setHasBiometricPassport] = useState(true);
-  const [hasSchengenPermit, setHasSchengenPermit] = useState(false);
+  // 'none' | 'without_work' | 'with_work'
+  const [permitStatus, setPermitStatus] = useState('none');
 
   // Aufenthaltsdaten: Einreisedatum, Kontrolldatum & beliebige vorherige Aufenthalte
   const [entryDate, setEntryDate] = useState('');
@@ -8603,7 +8604,7 @@ function StayCalculator() {
   // Gesamtbewertung nach VO (EU) 2018/1806, AufenthG, AufenthV und BeschV
   const evaluation = React.useMemo(() => {
     if (!selectedCountry) return null;
-    if (stayMetrics && stayMetrics.error) return null;
+    if (permitStatus !== 'with_work' && stayMetrics && stayMetrics.error) return null;
 
     // 1. EU / EWR / Schweiz
     if (selectedCountry.status === 'eu') {
@@ -8618,13 +8619,29 @@ function StayCalculator() {
       };
     }
 
+    // 2. Gültiger Aufenthaltstitel mit Erwerbstätigkeitserlaubnis (DE)
+    if (permitStatus === 'with_work') {
+      return {
+        status: 'ok',
+        badge: 'AUFENTHALT & ERWERBSTÄTIGKEIT ERLAUBT',
+        headline: 'Durch gültigen Aufenthaltstitel gedeckt',
+        summary: `Es liegt ein gültiger deutscher Aufenthaltstitel (bzw. Visum D) mit Erlaubnis zur Erwerbstätigkeit vor. Die 90/180-Tage-Kurzaufenthaltsgrenze findet keine Anwendung.`,
+        legalRefs: ['§ 4 Abs. 1 AufenthG (Erfordernis eines Aufenthaltstitels erfüllt)', '§ 4a Abs. 1 AufenthG (Zugang zur Erwerbstätigkeit)'],
+        violations: [],
+        notes: [
+          'Bitte Gültigkeitsdauer des Titels sowie etwaige Nebenbestimmungen (z. B. Arbeitgeber-, Tätigkeits- oder Stundenbindung auf dem Titel oder Zusatzblatt) kontrollieren.',
+          'Gültiger Nationalpass bzw. Passersatz muss mitgeführt werden (§ 3 AufenthG).'
+        ]
+      };
+    }
+
     const totalDays = stayMetrics ? stayMetrics.totalDaysIn180 : 0;
     const isOver90 = stayMetrics ? totalDays > 90 : false;
     const biometricMissing = Boolean(selectedCountry.biometricRequired && !hasBiometricPassport);
 
-    // Grundsätzliche Visumbefreiung für Kurzaufenthalt (bis 90/180 Tage)
+    // Grundsätzliche Befreiung für Kurzaufenthalt (bis 90/180 Tage)
     const isShortStayVisaFreeBase =
-      hasSchengenPermit || (selectedCountry.status === 'visa_free' && !biometricMissing);
+      permitStatus === 'without_work' || (selectedCountry.status === 'visa_free' && !biometricMissing);
 
     const reasons = [];
     const legalRefs = [];
@@ -8638,15 +8655,15 @@ function StayCalculator() {
       notes.push('§ 41 Abs. 2 AufenthV (Privilegierter Staat): Ein Aufenthaltstitel für Nicht-Erwerbszwecke kann im Inland beantragt werden. Für eine Erwerbstätigkeit ist vorab ein Visum erforderlich.');
     }
 
-    if (hasSchengenPermit) {
-      legalRefs.push('Art. 21 SDÜ (Aufenthaltstitel / Visum D eines anderen Schengen-Staates)');
+    if (permitStatus === 'without_work') {
+      legalRefs.push('Aufenthaltstitel ohne Erwerbstätigkeit (z. B. Art. 21 SDÜ – anderer Schengen-Staat oder Titel ohne Arbeitserlaubnis)');
     } else if (selectedCountry.status === 'visa_free') {
       legalRefs.push('Art. 4 Abs. 1 i. V. m. Anhang II VO (EU) 2018/1806 (Positivstaat)');
     } else {
       legalRefs.push('Art. 3 Abs. 1 i. V. m. Anhang I VO (EU) 2018/1806 (Negativstaat)');
     }
 
-    // Fall A: Grundsätzlich visumpflichtig (Anhang I ohne Schengen-Titel oder fehlender biometrischer Pass)
+    // Fall A: Grundsätzlich visumpflichtig (Anhang I ohne Titel oder fehlender biometrischer Pass)
     if (!isShortStayVisaFreeBase) {
       if (biometricMissing) {
         reasons.push(`Für ${selectedCountry.name} gilt die Visumfreiheit nach Anhang II VO (EU) 2018/1806 nur mit biometrischem Reisepass. Ohne biometrischen Pass besteht Visumpflicht.`);
@@ -8677,7 +8694,7 @@ function StayCalculator() {
       };
     }
 
-    // Fall B: Grundsätzlich visumfrei für Kurzaufenthalt (Positivstaat mit gültigem Pass ODER Schengen-Titel)
+    // Fall B: Grundsätzlich visumfrei für Kurzaufenthalt (Positivstaat mit gültigem Pass ODER Aufenthaltstitel ohne Erwerbstätigkeit)
     // Prüfung 1: Überschreitung 90/180 Tage
     if (isOver90) {
       reasons.push(`Die zulässige Kurzaufenthaltsdauer von 90 Tagen innerhalb von 180 Tagen wurde überschritten (berechnet: ${totalDays} Tage; Überschreitung um ${stayMetrics.overstayDays} Tag${stayMetrics.overstayDays === 1 ? '' : 'e'}).`);
@@ -8690,9 +8707,13 @@ function StayCalculator() {
     if (isWorking) {
       if (beschvException === 'NONE') {
         workViolated = true;
-        reasons.push('Durch die Aufnahme einer regulären Erwerbstätigkeit entfällt die Visumbefreiung nach § 17 Abs. 1 AufenthV vollständig. Es ist ein Visum bzw. Aufenthaltstitel mit Arbeitserlaubnis erforderlich.');
+        reasons.push(
+          permitStatus === 'without_work'
+            ? 'Der vorliegende Aufenthaltstitel erlaubt keine reguläre Erwerbstätigkeit in Deutschland (§ 17 Abs. 1 AufenthV / § 4a Abs. 1 AufenthG). Es ist ein deutscher Aufenthaltstitel bzw. ein Visum mit Erwerbstätigkeitserlaubnis erforderlich.'
+            : 'Durch die Aufnahme einer regulären Erwerbstätigkeit entfällt die Visumbefreiung nach § 17 Abs. 1 AufenthV vollständig. Es ist ein Visum bzw. Aufenthaltstitel mit Arbeitserlaubnis erforderlich.'
+        );
         legalRefs.push('§ 17 Abs. 1 AufenthV, § 4a Abs. 1 AufenthG');
-        violations.push('§ 95 Abs. 1 Nr. 2 AufenthG (Unerlaubter Aufenthalt – Wegfall der Befreiung nach § 17 Abs. 1 AufenthV)');
+        violations.push('§ 95 Abs. 1 Nr. 2 AufenthG (Unerlaubter Aufenthalt – Wegfall der Befreiung nach § 17 Abs. 1 AufenthV; bei deutschem Titel ggf. § 98 Abs. 2 Nr. 3 AufenthG prüfen)');
         violations.push('§ 404 Abs. 2 Nr. 4 SGB III (OWi – Beschäftigung ohne Berechtigung)');
       } else {
         legalRefs.push(selectedException.norm);
@@ -8709,7 +8730,7 @@ function StayCalculator() {
       return {
         status: 'required',
         badge: 'VISUM / AUFENTHALTSTITEL ERFORDERLICH',
-        headline: 'Aufenthaltstitel bzw. Visum benötigt',
+        headline: 'Aufenthaltstitel bzw. Visum mit Arbeitserlaubnis benötigt',
         summary: reasons.join(' '),
         legalRefs,
         violations,
@@ -8720,30 +8741,39 @@ function StayCalculator() {
     // Alles zulässig!
     return {
       status: 'ok',
-      badge: 'VISUMFREI (ZULÄSSIG)',
+      badge: permitStatus === 'without_work' ? 'AUFENTHALT ZULÄSSIG' : 'VISUMFREI (ZULÄSSIG)',
       headline: isWorking
-        ? 'Visumfrei zulässig (Ausnahme nach BeschV greift)'
+        ? 'Zulässig (Ausnahme nach BeschV greift)'
+        : permitStatus === 'without_work'
+        ? 'Kurzaufenthalt ohne Erwerbstätigkeit zulässig'
         : 'Visumfreier Kurzaufenthalt zulässig',
       summary: isWorking
-        ? `Der Aufenthalt ist im Rahmen der 90/180-Tage-Regel visumfrei. Die ausgeübte Tätigkeit fällt unter die Ausnahme „${selectedException.label}“ (${selectedException.norm}), sodass die Visumbefreiung bestehen bleibt.`
-        : `Der Aufenthalt ohne Erwerbstätigkeit ist im Rahmen der 90/180-Tage-Regel visumfrei zulässig${stayMetrics ? ` (${totalDays} von 90 Tagen verbraucht, noch ${stayMetrics.remainingDays} Tage frei)` : ''}.`,
+        ? `Der Aufenthalt ist im Rahmen der 90/180-Tage-Regel zulässig. Die ausgeübte Tätigkeit fällt unter die Ausnahme „${selectedException.label}“ (${selectedException.norm}), sodass keine Arbeitserlaubnis erforderlich ist.`
+        : `Der Aufenthalt ohne Erwerbstätigkeit ist im Rahmen der 90/180-Tage-Regel zulässig${stayMetrics ? ` (${totalDays} von 90 Tagen verbraucht, noch ${stayMetrics.remainingDays} Tage frei)` : ''}.`,
       legalRefs,
       violations: [],
       notes
     };
-  }, [selectedCountry, hasBiometricPassport, hasSchengenPermit, stayMetrics, isWorking, beschvException, selectedException]);
+  }, [selectedCountry, hasBiometricPassport, permitStatus, stayMetrics, isWorking, beschvException, selectedException]);
 
   const resetAll = () => {
     setCountrySearch('');
     setSelectedCountryName('');
     setHasBiometricPassport(true);
-    setHasSchengenPermit(false);
+    setPermitStatus('none');
     setEntryDate('');
     setControlDate(todayIso);
     setPreviousStays([]);
     setIsWorking(false);
     setBeschvException('NONE');
   };
+
+  const permitStatusLabel =
+    permitStatus === 'with_work'
+      ? 'Aufenthaltstitel mit Erwerbstätigkeitserlaubnis (DE)'
+      : permitStatus === 'without_work'
+      ? 'Aufenthaltstitel ohne Erwerbstätigkeit (z. B. Art. 21 SDÜ / ohne Arbeitserlaubnis)'
+      : 'Kein Aufenthaltstitel / Visum';
 
   return (
     <div className="max-w-md mx-auto bg-slate-50 min-h-screen">
@@ -8768,12 +8798,12 @@ function StayCalculator() {
               <tr><th>Biometrischer Reisepass</th><td>{hasBiometricPassport ? 'Ja' : 'Nein'}</td></tr>
             )}
             {selectedCountry?.status !== 'eu' && (
-              <tr><th>Aufenthaltstitel / Visum D anderer Schengen-Staat</th><td>{hasSchengenPermit ? 'Ja (Art. 21 SDÜ)' : 'Nein'}</td></tr>
+              <tr><th>Vorliegender Aufenthaltstitel</th><td>{permitStatusLabel}</td></tr>
             )}
           </tbody>
         </table>
 
-        {selectedCountry?.status !== 'eu' && (
+        {selectedCountry?.status !== 'eu' && permitStatus !== 'with_work' && (
           <>
             <h2 className="print-section">2. Aufenthaltsdauer & 180-Tage-Fenster</h2>
             <table className="print-table">
@@ -8809,7 +8839,7 @@ function StayCalculator() {
               </table>
             )}
 
-            <h2 className="print-section">3. Erwerbstätigkeit & BeschV</h2>
+            <h2 className="print-section">3. Erwerbstätigkeit</h2>
             <table className="print-table">
               <tbody>
                 <tr><th>Erwerbstätigkeit / Arbeit</th><td>{isWorking ? 'Ja' : 'Nein'}</td></tr>
@@ -8936,8 +8966,8 @@ function StayCalculator() {
 
           {/* Zusatzoptionen für Drittstaaten */}
           {selectedCountry && selectedCountry.status !== 'eu' && (
-            <div className="mt-3 space-y-2 pt-2.5 border-t border-slate-100 animate-in fade-in">
-              {selectedCountry.biometricRequired && (
+            <div className="mt-3 space-y-2.5 pt-2.5 border-t border-slate-100 animate-in fade-in">
+              {selectedCountry.biometricRequired && permitStatus === 'none' && (
                 <label className="flex items-start gap-2.5 p-2.5 rounded-xl bg-amber-50 border border-amber-200 cursor-pointer">
                   <input
                     type="checkbox"
@@ -8952,24 +8982,66 @@ function StayCalculator() {
                 </label>
               )}
 
-              <label className="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={hasSchengenPermit}
-                  onChange={(e) => setHasSchengenPermit(e.target.checked)}
-                  className="w-4 h-4 mt-0.5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
-                />
-                <div className="text-xs text-slate-700">
-                  <span className="font-bold block">Gültiger Aufenthaltstitel / Visum D eines anderen Schengen-Staates</span>
-                  <span className="text-[10px] text-slate-500">Art. 21 SDÜ – ermöglicht visumfreien Kurzaufenthalt (bis 90/180 Tage).</span>
+              <div>
+                <span className="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5 ml-0.5">
+                  Vorhandener Aufenthaltstitel / Visum
+                </span>
+                <div className="space-y-1.5">
+                  {[
+                    {
+                      id: 'none',
+                      title: 'Kein Aufenthaltstitel',
+                      sub: 'Reine Passprüfung nach EU-Visum-VO (90/180 Tage).'
+                    },
+                    {
+                      id: 'without_work',
+                      title: 'Aufenthaltstitel ohne Erwerbstätigkeit',
+                      sub: 'z. B. Titel/Visum D eines anderen Schengen-Staates (Art. 21 SDÜ) oder Titel ohne Arbeitserlaubnis.'
+                    },
+                    {
+                      id: 'with_work',
+                      title: 'Aufenthaltstitel mit Erwerbstätigkeitserlaubnis',
+                      sub: 'Gültiger deutscher Aufenthaltstitel / Visum D mit erlaubter Erwerbstätigkeit.'
+                    }
+                  ].map(opt => {
+                    const active = permitStatus === opt.id;
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => setPermitStatus(opt.id)}
+                        className={`w-full text-left flex items-start gap-2.5 p-2.5 rounded-xl border-2 transition-all ${
+                          active
+                            ? 'bg-emerald-50 border-emerald-500 shadow-sm'
+                            : 'bg-slate-50 border-slate-200 hover:bg-slate-100/70'
+                        }`}
+                      >
+                        <div
+                          className={`w-4 h-4 mt-0.5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                            active ? 'border-emerald-600 bg-emerald-600' : 'border-slate-300 bg-white'
+                          }`}
+                        >
+                          {active && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                        </div>
+                        <div className="text-xs">
+                          <span className={`font-bold block ${active ? 'text-emerald-900' : 'text-slate-700'}`}>
+                            {opt.title}
+                          </span>
+                          <span className={`text-[10px] leading-snug block mt-0.5 ${active ? 'text-emerald-700' : 'text-slate-500'}`}>
+                            {opt.sub}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
-              </label>
+              </div>
             </div>
           )}
         </div>
 
-        {/* 2. AUFENTHALTSDAUER (Nur bei Drittstaaten) */}
-        {selectedCountry && selectedCountry.status !== 'eu' && (
+        {/* 2. AUFENTHALTSDAUER (Nur bei Drittstaaten ohne DE-Erwerbstitel) */}
+        {selectedCountry && selectedCountry.status !== 'eu' && permitStatus !== 'with_work' && (
           <div className="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100 animate-in fade-in">
             <div className="flex items-center gap-2 mb-3 text-emerald-700">
               <Calendar className="w-5 h-5" />
@@ -9094,11 +9166,13 @@ function StayCalculator() {
         )}
 
         {/* 3. ERWERBSTÄTIGKEIT & BESCHV */}
-        {selectedCountry && selectedCountry.status !== 'eu' && (
+        {selectedCountry && selectedCountry.status !== 'eu' && permitStatus !== 'with_work' && (
           <div className="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100 animate-in fade-in">
             <div className="flex items-center gap-2 mb-3 text-emerald-700">
               <Briefcase className="w-5 h-5" />
-              <span className="text-sm font-black uppercase tracking-wide">3. Erwerbstätigkeit / Arbeit</span>
+              <span className="text-sm font-black uppercase tracking-wide">
+                3. Erwerbstätigkeit / Arbeit
+              </span>
             </div>
 
             <div className="grid grid-cols-2 gap-2 mb-3">
@@ -9246,7 +9320,7 @@ const HomeView = ({ onSelect }) => {
     const dateTime = useDateTime();
     
     // --- HIER UPDATE TEXT EINTRAGEN ---
-    const updateText = "‼️ Update 4.2: Aufenthaltsrechner eingefügt";
+    const updateText = "‼️ Update 4.2: Aufenthaltsrechner integriert";
 
     const tiles = [
         { id: 'age', title: 'Altersrechner', icon: Calendar, color: 'text-purple-500', bg: 'bg-purple-50', desc: '' },
