@@ -7897,9 +7897,148 @@ function BkatModule() {
     '4': { short: 'StVG', name: 'Straßenverkehrsgesetz' },
     '5': { short: 'Ferienreise-VO / GGVSEB', name: 'Ferienreise-VO / Gefahrgut' },
     '6': { short: 'eKFV', name: 'Elektrokleinstfahrzeuge-Verordnung' },
-    '7': { short: 'Sonstige / StVUnfStatG', name: 'Sonstige Vorschriften' },
-    '8': { short: 'FZV', name: 'Fahrzeug-Zulassungsverordnung' },
-    '9': { short: 'Sonstige', name: 'Weitere Vorschriften' }
+    '8': { short: 'FZV', name: 'Fahrzeug-Zulassungsverordnung' }
+  };
+
+  // Paragrafen-Bezeichnungen gemäß Vorgabe (Screenshots)
+  const PARAGRAPH_TITLES = {
+    '1': {
+      '1': 'Grundregeln',
+      '2': 'Straßenbenutzung durch Fahrzeuge',
+      '3': 'Geschwindigkeit',
+      '4': 'Abstand',
+      '5': 'Überholen',
+      '6': 'Vorbeifahren',
+      '7': 'Fahrstreifenbenutzung',
+      '8': 'Vorfahrt',
+      '9': 'Abbiegen, Wenden, Rückwärtsfahren',
+      '10': 'Einfahren und Anfahren',
+      '11': 'Besondere Verkehrslagen',
+      '12': 'Halten und Parken',
+      '13': 'Parkzeitüberwachung',
+      '14': 'Ein-/ Aussteigen',
+      '15': 'Liegenbleiben / Abschleppen von Fahrzeugen',
+      '16': 'Warnzeichen',
+      '17': 'Beleuchtung',
+      '18': 'Autobahnen und Kraftfahrstraße',
+      '19': 'Bahnübergänge',
+      '20': 'Öffentl. Verkehrsmittel und Schulbusse',
+      '21': 'Personenbeförderung',
+      '22': 'Ladung',
+      '23': 'Sonstige Pflichten des Fahrzeugführers',
+      '25': 'Fußgänger',
+      '26': 'Fußgängerüberwege',
+      '27': 'Verbände',
+      '28': 'Tiere',
+      '29': 'Übermäßige Straßenbenutzung',
+      '30': 'Umweltschutz, Sonntagsfahrverbot',
+      '31': 'Sport und Spiel',
+      '32': 'Verkehrshindernisse',
+      '33': 'Verkehrsbeeinträchtigungen',
+      '34': 'Unfall',
+      '35': 'Sonderrechte',
+      '36': 'Zeichen und Weisungen der Polizei',
+      '37': 'Wechsellichtzeichen und Dauerlichtzeichen',
+      '38': 'Blaues und gelbes Blinklicht',
+      '41': 'Vorschriftzeichen',
+      '42': 'Richtzeichen',
+      '43': 'Verkehrseinrichtungen',
+      '45': 'Verkehrszeichen u. Einrichtungen',
+      '46': 'Ausnahmegenehmigung',
+      '48': 'Verkehrsunterricht'
+    },
+    '2': {
+      '2': 'Eingeschränkte Zulassung',
+      '3': 'Einschränkung/Entziehung der Zulassung',
+      '4': 'Erlaubnis- und Ausweispflicht',
+      '5': 'Sonderbestimmungen Mofa',
+      '10': 'Mindestalter KFZ-Führer',
+      '23': 'Fahrerlaubnis-Auflagen',
+      '25': 'Ausfertigung des Führerscheins',
+      '28': 'Sonderbestimmungen für ausländische Fahrerlaubnisse',
+      '29': 'Sonderbestimmungen für ausländische Fahrerlaubnisse',
+      '46': 'Entziehung, Beschränkung, Auflagen',
+      '47': 'Entziehung, Beschränkung, Auflagen',
+      '48': 'Fahrerlaubnis zur Fahrgastbeförderung',
+      '74': 'Ausnahmen'
+    },
+    '3': {
+      '17': 'Einschränkung, Entziehung der Zulassung',
+      '19': 'Erteilung, Wirksamkeit d. Betriebserlaubnis',
+      '29': 'Untersuchung KFZ und Anhänger',
+      '30': 'Fahrzeugbeschaffenheit',
+      '31': 'Verantwortung für den Betrieb von KFZ',
+      '32': 'Abmessungen von Fahrzeugen',
+      '33': 'Schleppen von Fahrzeugen',
+      '34': 'Achslast und Gesamtgewicht',
+      '35': 'Sitze/Rückhaltesysteme',
+      '36': 'Bereifung und Lauffläche',
+      '37': 'Gleitschutz/Schneeketten',
+      '38': 'Lenk-/Sicherungseinrichtungen',
+      '40': 'Scheiben und Scheibenwischer',
+      '41': 'Bremsen und Unterlegkeile',
+      '42': 'Anhängelast hinter KFZ und Leergewicht',
+      '43': 'Verbindung von Fahrzeugen',
+      '44': 'Stützlast',
+      '47': 'Abgas-Untersuchung/-Ableitung',
+      '49': 'Geräuschentwicklung/Schalldämpfer/Lichttechnik',
+      '50': 'Scheinwerfer für Fern- und Abblendlicht',
+      '51': 'Begrenzungs-/Parkleuchten',
+      '52': 'Zusatz-/Rückfahrscheinwerfer',
+      '53': 'Schluß-/Brems-/Rück-/Warn-leuchten',
+      '54': 'Fahrtrichtungsanzeiger',
+      '55': 'Einrichtungen für Schallzeichen',
+      '56': 'Spiegel und andere Einrichtungen für indirekte Sicht',
+      '57': 'Prüfung Fahrtschreiber/Kontrollgeräte',
+      '61': 'Halteeinrichtungen für Beifahrer/Fußstützen und Ständer von zweirädrigen KFZ',
+      '64': 'Einrichtungen für Schallzeichen',
+      '65': 'Bremsen und Unterlegkeile',
+      '67': 'Lichttechnik Fahrräder',
+      '70': 'Ausnahmen',
+      '71': 'Auflagen bei Ausnahmegenehmigungen'
+    },
+    '4': {
+      '24': 'Berauschende Mittel'
+    },
+    '5': {
+      '1': 'Verkehrsverbot',
+      '3': 'Begleitpapiere nicht mitgeführt/ausgehändigt',
+      '4': 'Erlaubnis- und Ausweispflicht',
+      '19': 'GGVSEB: Pflichten des Beförderers',
+      '29': 'GGVSEB: Pflichten mehrerer Beteiligter'
+    },
+    '6': {
+      '2': 'Anforderungen an das Inbetriebsetzen',
+      '8': 'Personenbeförderung und Anhängerbetrieb',
+      '10': 'Zulässige Verkehrsflächen',
+      '11': 'Allgemeine Verhaltensregeln'
+    },
+    '8': {
+      '3': 'Notwendigkeit einer Zulassung',
+      '4': 'Voraussetzungen für eine Inbetriebsetzung zulassungsfreier Fahrzeuge',
+      '5': 'Beschränkung und Untersagung des Betriebs von Fahrzeugen',
+      '7': 'Tageszulassung',
+      '9': 'Zuteilung von Kennzeichen',
+      '10': 'Besondere Kennzeichen',
+      '12': 'Ausgestaltung und Anbringung der Kennzeichen',
+      '13': 'Zulassungsbescheinigung Teil I',
+      '15': 'Mitteilungspflichten bei Änderungen',
+      '17': 'Verwertungsnachweis',
+      '26': 'Gemeinsame Regelungen für die Zulassung und für Änderungen',
+      '28': 'Internetbasierte Tageszulassung',
+      '31': 'Zulässigkeit der sofortigen Inbetriebsetzung',
+      '32': 'Vorläufiger Zulassungsnachweis',
+      '41': 'Prüfungsfahrten, Probefahrten und Überführungsfahrten mit rotem Kennzeichen',
+      '42': 'Probefahrten und Überführungsfahrten mit Kurzzeitkennzeichen',
+      '43': 'Fahrten zur Teilnahme an Veranstaltungen für Oldtimer',
+      '45': 'Fahrten zur dauerhaften Verbringung eines Fahrzeuges in das Ausland',
+      '46': 'Vorübergehende Teilnahme am Straßenverkehr in der Bundesrepublik Deutschland',
+      '47': 'Kennzeichen und Unterscheidungszeichen',
+      '51': 'Maßnahmen und Pflichten bei fehlendem Versicherungsschutz',
+      '52': 'Versicherungskennzeichen',
+      '53': 'Ausgestaltung und Anbringung des Versicherungskennzeichens',
+      '56': 'Versicherungsplakette'
+    }
   };
 
   // Gruppierung für die Baumansicht anhand der TBNR (1. Ziffer = Gesetz, 2.+3. Ziffer = Paragraf)
@@ -7913,14 +8052,13 @@ function BkatModule() {
       const tbnrStr = item.tbnr;
       if (tbnrStr.length >= 3) {
         const lawCode = tbnrStr.charAt(0);
+        // Nur definierte Gesetze anzeigen (Reiter 7 und 9 bleiben ausgeschlossen)
+        if (!tree[lawCode]) return;
+
         const paraRaw = tbnrStr.substring(1, 3);
         const paraNum = parseInt(paraRaw, 10);
         const paraKey = isNaN(paraNum) ? paraRaw : String(paraNum);
 
-        // Falls eine unbekannte Anfangsziffer auftaucht, trotzdem auffangen statt verschlucken
-        if (!tree[lawCode]) {
-          tree[lawCode] = { short: `Kennziffer ${lawCode}`, name: 'Sonstige Vorschriften', paragraphs: {}, totalCount: 0 };
-        }
         if (!tree[lawCode].paragraphs[paraKey]) {
           tree[lawCode].paragraphs[paraKey] = [];
         }
@@ -7932,6 +8070,7 @@ function BkatModule() {
   }, [data]);
 
   // Intelligente Suche (unterstützt mehrere Suchbegriffe gleichzeitig, z.B. "101 Sachschaden")
+  // Alle passenden Tatbestände ohne 50er-Begrenzung anzeigen
   const filteredResults = React.useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     if (!q) return [];
@@ -7950,7 +8089,7 @@ function BkatModule() {
         paragraf.includes(term) ||
         bussgeld.includes(term)
       );
-    }).slice(0, 50); // Begrenzung auf 50 Ergebnisse für flüssige Performance auf dem Smartphone
+    });
   }, [searchQuery, data]);
 
   const handleCopy = (tbnr) => {
@@ -8089,7 +8228,7 @@ function BkatModule() {
             <span>Datenbestand: {data.length.toLocaleString('de-DE')} Einträge</span>
             {searchQuery.trim() !== '' && (
               <span className="text-orange-600">
-                {filteredResults.length >= 50 ? 'Top 50 Treffer' : `${filteredResults.length} Treffer`}
+                {filteredResults.length} {filteredResults.length === 1 ? 'Treffer' : 'Treffer'}
               </span>
             )}
           </div>
@@ -8150,22 +8289,24 @@ function BkatModule() {
                             const paraKey = `${lawCode}-${paraNum}`;
                             const isParaOpen = expandedPara === paraKey;
                             const items = lawInfo.paragraphs[paraNum];
+                            const paraTitle = PARAGRAPH_TITLES[lawCode]?.[paraNum];
 
                             return (
                               <div key={paraKey} className="bg-white rounded-xl border border-slate-200/80 overflow-hidden shadow-sm">
                                 <button
                                   onClick={() => setExpandedPara(isParaOpen ? null : paraKey)}
-                                  className={`w-full px-3.5 py-2.5 text-left flex items-center justify-between transition-colors ${isParaOpen ? 'bg-slate-800 text-white' : 'hover:bg-slate-50 text-slate-700'}`}
+                                  className={`w-full px-3.5 py-2.5 text-left flex items-center justify-between gap-2 transition-colors ${isParaOpen ? 'bg-slate-800 text-white' : 'hover:bg-slate-50 text-slate-700'}`}
                                 >
-                                  <div className="flex items-center gap-2.5">
-                                    <span className={`font-mono text-xs font-bold px-2 py-0.5 rounded ${isParaOpen ? 'bg-slate-700 text-orange-300' : 'bg-orange-50 text-orange-700 border border-orange-200/60'}`}>
-                                      {lawCode}{String(paraNum).padStart(2, '0')}...
-                                    </span>
-                                    <span className="font-bold text-xs sm:text-sm">
-                                      {paraNum === '0' ? 'Allgemein / Sonstige (§ 00)' : `§ ${paraNum} ${lawInfo.short}`}
+                                  <div className="flex items-baseline gap-2 min-w-0 flex-1">
+                                    <span className="font-bold text-xs sm:text-sm leading-snug">
+                                      {paraNum === '0'
+                                        ? 'Allgemein / Sonstige (§ 00)'
+                                        : paraTitle
+                                          ? `§ ${paraNum} ${paraTitle}`
+                                          : `§ ${paraNum} ${lawInfo.short}`}
                                     </span>
                                   </div>
-                                  <div className="flex items-center gap-2">
+                                  <div className="flex items-center gap-2 shrink-0">
                                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isParaOpen ? 'bg-slate-700 text-slate-300' : 'bg-slate-100 text-slate-500'}`}>
                                       {items.length} {items.length === 1 ? 'Eintrag' : 'Einträge'}
                                     </span>
