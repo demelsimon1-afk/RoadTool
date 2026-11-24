@@ -55,28 +55,82 @@ const darkThemeCSS = `
 // --- GLOBAL STYLES FOR PRINTING ---
 const PrintStyles = () => (
   <style>{`
+    /* SCREEN ONLY STYLES */
+    .print-only {
+      display: none;
+    }
+
+    /* IPHONE / IOS FALLBACK DRUCKVORSCHAU AUF DEM BILDSCHIRM */
+    body.force-print-preview {
+      background-color: #ffffff !important;
+      color: #000000 !important;
+    }
+    body.force-print-preview .no-print:not(.print-preview-bar) {
+      display: none !important;
+    }
+    body.force-print-preview .min-h-screen,
+    body.force-print-preview .max-w-md,
+    body.force-print-preview .flex-1 {
+      display: block !important;
+      max-width: 100% !important;
+      min-height: 0 !important;
+      background-color: #ffffff !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+    body.force-print-preview .print-only {
+      display: block !important;
+      padding: 76px 16px 32px 16px !important;
+      background-color: #ffffff !important;
+      color: #000000 !important;
+      max-width: 800px;
+      margin: 0 auto !important;
+    }
+
     @media print {
       @page {
         size: A4;
-        margin: 1.5cm;
+        margin: 1.4cm;
       }
+
+      /* iOS / WebKit Reset: Flexbox, min-h-screen, max-w-md & Darkmode fuer Druck aufheben */
+      html, body, #root,
+      .min-h-screen, .max-w-md, .flex-1, .dark, .dark .bg-slate-50 {
+        display: block !important;
+        position: static !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        overflow: visible !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        box-shadow: none !important;
+      }
+
       body {
-        background-color: white !important;
-        color: #000 !important;
         font-family: Arial, Helvetica, sans-serif !important;
-        font-size: 11pt !important;
+        font-size: 10.5pt !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
+
+      /* Inaktive Tabs im Druck unbedingt ausgeblendet lassen */
+      .hidden {
+        display: none !important;
+      }
       
       /* HIDE SCREEN ELEMENTS */
-      .no-print, nav, footer, button, .screen-only, .fixed, .sticky {
+      .no-print, .print-preview-bar, nav, footer, button, .screen-only, .fixed, .sticky {
         display: none !important;
       }
 
       /* SHOW PRINT ELEMENTS */
       .print-only {
         display: block !important;
+        padding: 0 !important;
       }
 
       /* GENERAL PRINT LAYOUT */
@@ -85,7 +139,8 @@ const PrintStyles = () => (
         max-width: 100%;
         margin: 0;
         padding: 0;
-        color: #1e293b;
+        color: #1e293b !important;
+        background-color: #ffffff !important;
       }
 
       h1.print-title {
@@ -96,7 +151,7 @@ const PrintStyles = () => (
         padding-bottom: 6px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        color: #0f172a;
+        color: #0f172a !important;
       }
 
       h2.print-section {
@@ -109,12 +164,14 @@ const PrintStyles = () => (
         border-left: 4px solid #334155;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        color: #0f172a;
+        color: #0f172a !important;
+        page-break-after: avoid;
+        break-after: avoid;
       }
 
       .print-meta {
         font-size: 9pt;
-        color: #475569;
+        color: #475569 !important;
         margin-bottom: 16px;
       }
 
@@ -125,6 +182,7 @@ const PrintStyles = () => (
         margin-bottom: 14px;
         font-size: 9.5pt;
         page-break-inside: avoid;
+        break-inside: avoid;
       }
       
       table.print-table th, table.print-table td {
@@ -132,12 +190,13 @@ const PrintStyles = () => (
         padding: 6px 10px;
         text-align: left;
         vertical-align: middle;
+        color: #0f172a !important;
       }
 
       table.print-table th {
         background-color: #f8fafc !important;
         font-weight: 700;
-        color: #334155;
+        color: #334155 !important;
         width: 38%;
       }
 
@@ -148,7 +207,9 @@ const PrintStyles = () => (
         padding: 12px 14px;
         margin-top: 14px;
         page-break-inside: avoid;
+        break-inside: avoid;
         background-color: #f8fafc !important;
+        color: #0f172a !important;
       }
       
       .print-result-header {
@@ -159,6 +220,7 @@ const PrintStyles = () => (
         letter-spacing: 0.5px;
         border-bottom: 1px solid #cbd5e1;
         padding-bottom: 4px;
+        color: #0f172a !important;
       }
 
       .print-warning {
@@ -170,11 +232,6 @@ const PrintStyles = () => (
       svg:not(.print-safe) {
         display: none !important;
       }
-    }
-
-    /* SCREEN ONLY STYLES */
-    .print-only {
-      display: none;
     }
   `}</style>
 );
@@ -453,74 +510,96 @@ const AppVersionFooter = () => (
     </div>
 );
 
-const PrintButton = () => (
-    <button 
-        onClick={() => window.print()} 
-        className="w-full mt-8 mb-4 py-3 bg-slate-800 text-white rounded-xl font-bold uppercase tracking-widest hover:bg-slate-700 transition-colors flex items-center justify-center gap-2 no-print shadow-lg"
-    >
-        <Printer className="w-5 h-5" />
-        Druckprotokoll erstellen
-    </button>
-);
+const PrintButton = () => {
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
-const FormulaFraction = ({ numerator, denominator, label, equals, className = "" }) => (
-  <div className={`flex items-center justify-center gap-2 font-mono text-sm ${className}`}>
-    {label && <span className="font-bold mr-1">{label}</span>}
-    {equals && <span className="mr-1">{equals}</span>}
-    <div className="flex flex-col items-center text-center">
-      <div className="border-b border-slate-400 pb-1 px-1 whitespace-nowrap">{numerator}</div>
-      <div className="pt-1 px-1 whitespace-nowrap">{denominator}</div>
-    </div>
-  </div>
-);
+    const isIOS = typeof navigator !== 'undefined' && (
+        /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+    );
 
-const LashingDetailTable = ({ data }) => (
-  <div className="mt-4 border-t border-slate-200 pt-3">
-    <div className="mb-2 text-[10px] text-slate-400 font-bold uppercase tracking-wide">Detaillierte Berechnungswerte</div>
-    <table className="w-full text-xs text-left">
-      <thead>
-        <tr className="text-slate-400 border-b border-slate-100">
-          <th className="pb-1 font-bold">Richtung</th>
-          <th className="pb-1 font-bold hidden sm:table-cell">Gleit-Reib. µ</th>
-          <th className="pb-1 font-bold">Beschl. c</th>
-          <th className="pb-1 font-bold hidden sm:table-cell">Winkel a</th>
-          <th className="pb-1 font-bold">Formschluss</th>
-          <th className="pb-1 font-bold">F<sub>Form</sub> (daN)</th>
-          <th className="pb-1 font-bold">f<sub>s</sub></th>
-          <th className="pb-1 text-right font-black">Ergebnis</th>
-        </tr>
-      </thead>
-      <tbody className="divide-y divide-slate-5">
-        {data.map((row, i) => (
-            <tr key={i} className="text-slate-700">
-                <td className="py-1.5 font-bold">{row.label}</td>
-                <td className="py-1.5 hidden sm:table-cell">{row.mu.toFixed(2).replace('.', ',')}</td>
-                <td className="py-1.5">{row.c} g</td>
-                <td className="py-1.5 hidden sm:table-cell">{row.angle}°</td>
-                <td className="py-1.5">{row.hasFit ? <span className="text-emerald-600 font-bold flex items-center gap-1"><CheckCircle className="w-3 h-3"/> Ja</span> : <span className="text-slate-400 text-[10px]">Nein</span>}</td>
-                <td className="py-1.5">{row.force}</td>
-                <td className="py-1.5 font-mono">{row.safetyFactor ? row.safetyFactor.toString().replace('.', ',') : '-'}</td>
-                <td className="py-1.5 text-right font-black">{row.result} Gurte</td>
-            </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-);
+    const isStandalone = typeof window !== 'undefined' && (
+        window.navigator.standalone === true ||
+        (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
+    );
 
-const CalculationToggle = ({ children, label = "Rechenweg anzeigen", forceOpen = false }) => {
-    const [isOpen, setIsOpen] = useState(forceOpen);
+    useEffect(() => {
+        if (isPreviewOpen) {
+            document.body.classList.add('force-print-preview');
+            window.scrollTo(0, 0);
+        } else {
+            document.body.classList.remove('force-print-preview');
+        }
+        return () => {
+            document.body.classList.remove('force-print-preview');
+        };
+    }, [isPreviewOpen]);
+
+    const triggerPrint = () => {
+        // Wichtig für iOS Safari: window.print() synchron im Klick-Handler ausführen
+        window.scrollTo(0, 0);
+        if (isIOS && isStandalone) {
+            // In iOS Home-Screen-PWAs blockiert Apple window.print() oft -> direkt Protokoll-Ansicht öffnen
+            setIsPreviewOpen(true);
+            try { window.print(); } catch (e) {}
+            return;
+        }
+        try {
+            window.print();
+        } catch (e) {
+            setIsPreviewOpen(true);
+        }
+    };
+
     return (
-        <div className="mt-4">
-            <button 
-                onClick={() => setIsOpen(!isOpen)} 
-                className="flex items-center gap-2 text-xs font-bold uppercase text-slate-400 hover:text-indigo-600 transition-colors mx-auto no-print"
-            >
-                {isOpen ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                {label}
-            </button>
-            {isOpen && <div className="animate-in fade-in slide-in-from-top-2 duration-300">{children}</div>}
-        </div>
+        <>
+            <div className="mt-8 mb-4 space-y-2 no-print">
+                <button 
+                    type="button"
+                    onClick={triggerPrint} 
+                    className="w-full py-3 bg-slate-800 text-white rounded-xl font-bold uppercase tracking-widest hover:bg-slate-700 active:scale-[0.99] transition-all flex items-center justify-center gap-2 shadow-lg"
+                >
+                    <Printer className="w-5 h-5" />
+                    Druckprotokoll erstellen
+                </button>
+                <button
+                    type="button"
+                    onClick={() => setIsPreviewOpen(true)}
+                    className="w-full py-2 bg-white text-slate-600 border border-slate-200 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-slate-50 transition-colors flex items-center justify-center gap-1.5"
+                >
+                    <Eye className="w-4 h-4" />
+                    Protokoll-Vorschau {isIOS ? '(iPhone / PDF)' : 'anzeigen'}
+                </button>
+            </div>
+
+            {isPreviewOpen && (
+                <div className="print-preview-bar no-print fixed top-0 left-0 right-0 z-[200] bg-slate-900 text-white px-3 py-2.5 shadow-xl border-b border-slate-700">
+                    <div className="max-w-md mx-auto flex flex-col gap-1.5">
+                        <div className="flex items-center justify-between gap-2">
+                            <button
+                                type="button"
+                                onClick={() => setIsPreviewOpen(false)}
+                                className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-bold flex items-center gap-1"
+                            >
+                                <X className="w-4 h-4" /> Schließen
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => { try { window.print(); } catch (e) {} }}
+                                className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-bold flex items-center gap-1.5"
+                            >
+                                <Printer className="w-4 h-4" /> Jetzt drucken
+                            </button>
+                        </div>
+                        {isIOS && (
+                            <p className="text-[10px] text-slate-300 leading-tight text-center">
+                                iPhone-Tipp: Falls sich kein Druckdialog öffnet, tippe unten in Safari auf <strong>Teilen</strong> &rarr; <strong>Drucken</strong> (oder öffne die Seite direkt in Safari statt vom Home-Bildschirm).
+                            </p>
+                        )}
+                    </div>
+                </div>
+            )}
+        </>
     );
 };
 
@@ -2228,9 +2307,6 @@ function OverloadCalculator({ onSwitch }) {
               size: A4; 
               margin: 1.2cm; 
             }
-            .print-container {
-              zoom: 0.9; 
-            }
             .print-section { 
               page-break-after: avoid !important; 
               break-after: avoid !important; 
@@ -2242,7 +2318,7 @@ function OverloadCalculator({ onSwitch }) {
             }
             .print-table th, .print-table td {
               padding: 4px 6px !important;
-              font-size: 11px !important;
+              font-size: 9.5pt !important;
             }
           }
         `}
