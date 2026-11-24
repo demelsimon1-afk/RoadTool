@@ -449,7 +449,7 @@ const HeaderLogo = () => {
 
 const AppVersionFooter = () => (
     <div className="text-center text-[10px] text-slate-300 font-mono py-2 select-none no-print">
-        RoadTool v. 4.1
+        RoadTool v. 4.2
     </div>
 );
 
@@ -4261,6 +4261,7 @@ const ESCOOTER_TUNING_MODELS = [
     const [kzView, setKzView] = useState('kurzzeit'); 
     const [alkDroView, setAlkDroView] = useState('ph1'); 
     const [kcangView, setKcangView] = useState('besitz'); 
+    const [lasiView, setLasiView] = useState('grundlagen');
     const [lasiAblegereife, setLasiAblegereife] = useState('gurte'); 
     const [escooterSpeed, setEscooterSpeed] = useState('bis22'); 
     const [escooterOrigin, setEscooterOrigin] = useState('de'); 
@@ -4268,6 +4269,7 @@ const ESCOOTER_TUNING_MODELS = [
     const [ebikeView, setEbikeView] = useState('pedelec25'); 
     const [taxiView, setTaxiView] = useState('taxi'); 
     const [sozialView, setSozialView] = useState('gueterverkehr'); 
+    const [pkwView, setPkwView] = useState('regeln');
     const [escooterTuningTab, setEscooterTuningTab] = useState('allgemein');
     const [selectedTuningBrand, setSelectedTuningBrand] = useState('Alle');
     const [expandedTuningIdx, setExpandedTuningIdx] = useState(null);
@@ -4283,7 +4285,7 @@ const ESCOOTER_TUNING_MODELS = [
   // Automatisches Scrollen nach ganz oben, wenn das Register gewechselt wird
   useEffect(() => {
       window.scrollTo(0, 0);
-  }, [view, kzView, alkDroView, kcangView, lasiAblegereife, escooterSpeed, escooterOrigin, escooterTuningTab, kindersitzView, ebikeView, taxiView, sozialView]);
+  }, [view, kzView, alkDroView, kcangView, lasiView, lasiAblegereife, escooterSpeed, escooterOrigin, escooterTuningTab, kindersitzView, ebikeView, taxiView, sozialView]);
 
   const tabs = [
       { id: 'blut', label: 'Blutentnahme', icon: Syringe, color: 'text-red-500', bg: 'bg-red-50' },
@@ -5097,18 +5099,41 @@ const ESCOOTER_TUNING_MODELS = [
                                 <strong className="block mb-1 font-black">Grundsatz bei gewerblichen Transporten:</strong>
                                 Hat der Täter oder ein Dritter (Unternehmer) durch eine mit Geldbuße bedrohte Handlung etwas erlangt (z. B. ersparte Aufwendungen für ein größeres Fahrzeug oder korrekte Sicherungsmittel), kann die Einziehung eines Geldbetrages angeordnet werden.
                             </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                                <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-                                    <span className="text-xs font-bold text-slate-400 uppercase block mb-1">Überladung (&gt; 3,5 t zGM)</span>
-                                    <span className="font-black text-slate-800 text-base">ab 15 % Überladung</span>
-                                </div>
-                                <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-                                    <span className="text-xs font-bold text-slate-400 uppercase block mb-1">Überladung (≤ 3,5 t zGM)</span>
-                                    <span className="font-black text-slate-800 text-base">ab 20 % Überladung</span>
-                                </div>
+
+                            <h4 className="font-bold text-xs uppercase text-slate-500 pt-2">Anwendungsfälle & Schwellenwerte</h4>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 sm:col-span-2">
-                                    <span className="text-xs font-bold text-slate-400 uppercase block mb-1">Mangelhafte Ladungssicherung</span>
-                                    <span className="font-black text-slate-800 text-base">ab 30 % ungesicherter Ladung</span>
+                                    <span className="text-xs font-bold text-slate-400 uppercase block mb-1">Überladung</span>
+                                    <div className="space-y-1">
+                                        <div className="font-black text-slate-800 text-sm">LKW: ab 15 %</div>
+                                        <div className="font-black text-slate-800 text-sm">bis zGM 3,5 t: ab 20 %</div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                                    <span className="text-xs font-bold text-slate-400 uppercase block mb-1">Überhöhe</span>
+                                    <span className="font-black text-slate-800 text-base">ab 4,20 m</span>
+                                </div>
+
+                                <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                                    <span className="text-xs font-bold text-slate-400 uppercase block mb-1">Überbreite</span>
+                                    <span className="font-black text-slate-800 text-base">ab 4,20 m</span>
+                                </div>
+
+                                <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 sm:col-span-2">
+                                    <span className="text-xs font-bold text-slate-400 uppercase block mb-1">Ladungssicherung</span>
+                                    <span className="font-black text-slate-800 text-base block">Mehr als 30 % der Ladung ungesichert</span>
+                                    <span className="text-xs text-slate-500 font-medium block mt-1">(nur wenn kein rutschhemmendes Material mitgeführt wird)</span>
+                                </div>
+
+                                <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                                    <span className="text-xs font-bold text-slate-400 uppercase block mb-1">Fahrzeugmängel / Einsatz</span>
+                                    <span className="font-black text-slate-800 text-sm">Ungeeignetheit von Fahrzeugen</span>
+                                </div>
+
+                                <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                                    <span className="text-xs font-bold text-slate-400 uppercase block mb-1">Fahrverbote</span>
+                                    <span className="font-black text-slate-800 text-sm">Sonntags- / Feiertagsfahrverbot</span>
                                 </div>
                             </div>
                         </div>
@@ -6437,352 +6462,740 @@ const ESCOOTER_TUNING_MODELS = [
 
             {/* LASI WISSEN */}
             {view === 'lasi' && (
-                <div className="space-y-4">
-                    {/* Allgemein */}
-                    <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-                        <div className="flex items-center gap-2 mb-4 text-teal-700 pb-2 border-b border-slate-50">
-                            <LashingStrapIcon className="w-5 h-5" />
-                            <h3 className="font-black uppercase tracking-wide text-xs">LaSi - Allgemein</h3>
-                        </div>
-                        <ol className="space-y-3 text-sm text-slate-700 font-medium list-decimal list-inside">
-                            <li className="pl-1"><strong>Formschluss</strong> besteht bis zu einem Abstand von 3 cm in alle Richtungen außer hinten, dort maximal 30 cm.</li>
-                            <li className="pl-1 leading-relaxed"><strong>Rutschhemmendes Material</strong> kann nur bezüglich des Reibwerts angenommen werden, wenn die Ladung gänzlich durch das rutschhemmende Material vom Boden angehoben wird.</li>
-                            <li className="pl-1 leading-relaxed">Wenn die Ladung aufgrund der Reibung bzw. dem Formschluss rechnerisch nicht durch Gurte gesichert werden muss, muss die Ladung dennoch <strong>mindestens durch einen Gurt niedergehalten</strong> werden.</li>
-                            <li className="pl-1 leading-relaxed">Ladung, die <strong>freistehend</strong> befördert wird, muss <strong>mindestens durch zwei Zurrgurte</strong> gesichert werden, auch wenn rechnerisch bereits ein Gurt die Ladung sichern würde.</li>
-                        </ol>
+                <div className="space-y-4 animate-in fade-in">
+                    {/* Sub-Navigation für Ladungssicherung */}
+                    <div className="flex overflow-x-auto gap-2 pb-3 mb-1 custom-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }}>
+                        {[
+                            { id: 'grundlagen', label: 'Grundlagen & Kippgefahr' },
+                            { id: 'berechnung', label: 'Formeln, c- & µ-Werte' },
+                            { id: 'aufbau', label: 'Aufbau, Einziehung & BKat' },
+                            { id: 'ablegereife', label: 'Ablegereife' }
+                        ].map(sub => (
+                            <button
+                                key={sub.id}
+                                onClick={() => setLasiView(sub.id)}
+                                className={`whitespace-nowrap px-3 py-2 rounded-xl text-xs font-bold transition-all border ${lasiView === sub.id ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}`}
+                            >
+                                {sub.label}
+                            </button>
+                        ))}
                     </div>
 
-                  {/* START: Kippgefahr Karte */}
-                  <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-                      
-                      {/* Header-Bereich */}
-                      <div className="flex items-center gap-2 mb-4 text-teal-700 pb-2 border-b border-slate-50">
-                          <RotateCw className="w-5 h-5" />
-                          <h3 className="font-black uppercase tracking-wide text-xs">Kippgefahr</h3>
-                      </div>
-                      
-                      {/* Content: Text und Grafik */}
-                      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 justify-between">
-                          
-                          {/* Text-Bereich */}
-                          <div className="flex-1 text-sm text-slate-700 leading-relaxed font-medium space-y-3">
-                              <p>1. Wenn <strong>b größer c</strong>, dann besteht <strong className="text-red-600">Kippgefahr</strong>.</p>
-                              <p>2. Somit müssen alle Beschleunigungswerte gemäß der VDI 2700 erhöht werden.</p>
-                          </div>
+                    {/* UNTERREITER 1: GRUNDLAGEN & KIPPGEFAHR */}
+                    {lasiView === 'grundlagen' && (
+                        <div className="space-y-4 animate-in fade-in">
+                            {/* Allgemein & Verdrehschutz */}
+                            <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+                                <div className="flex items-center gap-2 mb-4 text-teal-700 pb-2 border-b border-slate-50">
+                                    <LashingStrapIcon className="w-5 h-5" />
+                                    <h3 className="font-black uppercase tracking-wide text-xs">LaSi - Allgemein & Verdrehschutz</h3>
+                                </div>
+                                <ol className="space-y-3 text-sm text-slate-700 font-medium list-decimal list-inside">
+                                    <li className="pl-1"><strong>Formschluss</strong> besteht bis zu einem Abstand von 3 cm (Praxistoleranz im Rechner: 5 cm) in alle Richtungen außer hinten, dort maximal 30 cm.</li>
+                                    <li className="pl-1 leading-relaxed"><strong>Rutschhemmendes Material</strong> kann nur bezüglich des Reibwerts (µ = 0,60) angenommen werden, wenn die Ladung gänzlich durch das rutschhemmende Material vom Boden angehoben wird.</li>
+                                    <li className="pl-1 leading-relaxed"><strong>Teil-Formschluss (Verdrehschutz):</strong> Wenn die Ladung aufgrund der Reibung bzw. teilweisem Formschluss rechnerisch 0 Gurte benötigt, muss dennoch <strong>mindestens 1 Gurt</strong> als Niederhalter / Verdrehschutz angelegt werden.</li>
+                                    <li className="pl-1 leading-relaxed"><strong>Freistehende Ladung (Verdrehschutz):</strong> Liegt keinerlei Formschluss vor, müssen <strong>mindestens 2 Zurrgurte</strong> verwendet werden – auch dann, wenn rechnerisch 0 oder 1 Gurt ausreichen würde.</li>
+                                </ol>
+                            </div>
 
-                          {/* Grafik-Bereich */}
-                          <div className="flex-shrink-0 bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm w-[160px] sm:w-[180px]">
-                              <svg viewBox="0 0 200 240" className="w-full h-auto mx-auto block">
-                                  {/* Oranger Rahmen (Ladung) */}
-                                  <rect x="20" y="20" width="160" height="200" fill="#ffffff" stroke="#f59e0b" strokeWidth="4" rx="4" />
-                                  
-                                  {/* Schwerpunkt 'a' */}
-                                  <circle cx="100" cy="100" r="5" fill="#ef4444" />
-                                  <text x="115" y="105" fontSize="16" fontFamily="sans-serif" fill="#334155" fontWeight="bold">a</text>
-                                  
-                                  {/* Blaue Linie 'b' (Höhe) */}
-                                  <line x1="100" y1="100" x2="100" y2="220" stroke="#3b82f6" strokeWidth="4" strokeLinecap="round" />
-                                  <text x="115" y="165" fontSize="16" fontFamily="sans-serif" fill="#334155" fontWeight="bold">b</text>
-                                  
-                                  {/* Blaue Linie 'c' (Abstand zur Kippkante) */}
-                                  <line x1="100" y1="220" x2="180" y2="220" stroke="#3b82f6" strokeWidth="4" strokeLinecap="round" />
-                                  <text x="140" y="238" fontSize="16" fontFamily="sans-serif" fill="#334155" fontWeight="bold">c</text>
-                              </svg>
-                          </div>
-                      </div>
-                  </div>
-                  {/* ENDE: Kippgefahr Karte */}
+                            {/* Einfluss von Winkel Alpha & Vorspannkraft STF */}
+                            <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+                                <div className="flex items-center gap-2 mb-4 text-indigo-700 pb-2 border-b border-slate-50">
+                                    <Gauge className="w-5 h-5" />
+                                    <h3 className="font-black uppercase tracking-wide text-xs">Wirkung von Winkel α & Vorspannkraft S<sub>TF</sub></h3>
+                                </div>
+                                <p className="text-xs text-slate-600 leading-relaxed mb-3">
+                                    Beim Niederzurren wirkt die Vorspannkraft <strong>S<sub>TF</sub></strong> (Standard-Ratsche meist 250–500 daN) nur über den Sinus des Vertikalwinkels <strong>α</strong> senkrecht auf die Ladefläche. Je flacher der Gurt verläuft, desto weniger Anpresskraft bleibt übrig:
+                                </p>
+                                <div className="grid grid-cols-4 gap-2 text-center mb-3">
+                                    {[
+                                        { deg: '90°', pct: '100 %', color: 'bg-emerald-50 border-emerald-200 text-emerald-800' },
+                                        { deg: '60°', pct: '87 %', color: 'bg-emerald-50 border-emerald-200 text-emerald-700' },
+                                        { deg: '45°', pct: '71 %', color: 'bg-amber-50 border-amber-200 text-amber-800' },
+                                        { deg: '30°', pct: '50 %', color: 'bg-red-50 border-red-200 text-red-700' }
+                                    ].map((item, idx) => (
+                                        <div key={idx} className={`p-2 rounded-xl border ${item.color}`}>
+                                            <div className="text-xs font-black">{item.deg}</div>
+                                            <div className="text-[10px] font-bold mt-0.5">{item.pct}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="bg-amber-50 border border-amber-200 p-2.5 rounded-xl text-[11px] text-amber-900 flex gap-2 items-start">
+                                    <Info className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                                    <span>Unter <strong>30°</strong> ist das Niederzurren unwirtschaftlich – hier sollte auf <strong>Formschluss</strong> oder <strong>Direkt-/Diagonalzurren</strong> ausgewichen werden.</span>
+                                </div>
+                            </div>
 
-
-                    {/* Ablegereife */}
-                    <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-                        <div className="flex items-center gap-2 mb-4 text-teal-700 pb-2 border-b border-slate-50">
-                            <AlertTriangle className="w-5 h-5" />
-                            <h3 className="font-black uppercase tracking-wide text-xs">Ablegereife</h3>
-                        </div>
-
-                        <div className="mb-4 relative">
-                            <select 
-                                value={lasiAblegereife}
-                                onChange={(e) => setLasiAblegereife(e.target.value)}
-                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500 appearance-none shadow-sm cursor-pointer"
-                            >
-                                <option value="gurte">1. Zurrgurte (VDI 2700 Blatt 3.1)</option>
-                                <option value="ketten">2. Zurrketten (VDI 2700 Blatt 3.1)</option>
-                                <option value="rutsch">3. Rutschhemmendes Material (VDI 2700 Blatt 15)</option>
-                            </select>
-                            <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400">
-                                <ChevronDown className="w-4 h-4" />
+                            {/* Kippgefahr Karte */}
+                            <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+                                <div className="flex items-center gap-2 mb-4 text-teal-700 pb-2 border-b border-slate-50">
+                                    <RotateCw className="w-5 h-5" />
+                                    <h3 className="font-black uppercase tracking-wide text-xs">Kippgefahr</h3>
+                                </div>
+                                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 justify-between">
+                                    <div className="flex-1 text-sm text-slate-700 leading-relaxed font-medium space-y-3">
+                                        <p>1. Wenn <strong>b größer c</strong>, dann besteht <strong className="text-red-600">Kippgefahr</strong>.</p>
+                                        <p>2. Somit müssen alle Beschleunigungswerte gemäß der VDI 2700 erhöht werden.</p>
+                                    </div>
+                                    <div className="flex-shrink-0 bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm w-[160px] sm:w-[180px]">
+                                        <svg viewBox="0 0 200 240" className="w-full h-auto mx-auto block">
+                                            <rect x="20" y="20" width="160" height="200" fill="#ffffff" stroke="#f59e0b" strokeWidth="4" rx="4" />
+                                            <circle cx="100" cy="100" r="5" fill="#ef4444" />
+                                            <text x="115" y="105" fontSize="16" fontFamily="sans-serif" fill="#334155" fontWeight="bold">a</text>
+                                            <line x1="100" y1="100" x2="100" y2="220" stroke="#3b82f6" strokeWidth="4" strokeLinecap="round" />
+                                            <text x="115" y="165" fontSize="16" fontFamily="sans-serif" fill="#334155" fontWeight="bold">b</text>
+                                            <line x1="100" y1="220" x2="180" y2="220" stroke="#3b82f6" strokeWidth="4" strokeLinecap="round" />
+                                            <text x="140" y="238" fontSize="16" fontFamily="sans-serif" fill="#334155" fontWeight="bold">c</text>
+                                        </svg>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        
-                        {/* 1. Zurrgurte */}
-                        {lasiAblegereife === 'gurte' && (
-                            <div className="animate-in fade-in">
-                                <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-3">
-                                    <div>
-                                        <strong className="text-xs text-teal-700 uppercase tracking-wide block mb-1">Gewebegurtband:</strong>
-                                        <ul className="list-disc list-inside text-xs text-slate-700 space-y-1">
-                                            <li>Einschnitte größer als 10 %</li>
-                                            <li>Verformungen</li>
+                    )}
+
+                    {/* UNTERREITER 2: FORMELN, C- & µ-WERTE */}
+                    {lasiView === 'berechnung' && (
+                        <div className="space-y-4 animate-in fade-in">
+                            {/* Gewichtsklassen & c-Werte */}
+                            <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+                                <div className="flex items-center gap-2 mb-3 text-indigo-700 pb-2 border-b border-slate-50">
+                                    <Scale className="w-5 h-5" />
+                                    <h3 className="font-black uppercase tracking-wide text-xs">Gewichtsklassen & Beschleunigungsbeiwerte (c)</h3>
+                                </div>
+                                <p className="text-xs text-slate-600 mb-3 leading-relaxed">
+                                    Die anzusetzenden Massenkräfte hängen von der zulässigen Gesamtmasse (zGM) des beladenen Fahrzeugs ab (leichtere Fahrzeuge bremsen stärker und erreichen höhere Querbeschleunigungen):
+                                </p>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-xs text-left border-collapse border border-slate-200">
+                                        <thead>
+                                            <tr className="bg-slate-100 text-slate-600">
+                                                <th className="p-2 border border-slate-200 font-bold">zGM Fahrzeug</th>
+                                                <th className="p-2 border border-slate-200 font-bold text-center">Vorne (c<sub>x</sub>)</th>
+                                                <th className="p-2 border border-slate-200 font-bold text-center">Seite (c<sub>y</sub>)</th>
+                                                <th className="p-2 border border-slate-200 font-bold text-center">Hinten (c<sub>x</sub>)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="bg-white">
+                                            <tr>
+                                                <td className="p-2 border border-slate-200 font-bold text-slate-700">&lt; 2.000 kg <span className="block text-[9px] font-normal text-slate-400">(PKW / Standard)</span></td>
+                                                <td className="p-2 border border-slate-200 text-center font-black text-indigo-600">0,90 g</td>
+                                                <td className="p-2 border border-slate-200 text-center font-black text-indigo-600">0,70 g</td>
+                                                <td className="p-2 border border-slate-200 text-center font-black text-indigo-600">0,50 g</td>
+                                            </tr>
+                                            <tr>
+                                                <td className="p-2 border border-slate-200 font-bold text-slate-700">2.000 – 3.500 kg <span className="block text-[9px] font-normal text-slate-400">(Transporter)</span></td>
+                                                <td className="p-2 border border-slate-200 text-center font-black text-indigo-600">0,80 g</td>
+                                                <td className="p-2 border border-slate-200 text-center font-black text-indigo-600">0,60 g</td>
+                                                <td className="p-2 border border-slate-200 text-center font-black text-indigo-600">0,50 g</td>
+                                            </tr>
+                                            <tr>
+                                                <td className="p-2 border border-slate-200 font-bold text-slate-700">&gt; 3.500 kg <span className="block text-[9px] font-normal text-slate-400">(LKW / Anhänger)</span></td>
+                                                <td className="p-2 border border-slate-200 text-center font-black text-indigo-600">0,80 g</td>
+                                                <td className="p-2 border border-slate-200 text-center font-black text-indigo-600">0,50 g</td>
+                                                <td className="p-2 border border-slate-200 text-center font-black text-indigo-600">0,50 g</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            {/* Berechnungsformeln Niederzurren */}
+                            <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+                                <div className="flex items-center gap-2 text-indigo-700 pb-2 border-b border-slate-50">
+                                    <Calculator className="w-5 h-5" />
+                                    <h3 className="font-black uppercase tracking-wide text-xs">Berechnungsformeln (Niederzurren)</h3>
+                                </div>
+
+                                <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                                    <div className="text-[10px] font-black uppercase text-indigo-600 mb-2 text-center">1. Bis 3.500 kg zGM (Spezialformel ≤ 3,5 t)</div>
+                                    <FormulaFraction
+                                        label={<span className="italic">n</span>}
+                                        equals="="
+                                        numerator={<span>(F<sub>G</sub> · c) − F<sub>Form</sub> − (F<sub>G</sub> · µ)</span>}
+                                        denominator={<span>1,8 · µ · sin(α) · S<sub>TF</sub></span>}
+                                    />
+                                    <p className="text-[10px] text-slate-500 text-center mt-2">
+                                        Übertragungsbeiwert k = <strong>1,8</strong> | kein zusätzlicher Sicherheitsbeiwert (f<sub>s</sub> = 1,0).
+                                    </p>
+                                </div>
+
+                                <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                                    <div className="text-[10px] font-black uppercase text-indigo-600 mb-2 text-center">2. Über 3.500 kg zGM (VDI 2700 / DIN EN 12195-1)</div>
+                                    <FormulaFraction
+                                        label={<span className="italic">n</span>}
+                                        equals="="
+                                        numerator={<span>((F<sub>G</sub> · c) − F<sub>Form</sub> − (F<sub>G</sub> · µ)) · f<sub>s</sub></span>}
+                                        denominator={<span>2 · µ · sin(α) · S<sub>TF</sub></span>}
+                                    />
+                                    <div className="text-[10px] text-slate-600 text-center mt-2 bg-white py-1 px-2 rounded border border-slate-200 font-mono">
+                                        Sicherheitsbeiwert f<sub>s</sub>: Vorne = <strong>1,25</strong> | Seite &amp; Hinten = <strong>1,10</strong>
+                                    </div>
+                                </div>
+
+                                <div className="text-[11px] text-slate-500 bg-indigo-50/60 border border-indigo-100 p-3 rounded-xl space-y-1">
+                                    <div><strong>F<sub>G</sub></strong> = Gewichtskraft in Newton (m · 9,81 m/s²)</div>
+                                    <div><strong>F<sub>Form</sub></strong> = Blockierkraft des Aufbaus (1 daN = 10 N)</div>
+                                    <div><strong>Rundung:</strong> Das Ergebnis <em>n</em> wird stets auf ganze Gurte <strong>aufgerundet</strong>.</div>
+                                </div>
+                            </div>
+
+                            {/* Gleit-Reibbeiwerte */}
+                            <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+                                <div className="flex items-center gap-2 mb-3 text-indigo-700 pb-2 border-b border-slate-50">
+                                    <Box className="w-5 h-5" />
+                                    <h3 className="font-black uppercase tracking-wide text-xs">Gleit-Reibbeiwerte (µ) im Rechner</h3>
+                                </div>
+                                <div className="space-y-1.5 text-xs">
+                                    {[
+                                        { mu: '0,20', desc: 'Nicht besenrein (verschmutzt) / Metall auf Metall / Kunststoffpalette auf Siebdruckboden' },
+                                        { mu: '0,25', desc: 'Gitterbox / Kunststoffpalette / unverpackte Papierrolle auf Siebdruckboden' },
+                                        { mu: '0,30', desc: 'Holzpalette (Mehrweg) / verpackte Papierrolle auf Siebdruckboden / Papierrolle auf Metallboden' },
+                                        { mu: '0,35', desc: 'Papierrolle mit Joloda / Strohballen auf Siebdruckboden' },
+                                        { mu: '0,40', desc: 'Kantholz auf Siebdruckboden' },
+                                        { mu: '0,45', desc: 'Holzpalette (Einweg) / Stahlkiste / Gummireifen auf Siebdruckboden' },
+                                        { mu: '0,55', desc: 'Betonware auf Siebdruckboden' },
+                                        { mu: '0,60', desc: 'Antirutschmatte (ARM) – bei vollständiger Auflage' }
+                                    ].map((row, idx) => (
+                                        <div key={idx} className="flex gap-2.5 items-start bg-slate-50 p-2 rounded-lg border border-slate-100">
+                                            <span className="font-mono font-black text-indigo-700 bg-white px-2 py-0.5 rounded border border-indigo-100 shrink-0">{row.mu} µ</span>
+                                            <span className="text-slate-700 leading-snug">{row.desc}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* UNTERREITER 3: AUFBAU, EINZIEHUNG & BKAT */}
+                    {lasiView === 'aufbau' && (
+                        <div className="space-y-4 animate-in fade-in">
+                            {/* Aufbaubelastbarkeit */}
+                            <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+                                <div className="flex items-center gap-2 mb-3 text-indigo-700 pb-2 border-b border-slate-50">
+                                    <ShieldCheck className="w-5 h-5" />
+                                    <h3 className="font-black uppercase tracking-wide text-xs">Aufbaubelastbarkeit (DIN EN 12642)</h3>
+                                </div>
+
+                                <div className="bg-indigo-50 border border-indigo-200 p-3 rounded-xl text-xs text-indigo-900 mb-4 leading-relaxed">
+                                    <strong>Bezugsgröße Nutzlast (zGM − Leergewicht):</strong> Immer die Werte des Fahrzeugteils ansetzen, auf dem die Ladung tatsächlich steht (LKW, Auflieger oder Anhänger – <u>nicht</u> Gesamtzug!).
+                                </div>
+
+                                <div className="space-y-3 text-xs">
+                                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                                        <div className="font-black text-slate-800 uppercase mb-1">1. Kein geprüfter Aufbau</div>
+                                        <p className="text-slate-600">z. B. Kleintransporter mit geschlossenem Kastenaufbau ohne Zertifikat: Standardmäßig <strong>0 daN</strong> in alle Richtungen (nur anrechenbar bei konkretem Herstellernachweis).</p>
+                                    </div>
+
+                                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                                        <div className="font-black text-indigo-700 uppercase mb-1.5">2. Code L (Standardaufbau)</div>
+                                        <ul className="space-y-1 text-slate-700 list-disc list-inside">
+                                            <li><strong>Stirnwand:</strong> 40 % der Nutzlast (max. <strong>5.000 daN</strong>)</li>
+                                            <li><strong>Heck:</strong> 25 % der Nutzlast (max. <strong>3.100 daN</strong>)</li>
+                                            <li><strong>Seite – Planenauflieger:</strong> mit Einstecklatten = <strong>30 %</strong> | ohne Einstecklatten = <strong>15 %</strong> der Nutzlast</li>
+                                            <li><strong>Seite – Hamburger Verdeck / Polensprinter:</strong> Formschluss Bordwand = <strong>24 %</strong> | Formschluss Planenaufbau = <strong>6 %</strong> (kombiniert = <strong>30 %</strong>)</li>
                                         </ul>
                                     </div>
-                                    <div className="border-t border-slate-200 pt-2">
-                                        <strong className="text-xs text-teal-700 uppercase tracking-wide block mb-1">Endbeschlagteil:</strong>
+
+                                    <div className="bg-emerald-50/70 p-3 rounded-xl border border-emerald-200">
+                                        <div className="font-black text-emerald-800 uppercase mb-1.5">3. Code XL (Zertifizierter Aufbau)</div>
+                                        <ul className="space-y-1 text-emerald-900 list-disc list-inside">
+                                            <li><strong>Stirnwand:</strong> 50 % der Nutzlast (ohne Deckelung)</li>
+                                            <li><strong>Seite:</strong> 30 % der Nutzlast</li>
+                                            <li><strong>Heck:</strong> 40 % der Nutzlast</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Prüfung Einziehung (Ungesicherte Ladung in %) */}
+                            <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+                                <div className="flex items-center gap-2 mb-3 text-red-600 pb-2 border-b border-slate-50">
+                                    <AlertTriangle className="w-5 h-5" />
+                                    <h3 className="font-black uppercase tracking-wide text-xs">Prüfung Einziehung (Ungesicherte Ladung in %)</h3>
+                                </div>
+                                <p className="text-xs text-slate-600 leading-relaxed mb-3">
+                                    Im Kontroll-Modus berechnet der Rechner aus den vor Ort tatsächlich angebrachten Gurten die verbleibende fehlende Sicherungskraft und rechnet diese in den prozentualen Anteil der ungesicherten Ladungsmasse um:
+                                </p>
+                                <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-3 mb-3">
+                                    <FormulaFraction
+                                        label={<span className="italic">m<sub>ungesichert</sub></span>}
+                                        equals="="
+                                        numerator="Restliche fehlende Kraft (N)"
+                                        denominator="g · (c − µ)"
+                                    />
+                                    <FormulaFraction
+                                        label={<span className="italic">Anteil (%)</span>}
+                                        equals="="
+                                        numerator={<><span className="italic">m<sub>ungesichert</sub></span> · 100</>}
+                                        denominator={<span className="italic">m<sub>gesamt</sub></span>}
+                                    />
+                                </div>
+                                <div className="bg-red-50 border border-red-200 p-3 rounded-xl text-xs text-red-900 font-medium leading-relaxed">
+                                    <strong className="text-red-700 block mb-0.5">Schwellenwert § 29a OWiG:</strong>
+                                    Sind <strong>mehr als 30 % der Ladung ungesichert</strong> (und wird kein rutschhemmendes Material mitgeführt), kommt bei gewerblichen Transporten die <strong>Einziehung von Taterträgen</strong> in Betracht.
+                                </div>
+                            </div>
+
+                            {/* Mögliche Tatbestände (BKat) */}
+                            <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+                                <div className="flex items-center gap-2 mb-3 text-slate-700 pb-2 border-b border-slate-50">
+                                    <Gavel className="w-5 h-5 text-slate-500" />
+                                    <h3 className="font-black uppercase tracking-wide text-xs">Mögliche Bußgeldtatbestände (BKat)</h3>
+                                </div>
+                                <div className="bg-slate-50 p-2 sm:p-3 rounded-xl border border-slate-200">
+                                    <BkatRow
+                                        title="PKW bzw. dessen Anhänger (≤ 3,5 t ohne Code L/XL)"
+                                        fines={[
+                                            { role: 'Fahrer', tbnr: '122100', cost: '35 €' },
+                                            { role: 'Halter', tbnr: '331630', cost: '135 €', points: '1 Pkt', note: 'Nur wenn nicht genug Zurrmittel bereitgestellt' }
+                                        ]}
+                                    />
+                                    <BkatRow
+                                        title="LKW bzw. dessen Anhänger (> 3,5 t oder Code L/XL)"
+                                        fines={[
+                                            { role: 'Fahrer', tbnr: '122600', cost: '60 €', points: '1 Pkt' },
+                                            { role: 'Halter', tbnr: '331618', cost: '270 €', points: '1 Pkt', note: 'Nur wenn nicht genug Zurrmittel bereitgestellt' }
+                                        ]}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* UNTERREITER 4: ABLEGEREIFE */}
+                    {lasiView === 'ablegereife' && (
+                        <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 animate-in fade-in">
+                            <div className="flex items-center gap-2 mb-4 text-teal-700 pb-2 border-b border-slate-50">
+                                <AlertTriangle className="w-5 h-5" />
+                                <h3 className="font-black uppercase tracking-wide text-xs">Ablegereife</h3>
+                            </div>
+
+                            <div className="mb-4 relative">
+                                <select 
+                                    value={lasiAblegereife}
+                                    onChange={(e) => setLasiAblegereife(e.target.value)}
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500 appearance-none shadow-sm cursor-pointer"
+                                >
+                                    <option value="gurte">1. Zurrgurte (VDI 2700 Blatt 3.1)</option>
+                                    <option value="ketten">2. Zurrketten (VDI 2700 Blatt 3.1)</option>
+                                    <option value="rutsch">3. Rutschhemmendes Material (VDI 2700 Blatt 15)</option>
+                                </select>
+                                <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400">
+                                    <ChevronDown className="w-4 h-4" />
+                                </div>
+                            </div>
+                            
+                            {/* 1. Zurrgurte */}
+                            {lasiAblegereife === 'gurte' && (
+                                <div className="animate-in fade-in">
+                                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-3">
+                                        <div>
+                                            <strong className="text-xs text-teal-700 uppercase tracking-wide block mb-1">Gewebegurtband:</strong>
+                                            <ul className="list-disc list-inside text-xs text-slate-700 space-y-1">
+                                                <li>Einschnitte größer als 10 %</li>
+                                                <li>Verformungen</li>
+                                            </ul>
+                                        </div>
+                                        <div className="border-t border-slate-200 pt-2">
+                                            <strong className="text-xs text-teal-700 uppercase tracking-wide block mb-1">Endbeschlagteil:</strong>
+                                            <ul className="list-disc list-inside text-xs text-slate-700 space-y-1">
+                                                <li>Verformung</li>
+                                                <li>Risse</li>
+                                                <li>Rost</li>
+                                            </ul>
+                                        </div>
+                                        <div className="border-t border-slate-200 pt-2">
+                                            <strong className="text-xs text-teal-700 uppercase tracking-wide block mb-1">Etikett:</strong>
+                                            <ul className="list-disc list-inside text-xs text-slate-700 space-y-1">
+                                                <li>fehlt</li>
+                                                <li>unleserlich</li>
+                                                <li>CE Kennzeichnung vorhanden</li>
+                                                <li>Belastbarkeit in kg angegeben</li>
+                                            </ul>
+                                            <div className="mt-2.5 pt-2.5 border-t border-slate-100 space-y-1.5 text-xs text-slate-700 font-medium">
+                                                <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-blue-500 shrink-0 shadow-sm border border-blue-600/20"></div>PES (Polyester) = blaues Etikett</div>
+                                                <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-emerald-500 shrink-0 shadow-sm border border-emerald-600/20"></div>PA (Polyamid) = grünes Etikett</div>
+                                                <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-[#8B4513] shrink-0 shadow-sm border border-black/20"></div>PP (Polypropylen) = braunes Etikett</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* 2. Zurrketten */}
+                            {lasiAblegereife === 'ketten' && (
+                                <div className="animate-in fade-in">
+                                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-3">
+                                        <div>
+                                            <strong className="text-xs text-teal-700 uppercase tracking-wide block mb-1">Rundstahlkette:</strong>
+                                            <ul className="list-disc list-inside text-xs text-slate-700 space-y-1">
+                                                <li>Oberflächenrisse</li>
+                                                <li>Dehnung von mehr als 3 %</li>
+                                                <li>Verformungen</li>
+                                                <li>Verschleiß von mehr als 10 % der Nenndicke</li>
+                                            </ul>
+                                        </div>
+                                        <div className="border-t border-slate-200 pt-2">
+                                            <strong className="text-xs text-teal-700 uppercase tracking-wide block mb-1">Verbindungsstellen / Spannelemente:</strong>
+                                            <ul className="list-disc list-inside text-xs text-slate-700 space-y-1">
+                                                <li>Verformungen</li>
+                                                <li>Risse</li>
+                                                <li>viel Rost</li>
+                                                <li className="leading-snug">Sicherung des Zurrhakens darf fehlen, wenn die Tiefe der Nut mind. dem 5-fachen Wert der Nenndicke der Rundstahlkette entspricht</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* 3. Rutschhemmendes Material */}
+                            {lasiAblegereife === 'rutsch' && (
+                                <div className="animate-in fade-in">
+                                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                                        <strong className="text-xs text-teal-700 uppercase tracking-wide block mb-2">Rutschhemmendes Material:</strong>
                                         <ul className="list-disc list-inside text-xs text-slate-700 space-y-1">
-                                            <li>Verformung</li>
+                                            <li>ausgebrochene Materialien</li>
+                                            <li>bleibende Druckstellen oder Verformungen</li>
                                             <li>Risse</li>
-                                            <li>Rost</li>
+                                            <li>Schäden durch Kontakt mit aggressiven Stoffen</li>
+                                            <li>Verschmutzung die Funktion beeinträchtigt</li>
+                                            <li>Versprödung</li>
                                         </ul>
                                     </div>
-                                    <div className="border-t border-slate-200 pt-2">
-                                        <strong className="text-xs text-teal-700 uppercase tracking-wide block mb-1">Etikett:</strong>
-                                        <ul className="list-disc list-inside text-xs text-slate-700 space-y-1">
-                                            <li>fehlt</li>
-                                            <li>unleserlich</li>
-                                            <li>CE Kennzeichnung vorhanden</li>
-                                            <li>Belastbarkeit in kg angegeben</li>
-                                        </ul>
-                                        <div className="mt-2.5 pt-2.5 border-t border-slate-100 space-y-1.5 text-xs text-slate-700 font-medium">
-                                            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-blue-500 shrink-0 shadow-sm border border-blue-600/20"></div>PES (Polyester) = blaues Etikett</div>
-                                            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-emerald-500 shrink-0 shadow-sm border border-emerald-600/20"></div>PA (Polyamid) = grünes Etikett</div>
-                                            <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-[#8B4513] shrink-0 shadow-sm border border-black/20"></div>PP (Polypropylen) = braunes Etikett</div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* PKW TRANSPORTER */}
+            {view === 'pkw' && (
+                <div className="space-y-4 animate-in fade-in">
+                    {/* Sub-Navigation */}
+                    <div className="flex overflow-x-auto gap-2 pb-3 mb-1 custom-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }}>
+                        {[
+                            { id: 'regeln', label: 'Regeln & Matrix' },
+                            { id: 'sonderfaelle', label: 'Sonderfälle & Verbote' },
+                            { id: 'bilder', label: 'Verladebilder (1–6)' },
+                            { id: 'technik', label: 'Technik & Kontrolle' }
+                        ].map(sub => (
+                            <button
+                                key={sub.id}
+                                onClick={() => setPkwView(sub.id)}
+                                className={`whitespace-nowrap px-3 py-2 rounded-xl text-xs font-bold transition-all border ${pkwView === sub.id ? 'bg-blue-600 text-white border-blue-600 shadow-md' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}`}
+                            >
+                                {sub.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-100">
+                        <div className="flex items-center gap-2 mb-5 text-blue-700 pb-2 border-b border-slate-50">
+                            <Car className="w-5 h-5" />
+                            <h3 className="font-black uppercase tracking-wide text-xs">PKW-Transporter (VDI 2700 Blatt 8.1)</h3>
+                        </div>
+
+                        {/* 1. REGELN & MATRIX */}
+                        {pkwView === 'regeln' && (
+                            <div className="space-y-5 animate-in fade-in">
+                                <div className="bg-blue-50 border border-blue-200 p-3.5 rounded-xl text-xs text-blue-900 leading-relaxed shadow-sm">
+                                    <strong className="block text-blue-800 uppercase tracking-wide mb-1">Grundprinzip der Auswahl</strong>
+                                    Maßgeblich für das zulässige Verladebild sind das <strong>Fahrzeuggewicht</strong>, der <strong>Anstellwinkel der Fahrbahn</strong> (Steigung/Gefälle in Fahrtrichtung), die <strong>Verladerichtung</strong> (vorwärts/rückwärts) sowie die <strong>Position am Zugende</strong>.
+                                </div>
+
+                                {/* Korrigierte Zuordnungsmatrix */}
+                                <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-xl shadow-sm">
+                                    <span className="font-black text-slate-800 text-xs uppercase tracking-wide block mb-2.5">Zulässige Verladebilder (Matrix)</span>
+                                    <table className="w-full text-[11px] text-left text-slate-700 border-collapse">
+                                        <thead>
+                                            <tr className="bg-slate-800 text-white text-[10px] uppercase">
+                                                <th className="p-2 border border-slate-700">Fahrzeugmasse</th>
+                                                <th className="p-2 border border-slate-700">Anstellwinkel</th>
+                                                <th className="p-2 border border-slate-700">Zulässige VB</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="bg-white">
+                                            <tr>
+                                                <td className="p-2 border border-slate-200 font-bold" rowSpan="3">0 – 2.000 kg</td>
+                                                <td className="p-2 border border-slate-200">max. ±25°</td>
+                                                <td className="p-2 border border-slate-200 font-black text-indigo-600">1*, 5**</td>
+                                            </tr>
+                                            <tr>
+                                                <td className="p-2 border border-slate-200">max. +10° / -25°</td>
+                                                <td className="p-2 border border-slate-200 font-black text-indigo-600">1*, 2, 3, 5**</td>
+                                            </tr>
+                                            <tr>
+                                                <td className="p-2 border border-slate-200">max. ±10°</td>
+                                                <td className="p-2 border border-slate-200 font-black text-indigo-600">1*, 2, 3, 4, 5**</td>
+                                            </tr>
+                                            <tr>
+                                                <td className="p-2 border border-slate-200 font-bold" rowSpan="3">&gt; 2.000 – 3.000 kg</td>
+                                                <td className="p-2 border border-slate-200">max. ±25°</td>
+                                                <td className="p-2 border border-slate-200 font-black text-indigo-600">6*, 5**</td>
+                                            </tr>
+                                            <tr>
+                                                <td className="p-2 border border-slate-200">max. +10° / -25°</td>
+                                                <td className="p-2 border border-slate-200 font-black text-indigo-600">6*, 3, 5**</td>
+                                            </tr>
+                                            <tr>
+                                                <td className="p-2 border border-slate-200">max. ±10°</td>
+                                                <td className="p-2 border border-slate-200 font-black text-indigo-600">6*, 3, 5**</td>
+                                            </tr>
+                                            <tr>
+                                                <td className="p-2 border border-slate-200 font-bold">&gt; 3.000 – 4.500 kg</td>
+                                                <td className="p-2 border border-slate-200">max. ±10°<br/><span className="font-normal text-[9px] text-red-600">(Über ±10° unzulässig!)</span></td>
+                                                <td className="p-2 border border-slate-200 font-black text-indigo-600">5**</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div className="mt-3 text-[10px] text-slate-600 leading-relaxed space-y-1.5">
+                                        <p><strong className="text-slate-800">* Regel-Verladebilder (VB 1 &amp; VB 6):</strong> Im Bereich bis 2.000 kg ist grundsätzlich <strong>VB 1</strong>, im Bereich &gt; 2.000 – 3.000 kg grundsätzlich <strong>VB 6</strong> anzuwenden. Ein Ausweichen auf andere zulässige Bilder erfolgt nur, wenn technisch nicht anders machbar.</p>
+                                        <p><strong className="text-slate-800">** Verladebild 5 (Pflicht am Zugende):</strong> Verpflichtend anzuwenden, wenn der Masseschwerpunkt hinter der letzten Achse des Transporters/Anhängers liegt (0 – 3.000 kg) sowie immer bei Fahrzeugen &gt; 3.000 – 4.500 kg.</p>
+                                    </div>
+                                </div>
+
+                                {/* Logiken aus dem Rechner */}
+                                <div className="space-y-2.5">
+                                    <h4 className="font-black text-slate-700 text-xs uppercase tracking-wide">Wichtige Prüf- &amp; Anwendungslogiken</h4>
+                                    <div className="bg-white border border-slate-200 p-3 rounded-xl shadow-sm flex gap-3 items-start">
+                                        <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                                        <div className="text-xs text-slate-700 leading-relaxed">
+                                            <strong className="block text-slate-800 mb-0.5">Bezug auf die LKW-Fahrtrichtung</strong>
+                                            Alle Vorgaben („Achse in Fahrtrichtung“ / „Achse gegen Fahrtrichtung“) beziehen sich immer auf die <strong>Fahrtrichtung des Transporters (LKW)</strong> – unabhängig davon, ob der PKW vorwärts oder rückwärts aufgefahren wurde.
+                                        </div>
+                                    </div>
+                                    <div className="bg-white border border-slate-200 p-3 rounded-xl shadow-sm flex gap-3 items-start">
+                                        <RotateCw className="w-4 h-4 text-indigo-500 shrink-0 mt-0.5" />
+                                        <div className="text-xs text-slate-700 leading-relaxed">
+                                            <strong className="block text-slate-800 mb-0.5">Spiegelung (Links / Rechts) zulässig</strong>
+                                            Asymmetrische Verladebilder (VB 1, VB 2, VB 5, VB 6) dürfen <strong>spiegelverkehrt</strong> angewendet werden (z. B. bei VB 1 entweder VL + HR oder VR + HL).
+                                        </div>
+                                    </div>
+                                    <div className="bg-white border border-slate-200 p-3 rounded-xl shadow-sm flex gap-3 items-start">
+                                        <ShieldCheck className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+                                        <div className="text-xs text-slate-700 leading-relaxed">
+                                            <strong className="block text-slate-800 mb-0.5">Höherwertige Sicherung deckt flachere Winkel ab</strong>
+                                            Ein stärkeres Verladebild (z. B. VB 1, VB 5 oder VB 6) ist auch bei flacheren Neigungswinkeln zulässig. Eine Übererfüllung (zusätzliche Gurte/Keile) schadet nicht.
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         )}
 
-                        {/* 2. Zurrketten */}
-                        {lasiAblegereife === 'ketten' && (
-                            <div className="animate-in fade-in">
-                                <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-3">
-                                    <div>
-                                        <strong className="text-xs text-teal-700 uppercase tracking-wide block mb-1">Rundstahlkette:</strong>
-                                        <ul className="list-disc list-inside text-xs text-slate-700 space-y-1">
-                                            <li>Oberflächenrisse</li>
-                                            <li>Dehnung von mehr als 3 %</li>
-                                            <li>Verformungen</li>
-                                            <li>Verschleiß von mehr als 10 % der Nenndicke</li>
-                                        </ul>
+                        {/* 2. SONDERFÄLLE & VERBOTE */}
+                        {pkwView === 'sonderfaelle' && (
+                            <div className="space-y-3.5 animate-in fade-in">
+                                {/* Rückwärtsverladung & VB 3 */}
+                                <div className="bg-red-50 border border-red-200 p-3.5 rounded-xl shadow-sm">
+                                    <div className="flex items-center gap-2 text-red-800 font-black text-xs uppercase mb-1.5">
+                                        <AlertTriangle className="w-4 h-4 shrink-0" />
+                                        <span>Verbot bei Rückwärtsverladung: VB 3</span>
                                     </div>
-                                    <div className="border-t border-slate-200 pt-2">
-                                        <strong className="text-xs text-teal-700 uppercase tracking-wide block mb-1">Verbindungsstellen / Spannelemente:</strong>
-                                        <ul className="list-disc list-inside text-xs text-slate-700 space-y-1">
-                                            <li>Verformungen</li>
-                                            <li>Risse</li>
-                                            <li>viel Rost</li>
-                                            <li className="leading-snug">Sicherung des Zurrhakens darf fehlen, wenn die Tiefe der Nut mind. dem 5-fachen Wert der Nenndicke der Rundstahlkette entspricht</li>
-                                        </ul>
-                                    </div>
+                                    <p className="text-xs text-red-900 leading-relaxed">
+                                        <strong>Verladebild 3</strong> darf ausschließlich bei <strong>vorwärts</strong> verladenen Fahrzeugen angewendet werden! Steht ein PKW rückwärts auf der Ladefläche, ist VB 3 unzulässig.
+                                    </p>
                                 </div>
-                            </div>
-                        )}
 
-                        {/* 3. Rutschhemmendes Material */}
-                        {lasiAblegereife === 'rutsch' && (
-                            <div className="animate-in fade-in">
-                                <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                                    <strong className="text-xs text-teal-700 uppercase tracking-wide block mb-2">Rutschhemmendes Material:</strong>
-                                    <ul className="list-disc list-inside text-xs text-slate-700 space-y-1">
-                                        <li>ausgebrochene Materialien</li>
-                                        <li>bleibende Druckstellen oder Verformungen</li>
-                                        <li>Risse</li>
-                                        <li>Schäden durch Kontakt mit aggressiven Stoffen</li>
-                                        <li>Verschmutzung die Funktion beeinträchtigt</li>
-                                        <li>Versprödung</li>
+                                {/* Winkelgrenzen */}
+                                <div className="bg-red-50 border border-red-200 p-3.5 rounded-xl shadow-sm">
+                                    <div className="flex items-center gap-2 text-red-800 font-black text-xs uppercase mb-1.5">
+                                        <Gauge className="w-4 h-4 shrink-0" />
+                                        <span>Absolute Winkelgrenzen (±25° / ±10°)</span>
+                                    </div>
+                                    <ul className="text-xs text-red-900 space-y-1.5 list-disc list-inside leading-relaxed">
+                                        <li><strong>Generell:</strong> Ein Anstellwinkel von über <strong>+25°</strong> oder unter <strong>-25°</strong> ist grundsätzlich unzulässig.</li>
+                                        <li><strong>Schwere Fahrzeuge (&gt; 3.000 – 4.500 kg):</strong> Maximal <strong>±10°</strong> zulässig! Jeder steilere Winkel ist unzulässig.</li>
+                                        <li><strong>Winkel-Zuordnung bei Messung:</strong> &gt; +10° bis +25° → Bereich ±25° | -10° bis +10° → Bereich ±10° | -25° bis &lt; -10° → Bereich +10° / -25°.</li>
+                                    </ul>
+                                </div>
+
+                                {/* Schwerpunkt hinter letzter Achse */}
+                                <div className="bg-amber-50 border border-amber-200 p-3.5 rounded-xl shadow-sm">
+                                    <div className="flex items-center gap-2 text-amber-900 font-black text-xs uppercase mb-1.5">
+                                        <Truck className="w-4 h-4 shrink-0 text-amber-600" />
+                                        <span>Letztes Fahrzeug / Schwerpunkt hinter letzter Achse</span>
+                                    </div>
+                                    <ul className="text-xs text-amber-950 space-y-1.5 list-disc list-inside leading-relaxed">
+                                        <li>Liegt der Masseschwerpunkt des PKW hinter der letzten Achse des Transporters/Anhängers, ist zwingend <strong>VB 5</strong> (mind. 3 Räder mit Gurt + je 2 Keilen beidseitig) erforderlich.</li>
+                                        <li><strong>Ausschluss &gt; 3.000 kg:</strong> Für Fahrzeuge über 3.000 kg ist diese Position am Zugende laut VDI-Tabelle <strong>nicht definiert / nicht zulässig</strong>.</li>
+                                    </ul>
+                                </div>
+
+                                {/* Keine Keile möglich */}
+                                <div className="bg-indigo-50 border border-indigo-200 p-3.5 rounded-xl shadow-sm">
+                                    <div className="flex items-center gap-2 text-indigo-900 font-black text-xs uppercase mb-1.5">
+                                        <ShieldAlert className="w-4 h-4 shrink-0 text-indigo-600" />
+                                        <span>Sonderregel: Keine Keile möglich (Fußnote *)</span>
+                                    </div>
+                                    <ul className="text-xs text-indigo-950 space-y-1.5 list-disc list-inside leading-relaxed">
+                                        <li>Können aus technischen Gründen keine Radvorleger gesetzt werden, dürfen diese durch weitere Gurte ersetzt werden: <strong>Alle 4 Räder müssen zwingend gegurtet sein!</strong></li>
+                                        <li><strong>Gewichtsgrenze:</strong> Diese Ausnahme ohne Keile gilt <strong>nur für Fahrzeuge bis 2.000 kg</strong>! Bei Fahrzeugen über 2.000 kg ist eine Sicherung gänzlich ohne Keile unzulässig.</li>
+                                    </ul>
+                                </div>
+
+                                {/* Keilposition & Radmulde */}
+                                <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-xl shadow-sm">
+                                    <div className="flex items-center gap-2 text-slate-800 font-black text-xs uppercase mb-1.5">
+                                        <Box className="w-4 h-4 shrink-0 text-yellow-500" />
+                                        <span>Keilposition „Vorne“ &amp; Radmulde / Brille</span>
+                                    </div>
+                                    <ul className="text-xs text-slate-700 space-y-1.5 list-disc list-inside leading-relaxed">
+                                        <li><strong>Einzelkeil (VB 1, VB 2, VB 6):</strong> Der Keil an der Achse in Fahrtrichtung muss zwingend <strong>VOR dem Reifen</strong> (in LKW-Fahrtrichtung) anliegen. Ein Keil nur hinter dem Reifen genügt nicht!</li>
+                                        <li><strong>Beidseitige Keilung / Mulde:</strong> Wo 2 Keile (vor und hinter dem Reifen) vorgeschrieben sind, ist eine <strong>Radmulde / Brille</strong> (formschlüssiges Einsinken des Rades) als gleichwertig anzuerkennen.</li>
                                     </ul>
                                 </div>
                             </div>
                         )}
-                    </div>
-                </div>
-            )}
 
-            {/* PKW TRANSPORTER */}
-            {view === 'pkw' && (
-                <div className="space-y-4">
-                    <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-                        <div className="flex items-center gap-2 mb-6 text-teal-700 pb-2 border-b border-slate-50">
-                            <Car className="w-5 h-5" />
-                            <h3 className="font-black uppercase tracking-wide text-xs">PKW-Transporter (VDI 2700 Blatt 8.1)</h3>
-                        </div>
-
-                        {/* TECHNISCHE DATEN (AUS PDF) */}
-                        <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl mb-6">
-                            <h4 className="font-black text-slate-800 text-sm mb-3 flex items-center gap-2"><Settings className="w-4 h-4 text-slate-500"/> Technische Vorgaben & Zertifikat</h4>
-                            
-                            <div className="bg-amber-50 border border-amber-200 p-3 rounded-lg flex items-start gap-3 shadow-sm mb-4">
-                                <Info className="w-5 h-5 shrink-0 text-amber-500 mt-0.5" />
-                                <div className="text-xs text-amber-900 font-medium">
-                                    <strong className="block mb-1 text-amber-800">Hinweis zum Zertifikat (Übereinstimmungserklärung)</strong>
-                                    Ein Zertifikat ist <strong>kein amtliches Dokument</strong> und es besteht <strong>keine behördliche Mitführpflicht</strong>! Es erleichtert lediglich die Kontrolle, um die Kompatibilität der Fahrbahnelemente mit den Sicherungsmitteln nachzuweisen.
-                                </div>
-                            </div>
-
-                            <div className="space-y-3">
-                                <div className="flex gap-3 items-start bg-white p-3 rounded-lg border border-slate-100 shadow-sm">
-                                    <div className="w-5 h-5 shrink-0 mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-500"><path d="M2 12h20" /><rect x="8" y="7" width="8" height="10" rx="2" fill="currentColor" fillOpacity="0.1" /><path d="M8 12h8" /><path d="M2 12l2 2" /><path d="M22 12l-2 2" /></svg></div>
-                                    <div>
-                                        <span className="font-bold text-slate-800 text-xs uppercase block mb-1">Drei-Punkt-Zurrgurte & Controller</span>
-                                        <ul className="text-[11px] text-slate-600 list-disc list-inside space-y-0.5">
-                                            <li><strong className="text-slate-700">LC:</strong> mind. 1500 daN | <strong className="text-slate-700">STF:</strong> mind. 330 daN</li>
-                                            <li><strong className="text-slate-700">Gurtband-Dehnung:</strong> ≤ 4 %</li>
-                                            <li><strong className="text-slate-700">Controller (ETA-Wert):</strong> Übertragungswert k ≥ 0,5</li>
-                                            <li><strong className="text-slate-700">Controller-Länge:</strong> mind. halber Radumfang (180°)</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div className="flex gap-3 items-start bg-white p-3 rounded-lg border border-slate-100 shadow-sm">
-                                    <div className="w-5 h-5 shrink-0 mt-0.5"><Box className="w-full h-full text-yellow-500"/></div>
-                                    <div>
-                                        <span className="font-bold text-slate-800 text-xs uppercase block mb-1">Radvorleger (Anfahrbügel)</span>
-                                        <ul className="text-[11px] text-slate-600 list-disc list-inside space-y-0.5">
-                                            <li><strong className="text-slate-700">Höhe:</strong> = 1/6 des Raddurchmessers (mind. 120 mm)</li>
-                                            <li><strong className="text-slate-700">Blockierkraft (BC):</strong> = 500 daN</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div className="flex gap-3 items-start bg-white p-3 rounded-lg border border-slate-100 shadow-sm">
-                                    <div className="w-5 h-5 shrink-0 mt-0.5"><ShieldCheck className="w-full h-full text-emerald-500"/></div>
-                                    <div className="w-full">
-                                        <span className="font-bold text-slate-800 text-xs uppercase block mb-1">Sicherungspunkte am Transporter</span>
-                                        <table className="w-full text-[10px] text-left text-slate-600 mt-1">
-                                            <thead className="text-slate-400 border-b border-slate-100">
-                                                <tr><th className="pb-1">Fahrzeugmasse</th><th className="pb-1">Gurtzug 0°</th><th className="pb-1">Gurtzug 45°</th><th className="pb-1">Gurtzug 90°</th></tr>
-                                            </thead>
-                                            <tbody className="bg-white">
-                                                <tr>
-                                                    <td className="p-2 border border-slate-200 font-bold" rowSpan="3">0 - 2000 kg</td>
-                                                    <td className="p-2 border border-slate-200">max. +/- 25°</td>
-                                                    <td className="p-2 border border-slate-200 font-black text-indigo-600">1*, 5**</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="p-2 border border-slate-200">max. +10° / -25°</td>
-                                                    <td className="p-2 border border-slate-200 font-black text-indigo-600">1*, 2, 3, 5**</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="p-2 border border-slate-200">max. +/- 10°</td>
-                                                    <td className="p-2 border border-slate-200 font-black text-indigo-600">1*, 2, 3, 4, 5**</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="p-2 border border-slate-200 font-bold" rowSpan="3">&gt; 2000 - 3000 kg</td>
-                                                    <td className="p-2 border border-slate-200">max. +/- 25°</td>
-                                                    <td className="p-2 border border-slate-200 font-black text-indigo-600">6*, 5**</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="p-2 border border-slate-200">max. +10° / -25°</td>
-                                                    <td className="p-2 border border-slate-200 font-black text-indigo-600">6*, 3, 5**</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="p-2 border border-slate-200">max. +/- 10°</td>
-                                                    <td className="p-2 border border-slate-200 font-black text-indigo-600">6*, 4, 5**</td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="p-2 border border-slate-200 font-bold">&gt; 3000 - 4500 kg</td>
-                                                    <td className="p-2 border border-slate-200">max. +/- 10° <br/><span className="font-normal text-[9px] text-slate-500">(Über/Unter 10° unzulässig!)</span></td>
-                                                    <td className="p-2 border border-slate-200 font-black text-indigo-600">5**</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="mt-3 text-[10px] text-slate-500 leading-tight space-y-1">
-                                <p><strong className="text-slate-700">* Verladebild 1 bzw. 6</strong> ist im Bereich bis 2000 kg (VB 1) bzw. bis 3000 kg (VB 6) grundsätzlich anzuwenden. Ausweichen auf andere nur, wenn technisch nicht machbar. Kann aus technischen Gründen kein Keil gesetzt werden, darf dieser durch einen weiteren Gurt ersetzt werden.</p>
-                                <p><strong className="text-slate-700">** Verladebild 5</strong> ist verpflichtend anzuwenden, wenn der Masseschwerpunkt des transportierten Fahrzeugs hinter der letzten Achse des Transportfahrzeugs/Anhängers liegt (0 - 3000 kg).</p>
-              
-                            </div>
-                        </div>
-
-                        <div className="space-y-8">
-                            
-                            {/* Verladebilder Detailansicht - ALLE 6 BILDER */}
-                            <div>
-                                <h4 className="font-black text-slate-800 text-sm mb-3 border-b border-slate-100 pb-2">Alle 6 Verladebilder im Detail</h4>
-                                
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
+                        {/* 3. VERLADEBILDER (1–6) */}
+                        {pkwView === 'bilder' && (
+                            <div className="space-y-6 animate-in fade-in">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                     {/* VB 1 */}
                                     <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col h-full shadow-sm">
-                                        <div className="text-[10px] font-black text-indigo-600 uppercase mb-2 text-center tracking-widest">Verladebild 1</div>
+                                        <div className="text-[10px] font-black text-indigo-600 uppercase mb-2 text-center tracking-widest">Verladebild 1 (Standard 0–2 t)</div>
                                         <StaticCarDiagram carConfig={{ fl: { strap: true, chock: 'front' }, fr: { strap: false, chock: 'none' }, rl: { strap: false, chock: 'none' }, rr: { strap: true, chock: 'both' } }} />
                                         <p className="text-[10px] text-slate-600 mt-2 text-center leading-snug flex-grow">
-                                            <strong className="text-slate-800">Diagonalsicherung (0-2t):</strong><br/>1 Rad in FR (Gurt + 1 Keil).<br/>1 Rad diagonal gegen FR (Gurt + 2 Keile).
+                                            <strong className="text-slate-800">Diagonalsicherung (bis ±25°):</strong><br/>1 Rad in FR (Gurt + 1 Keil <strong>vorne</strong>).<br/>1 Rad diagonal gegen FR (Gurt + 2 Keile / Mulde).
                                         </p>
                                     </div>
 
                                     {/* VB 2 */}
                                     <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col h-full shadow-sm">
-                                        <div className="text-[10px] font-black text-indigo-600 uppercase mb-2 text-center tracking-widest">Verladebild 2</div>
+                                        <div className="text-[10px] font-black text-indigo-600 uppercase mb-2 text-center tracking-widest">Verladebild 2 (0–2 t)</div>
                                         <StaticCarDiagram carConfig={{ fl: { strap: false, chock: 'none' }, fr: { strap: false, chock: 'front' }, rl: { strap: true, chock: 'both' }, rr: { strap: true, chock: 'none' } }} />
                                         <p className="text-[10px] text-slate-600 mt-2 text-center leading-snug flex-grow">
-                                            <strong className="text-slate-800">Alternative (0-2t):</strong><br/>Achse in FR: 1 Vorleger. Achse gegen FR: 2 Gurte + 1 Rad beidseitig gekeilt.
+                                            <strong className="text-slate-800">Alternative (+10° / -25°):</strong><br/>Achse in FR: mind. 1 Keil <strong>vorne</strong>.<br/>Achse gegen FR: 2 Gurte + mind. 1 Rad beidseitig gekeilt.
                                         </p>
                                     </div>
 
                                     {/* VB 3 */}
                                     <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col h-full shadow-sm">
-                                        <div className="text-[10px] font-black text-indigo-600 uppercase mb-2 text-center tracking-widest">Verladebild 3</div>
+                                        <div className="text-[10px] font-black text-indigo-600 uppercase mb-2 text-center tracking-widest">Verladebild 3 (0–3 t)</div>
                                         <StaticCarDiagram carConfig={{ fl: { strap: false, chock: 'none' }, fr: { strap: false, chock: 'none' }, rl: { strap: true, chock: 'both' }, rr: { strap: true, chock: 'both' } }} />
                                         <p className="text-[10px] text-slate-600 mt-2 text-center leading-snug flex-grow">
-                                            <strong className="text-slate-800">Achsweise (0-3t):</strong><br/>Beide Räder der Achse gegen FR erhalten Gurt + 2 Keile beidseitig. Vorne frei. Fahrzeug muss in Fahrtrichtung verladen sein.<br/>
+                                            <strong className="text-slate-800">Achsweise (+10° / -25°):</strong><br/>Beide Räder der Achse gegen FR erhalten Gurt + 2 Keile beidseitig. Vorne frei.<br/>
                                             <strong className="text-red-600 mt-1 block">Nur bei Vorwärtsverladung!</strong>
                                         </p>
                                     </div>
 
                                     {/* VB 4 */}
                                     <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col h-full shadow-sm">
-                                        <div className="text-[10px] font-black text-indigo-600 uppercase mb-2 text-center tracking-widest">Verladebild 4</div>
+                                        <div className="text-[10px] font-black text-indigo-600 uppercase mb-2 text-center tracking-widest">Verladebild 4 (0–2 t)</div>
                                         <StaticCarDiagram carConfig={{ fl: { strap: true, chock: 'none' }, fr: { strap: true, chock: 'none' }, rl: { strap: true, chock: 'none' }, rr: { strap: true, chock: 'none' } }} />
                                         <p className="text-[10px] text-slate-600 mt-2 text-center leading-snug flex-grow">
-                                            <strong className="text-slate-800">Flacher Winkel max ±10°:</strong><br/>Alle 4 Räder mit Gurt gesichert. Radvorleger nicht erforderlich.
+                                            <strong className="text-slate-800">Flacher Winkel (max. ±10°):</strong><br/>Alle 4 Räder mit Gurt gesichert. Radvorleger nicht zwingend erforderlich.
                                         </p>
                                     </div>
 
                                     {/* VB 5 */}
                                     <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col h-full shadow-sm">
-                                        <div className="text-[10px] font-black text-indigo-600 uppercase mb-2 text-center tracking-widest">Verladebild 5</div>
+                                        <div className="text-[10px] font-black text-indigo-600 uppercase mb-2 text-center tracking-widest">Verladebild 5 (Max. / Zugende)</div>
                                         <StaticCarDiagram carConfig={{ fl: { strap: true, chock: 'both' }, fr: { strap: false, chock: 'none' }, rl: { strap: true, chock: 'both' }, rr: { strap: true, chock: 'both' } }} />
                                         <p className="text-[10px] text-slate-600 mt-2 text-center leading-snug flex-grow">
-                                            <strong className="text-slate-800">Max. Sicherung (Zugende):</strong><br/>Mind. 3 Räder mit Gurt + je 2 Keilen beidseitig. (Pflicht bei Schwerpunkt ganz hinten!).
+                                            <strong className="text-slate-800">Maximale Sicherung:</strong><br/>Mind. 3 Räder mit Gurt + je 2 Keilen beidseitig. Pflicht bei Schwerpunkt hinten (0–3 t) &amp; bei &gt;3–4,5 t (max. ±10°).
                                         </p>
                                     </div>
 
                                     {/* VB 6 */}
                                     <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col h-full shadow-sm">
-                                        <div className="text-[10px] font-black text-indigo-600 uppercase mb-2 text-center tracking-widest">Verladebild 6</div>
+                                        <div className="text-[10px] font-black text-indigo-600 uppercase mb-2 text-center tracking-widest">Verladebild 6 (Standard &gt;2–3 t)</div>
                                         <StaticCarDiagram carConfig={{ fl: { strap: true, chock: 'front' }, fr: { strap: false, chock: 'none' }, rl: { strap: true, chock: 'both' }, rr: { strap: true, chock: 'both' } }} />
                                         <p className="text-[10px] text-slate-600 mt-2 text-center leading-snug flex-grow">
-                                            <strong className="text-slate-800">Schwere PKW (&gt;2t - 3t):</strong><br/>1 Rad in FR (Gurt + Keil) & beide Räder gegen FR voll sichern (Gurt + 2 Keile).
+                                            <strong className="text-slate-800">Schwere PKW (bis ±25°):</strong><br/>1 Rad in FR (Gurt + 1 Keil <strong>vorne</strong>) &amp; beide Räder gegen FR voll sichern (Gurt + 2 Keile / Mulde).
                                         </p>
                                     </div>
                                 </div>
-                            </div>
 
-                            {/* Legende */}
-                            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                                <h5 className="font-black text-slate-800 text-sm mb-3">Legende für Abbildungen:</h5>
-                                <ul className="space-y-3 text-sm text-slate-700 font-bold flex flex-wrap gap-x-6 gap-y-2">
-                                    <li className="flex items-center gap-2">
-                                        <div className="w-5 h-1 bg-[#fde047] shadow-sm"></div>
-                                        = Radkeil / Vorleger
-                                    </li>
-                                    <li className="flex items-center gap-2">
-                                        <div className="w-6 h-3 border-2 border-slate-400 border-t-0 rounded-b-sm shadow-sm"></div> 
-                                        = Mulde / Brille
-                                    </li>
-                                    <li className="flex items-center gap-2">
-                                        <div className="w-6 h-1 bg-[#3b82f6] shadow-sm"></div> 
-                                        = Autotransportgurt
-                                    </li>
-                                    <li className="flex items-center gap-2">
-                                        <div className="w-3 h-5 bg-[#0f172a] rounded-[2px] shadow-sm"></div>
-                                        = Rad
-                                    </li>
-                                </ul>
+                                {/* Legende */}
+                                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                    <h5 className="font-black text-slate-800 text-xs uppercase tracking-wide mb-3">Legende für Abbildungen</h5>
+                                    <ul className="space-y-2 text-xs text-slate-700 font-bold flex flex-wrap gap-x-5 gap-y-2">
+                                        <li className="flex items-center gap-2">
+                                            <div className="w-5 h-1 bg-[#fde047] shadow-sm"></div>
+                                            = Radkeil / Vorleger
+                                        </li>
+                                        <li className="flex items-center gap-2">
+                                            <div className="w-6 h-3 border-2 border-slate-400 border-t-0 rounded-b-sm shadow-sm"></div> 
+                                            = Mulde / Brille
+                                        </li>
+                                        <li className="flex items-center gap-2">
+                                            <div className="w-6 h-1 bg-[#3b82f6] shadow-sm"></div> 
+                                            = Autotransportgurt
+                                        </li>
+                                        <li className="flex items-center gap-2">
+                                            <div className="w-3 h-5 bg-[#0f172a] rounded-[2px] shadow-sm"></div>
+                                            = Rad
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
-                        </div>
+                        )}
 
+                        {/* 4. TECHNIK & KONTROLLE */}
+                        {pkwView === 'technik' && (
+                            <div className="space-y-4 animate-in fade-in">
+                                <div className="bg-amber-50 border border-amber-200 p-3.5 rounded-xl flex items-start gap-3 shadow-sm">
+                                    <Info className="w-5 h-5 shrink-0 text-amber-500 mt-0.5" />
+                                    <div className="text-xs text-amber-900 font-medium leading-relaxed">
+                                        <strong className="block mb-1 text-amber-800">Hinweis zum Zertifikat (Übereinstimmungserklärung)</strong>
+                                        Ein Zertifikat ist <strong>kein amtliches Dokument</strong> und es besteht <strong>keine behördliche Mitführpflicht</strong>! Es erleichtert lediglich die Kontrolle, um die Kompatibilität der Fahrbahnelemente mit den Sicherungsmitteln nachzuweisen.
+                                    </div>
+                                </div>
+
+                                <div className="space-y-3">
+                                    <div className="flex gap-3 items-start bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                                        <div className="w-5 h-5 shrink-0 mt-0.5"><LashingStrapIcon className="w-5 h-5 text-indigo-500" /></div>
+                                        <div>
+                                            <span className="font-bold text-slate-800 text-xs uppercase block mb-1">Drei-Punkt-Zurrgurte &amp; Controller</span>
+                                            <ul className="text-xs text-slate-600 list-disc list-inside space-y-0.5">
+                                                <li><strong className="text-slate-700">LC:</strong> mind. 1.500 daN | <strong className="text-slate-700">STF:</strong> mind. 330 daN</li>
+                                                <li><strong className="text-slate-700">Gurtband-Dehnung:</strong> ≤ 4 %</li>
+                                                <li><strong className="text-slate-700">Controller (ETA-Wert):</strong> Übertragungswert k ≥ 0,5</li>
+                                                <li><strong className="text-slate-700">Controller-Länge:</strong> mind. halber Radumfang (180°)</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-3 items-start bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                                        <Box className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
+                                        <div>
+                                            <span className="font-bold text-slate-800 text-xs uppercase block mb-1">Radvorleger (Anfahrbügel)</span>
+                                            <ul className="text-xs text-slate-600 list-disc list-inside space-y-0.5">
+                                                <li><strong className="text-slate-700">Höhe:</strong> ≥ 1/6 des Raddurchmessers (mind. 120 mm)</li>
+                                                <li><strong className="text-slate-700">Blockierkraft (BC):</strong> ≥ 500 daN</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-3 items-start bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                                        <SpiritLevelIcon className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+                                        <div>
+                                            <span className="font-bold text-slate-800 text-xs uppercase block mb-1">Winkelmessung vor Ort</span>
+                                            <p className="text-xs text-slate-600 leading-relaxed">
+                                                Referenz zunächst auf der ebenen Fahrbahn / Standfläche nullen. Anschließend flach auf das <strong>Lochblech / die Fahrbahn unter dem PKW</strong> auflegen (Geräteoberkante zeigt in <strong>Fahrtrichtung des LKW</strong>).
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Kurze Kontroll-Checkliste */}
+                                <div className="bg-slate-800 text-white p-4 rounded-xl shadow-sm">
+                                    <h4 className="font-black text-xs uppercase tracking-wider text-blue-300 mb-2.5 flex items-center gap-2">
+                                        <CheckSquare className="w-4 h-4" /> Kontroll-Checkliste (6 Schritte)
+                                    </h4>
+                                    <ol className="text-xs space-y-1.5 list-decimal list-inside text-slate-200 leading-relaxed">
+                                        <li><strong>Gewichtsklasse</strong> des PKW feststellen (≤ 2 t / &gt; 2–3 t / &gt; 3–4,5 t).</li>
+                                        <li><strong>Position am Zugende</strong> prüfen (Schwerpunkt hinter letzter Achse → zwingend VB 5).</li>
+                                        <li><strong>Verladerichtung</strong> prüfen (bei Rückwärtsverladung ist VB 3 verboten).</li>
+                                        <li><strong>Anstellwinkel</strong> messen/prüfen (max. ±25°, über 3 t max. ±10°).</li>
+                                        <li><strong>Gurte &amp; Keile/Mulden</strong> je Rad prüfen (Einzelkeil in FR zwingend <em>vor</em> dem Reifen).</li>
+                                        <li><strong>Ablegereife &amp; Etiketten</strong> von Gurten, Controllern und Radvorlegern sichten.</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
@@ -7767,15 +8180,1077 @@ function DriverLicenseModule() {
   );
 }
 
+// --- STAY CALCULATOR (AUFENTHALTSRECHNER NACH VO (EU) 2018/1806 & BESCHV) ---
+const EU_VISA_COUNTRIES = [
+  // EU / EWR / Schweiz (Freizügigkeit)
+  { name: 'Belgien', status: 'eu' },
+  { name: 'Bulgarien', status: 'eu' },
+  { name: 'Dänemark', status: 'eu' },
+  { name: 'Deutschland', status: 'eu' },
+  { name: 'Estland', status: 'eu' },
+  { name: 'Finnland', status: 'eu' },
+  { name: 'Frankreich', status: 'eu' },
+  { name: 'Griechenland', status: 'eu' },
+  { name: 'Irland', status: 'eu' },
+  { name: 'Island (EWR)', status: 'eu' },
+  { name: 'Italien', status: 'eu' },
+  { name: 'Kroatien', status: 'eu' },
+  { name: 'Lettland', status: 'eu' },
+  { name: 'Liechtenstein (EWR)', status: 'eu' },
+  { name: 'Litauen', status: 'eu' },
+  { name: 'Luxemburg', status: 'eu' },
+  { name: 'Malta', status: 'eu' },
+  { name: 'Niederlande', status: 'eu' },
+  { name: 'Norwegen (EWR)', status: 'eu' },
+  { name: 'Österreich', status: 'eu' },
+  { name: 'Polen', status: 'eu' },
+  { name: 'Portugal', status: 'eu' },
+  { name: 'Rumänien', status: 'eu' },
+  { name: 'Schweden', status: 'eu' },
+  { name: 'Schweiz (Freizügigkeitsabkommen)', status: 'eu' },
+  { name: 'Slowakei', status: 'eu' },
+  { name: 'Slowenien', status: 'eu' },
+  { name: 'Spanien', status: 'eu' },
+  { name: 'Tschechien', status: 'eu' },
+  { name: 'Ungarn', status: 'eu' },
+  { name: 'Zypern', status: 'eu' },
+
+  // Anhang II VO (EU) 2018/1806 – Positivstaaten (visumfrei bis 90/180 Tage)
+  { name: 'Albanien', status: 'visa_free', biometricRequired: true },
+  { name: 'Andorra', status: 'visa_free', priv41: 2 },
+  { name: 'Antigua und Barbuda', status: 'visa_free' },
+  { name: 'Argentinien', status: 'visa_free' },
+  { name: 'Australien', status: 'visa_free', priv41: 1 },
+  { name: 'Bahamas', status: 'visa_free' },
+  { name: 'Barbados', status: 'visa_free' },
+  { name: 'Bosnien und Herzegowina', status: 'visa_free', biometricRequired: true },
+  { name: 'Brasilien', status: 'visa_free', priv41: 2 },
+  { name: 'Brunei Darussalam', status: 'visa_free' },
+  { name: 'Chile', status: 'visa_free' },
+  { name: 'Costa Rica', status: 'visa_free' },
+  { name: 'Dominica', status: 'visa_free' },
+  { name: 'El Salvador', status: 'visa_free', priv41: 2 },
+  { name: 'Georgien', status: 'visa_free', biometricRequired: true },
+  { name: 'Grenada', status: 'visa_free' },
+  { name: 'Guatemala', status: 'visa_free' },
+  { name: 'Heiliger Stuhl (Vatikanstadt)', status: 'visa_free' },
+  { name: 'Honduras', status: 'visa_free', priv41: 2 },
+  { name: 'Hongkong (SAR China)', status: 'visa_free' },
+  { name: 'Israel', status: 'visa_free', priv41: 1 },
+  { name: 'Japan', status: 'visa_free', priv41: 1 },
+  { name: 'Kanada', status: 'visa_free', priv41: 1 },
+  { name: 'Kiribati', status: 'visa_free' },
+  { name: 'Kolumbien', status: 'visa_free' },
+  { name: 'Kosovo', status: 'visa_free', biometricRequired: true, note: 'Visumfreiheit seit 01.01.2024 nur mit biometrischem Reisepass.' },
+  { name: 'Macau (SAR China)', status: 'visa_free' },
+  { name: 'Malaysia', status: 'visa_free' },
+  { name: 'Marshallinseln', status: 'visa_free' },
+  { name: 'Mauritius', status: 'visa_free' },
+  { name: 'Mexiko', status: 'visa_free' },
+  { name: 'Mikronesien', status: 'visa_free' },
+  { name: 'Moldau (Republik)', status: 'visa_free', biometricRequired: true },
+  { name: 'Monaco', status: 'visa_free', priv41: 2 },
+  { name: 'Montenegro', status: 'visa_free', biometricRequired: true },
+  { name: 'Neuseeland', status: 'visa_free', priv41: 1 },
+  { name: 'Nicaragua', status: 'visa_free' },
+  { name: 'Nordmazedonien', status: 'visa_free', biometricRequired: true },
+  { name: 'Palau', status: 'visa_free' },
+  { name: 'Panama', status: 'visa_free' },
+  { name: 'Paraguay', status: 'visa_free' },
+  { name: 'Peru', status: 'visa_free' },
+  { name: 'Republik Korea (Südkorea)', status: 'visa_free', priv41: 1 },
+  { name: 'Salomonen', status: 'visa_free' },
+  { name: 'Samoa', status: 'visa_free' },
+  { name: 'San Marino', status: 'visa_free', priv41: 2 },
+  { name: 'Serbien', status: 'visa_free', biometricRequired: true, note: 'Ohne Pässe der Koordinationsdirektion Belgrad (Koordinaciona uprava).' },
+  { name: 'Seychellen', status: 'visa_free' },
+  { name: 'Singapur', status: 'visa_free' },
+  { name: 'St. Kitts und Nevis', status: 'visa_free' },
+  { name: 'St. Lucia', status: 'visa_free' },
+  { name: 'St. Vincent und die Grenadinen', status: 'visa_free' },
+  { name: 'Taiwan', status: 'visa_free', note: 'Nur mit Reisepass, der eine Personalausweisnummer enthält.' },
+  { name: 'Timor-Leste (Osttimor)', status: 'visa_free' },
+  { name: 'Tonga', status: 'visa_free' },
+  { name: 'Trinidad und Tobago', status: 'visa_free' },
+  { name: 'Tuvalu', status: 'visa_free' },
+  { name: 'Ukraine', status: 'visa_free', biometricRequired: true },
+  { name: 'Uruguay', status: 'visa_free' },
+  { name: 'Venezuela', status: 'visa_free' },
+  { name: 'Vereinigte Arabische Emirate', status: 'visa_free' },
+  { name: 'Vereinigte Staaten von Amerika (USA)', status: 'visa_free', priv41: 1 },
+  { name: 'Vereinigtes Königreich (UK)', status: 'visa_free', priv41: 1 },
+
+  // Anhang I VO (EU) 2018/1806 – Negativstaaten (grundsätzlich visumpflichtig)
+  { name: 'Afghanistan', status: 'visa_required' },
+  { name: 'Ägypten', status: 'visa_required' },
+  { name: 'Algerien', status: 'visa_required' },
+  { name: 'Angola', status: 'visa_required' },
+  { name: 'Äquatorialguinea', status: 'visa_required' },
+  { name: 'Armenien', status: 'visa_required' },
+  { name: 'Aserbaidschan', status: 'visa_required' },
+  { name: 'Äthiopien', status: 'visa_required' },
+  { name: 'Bahrain', status: 'visa_required' },
+  { name: 'Bangladesch', status: 'visa_required' },
+  { name: 'Belarus (Weißrussland)', status: 'visa_required' },
+  { name: 'Belize', status: 'visa_required' },
+  { name: 'Benin', status: 'visa_required' },
+  { name: 'Bhutan', status: 'visa_required' },
+  { name: 'Bolivien', status: 'visa_required' },
+  { name: 'Botsuana', status: 'visa_required' },
+  { name: 'Burkina Faso', status: 'visa_required' },
+  { name: 'Burundi', status: 'visa_required' },
+  { name: 'China (Volksrepublik)', status: 'visa_required' },
+  { name: 'Côte d’Ivoire (Elfenbeinküste)', status: 'visa_required' },
+  { name: 'Dominikanische Republik', status: 'visa_required' },
+  { name: 'Dschibuti', status: 'visa_required' },
+  { name: 'Ecuador', status: 'visa_required' },
+  { name: 'Eritrea', status: 'visa_required' },
+  { name: 'Eswatini', status: 'visa_required' },
+  { name: 'Fidschi', status: 'visa_required' },
+  { name: 'Gabun', status: 'visa_required' },
+  { name: 'Gambia', status: 'visa_required' },
+  { name: 'Ghana', status: 'visa_required' },
+  { name: 'Guinea', status: 'visa_required' },
+  { name: 'Guinea-Bissau', status: 'visa_required' },
+  { name: 'Guyana', status: 'visa_required' },
+  { name: 'Haiti', status: 'visa_required' },
+  { name: 'Indien', status: 'visa_required' },
+  { name: 'Indonesien', status: 'visa_required' },
+  { name: 'Irak', status: 'visa_required' },
+  { name: 'Iran', status: 'visa_required' },
+  { name: 'Jamaika', status: 'visa_required' },
+  { name: 'Jemen', status: 'visa_required' },
+  { name: 'Jordanien', status: 'visa_required' },
+  { name: 'Kambodscha', status: 'visa_required' },
+  { name: 'Kamerun', status: 'visa_required' },
+  { name: 'Kap Verde', status: 'visa_required' },
+  { name: 'Kasachstan', status: 'visa_required' },
+  { name: 'Katar', status: 'visa_required' },
+  { name: 'Kenia', status: 'visa_required' },
+  { name: 'Kirgisistan', status: 'visa_required' },
+  { name: 'Komoren', status: 'visa_required' },
+  { name: 'Kongo (Demokratische Republik)', status: 'visa_required' },
+  { name: 'Kongo (Republik)', status: 'visa_required' },
+  { name: 'Korea (Demokratische Volksrepublik / Nordkorea)', status: 'visa_required' },
+  { name: 'Kuba', status: 'visa_required' },
+  { name: 'Kuwait', status: 'visa_required' },
+  { name: 'Laos', status: 'visa_required' },
+  { name: 'Lesotho', status: 'visa_required' },
+  { name: 'Libanon', status: 'visa_required' },
+  { name: 'Liberia', status: 'visa_required' },
+  { name: 'Libyen', status: 'visa_required' },
+  { name: 'Madagaskar', status: 'visa_required' },
+  { name: 'Malawi', status: 'visa_required' },
+  { name: 'Malediven', status: 'visa_required' },
+  { name: 'Mali', status: 'visa_required' },
+  { name: 'Marokko', status: 'visa_required' },
+  { name: 'Mauretanien', status: 'visa_required' },
+  { name: 'Mongolei', status: 'visa_required' },
+  { name: 'Mosambik', status: 'visa_required' },
+  { name: 'Myanmar', status: 'visa_required' },
+  { name: 'Namibia', status: 'visa_required' },
+  { name: 'Nauru', status: 'visa_required' },
+  { name: 'Nepal', status: 'visa_required' },
+  { name: 'Niger', status: 'visa_required' },
+  { name: 'Nigeria', status: 'visa_required' },
+  { name: 'Oman', status: 'visa_required' },
+  { name: 'Pakistan', status: 'visa_required' },
+  { name: 'Palästinensische Gebiete', status: 'visa_required' },
+  { name: 'Papua-Neuguinea', status: 'visa_required' },
+  { name: 'Philippinen', status: 'visa_required' },
+  { name: 'Ruanda', status: 'visa_required' },
+  { name: 'Russische Föderation', status: 'visa_required' },
+  { name: 'Sambia', status: 'visa_required' },
+  { name: 'São Tomé und Príncipe', status: 'visa_required' },
+  { name: 'Saudi-Arabien', status: 'visa_required' },
+  { name: 'Senegal', status: 'visa_required' },
+  { name: 'Sierra Leone', status: 'visa_required' },
+  { name: 'Simbabwe', status: 'visa_required' },
+  { name: 'Somalia', status: 'visa_required' },
+  { name: 'Sri Lanka', status: 'visa_required' },
+  { name: 'Südafrika', status: 'visa_required' },
+  { name: 'Sudan', status: 'visa_required' },
+  { name: 'Südsudan', status: 'visa_required' },
+  { name: 'Suriname', status: 'visa_required' },
+  { name: 'Syrien', status: 'visa_required' },
+  { name: 'Tadschikistan', status: 'visa_required' },
+  { name: 'Tansania', status: 'visa_required' },
+  { name: 'Thailand', status: 'visa_required' },
+  { name: 'Togo', status: 'visa_required' },
+  { name: 'Tschad', status: 'visa_required' },
+  { name: 'Tunesien', status: 'visa_required' },
+  { name: 'Türkei', status: 'visa_required' },
+  { name: 'Turkmenistan', status: 'visa_required' },
+  { name: 'Uganda', status: 'visa_required' },
+  { name: 'Usbekistan', status: 'visa_required' },
+  { name: 'Vanuatu', status: 'visa_required', note: 'Visumfreiheit seit 03.02.2025 dauerhaft aufgehoben (Anhang I).' },
+  { name: 'Vietnam', status: 'visa_required' },
+  { name: 'Zentralafrikanische Republik', status: 'visa_required' }
+].sort((a, b) => a.name.localeCompare(b.name, 'de'));
+
+const BESCHV_EXCEPTIONS = [
+  {
+    id: 'NONE',
+    label: 'Keine Ausnahme (reguläre Erwerbstätigkeit)',
+    norm: '§ 17 Abs. 1 AufenthV',
+    desc: 'Erwerbstätigkeit ist im visumfreien Kurzaufenthalt grundsätzlich nicht gestattet. Es ist ein Visum bzw. Aufenthaltstitel mit Arbeitserlaubnis erforderlich.',
+    limitType: 'none'
+  },
+  {
+    id: 'GESCHAEFTSREISE',
+    label: 'Geschäftsreisende (§ 16 BeschV)',
+    norm: '§ 30 Nr. 1 i. V. m. § 16 BeschV, § 17 Abs. 2 S. 3 AufenthV',
+    desc: 'Besprechungen, Verhandlungen, Vertragsabschlüsse oder Überwachung der Vertragsausführung für einen Arbeitgeber im Ausland (bis 90 Tage in 180 Tagen).',
+    limitType: '90_180'
+  },
+  {
+    id: 'KRAFTFAHRER_TRANSIT',
+    label: 'Berufskraftfahrer – reiner Transit (§ 20 Abs. 1 BeschV)',
+    norm: '§ 30 Nr. 1 i. V. m. § 20 Abs. 1 BeschV, § 17 Abs. 2 S. 2 AufenthV',
+    desc: 'Grenzüberschreitender Straßenverkehr: reine Durchbeförderung von Gütern/Personen durch Deutschland ohne Fahrzeugwechsel (keine Tätigkeitsfrist nach § 17 Abs. 2 S. 2 AufenthV; Schengen-Aufenthaltsgrenze 90/180 Tage bleibt bestehen).',
+    limitType: 'transit'
+  },
+  {
+    id: 'KRAFTFAHRER_INT',
+    label: 'Berufskraftfahrer – grenzüberschreitend (§ 20 Abs. 1 BeschV)',
+    norm: '§ 30 Nr. 1 i. V. m. § 20 Abs. 1 BeschV, § 17 Abs. 2 S. 3 AufenthV',
+    desc: 'Grenzüberschreitender Güter- oder Personenverkehr für einen Arbeitgeber im Ausland (mit Be-/Entladen in DE; bis 90 Tage in 180 Tagen).',
+    limitType: '90_180'
+  },
+  {
+    id: 'WERKLIEFERUNG',
+    label: 'Werklieferung / Montage / Wartung (§ 19 Abs. 1 BeschV)',
+    norm: '§ 30 Nr. 3 i. V. m. § 19 Abs. 1 BeschV, § 17 Abs. 2 S. 1 AufenthV',
+    desc: 'Aufstellung, Montage, Einweisung, Wartung oder Reparatur von gelieferten Maschinen/Anlagen für den ausländischen Lieferanten (bis 90 Tage in 12 Monaten; vorherige Anzeige bei der BA erforderlich!).',
+    limitType: '90_12m',
+    extraNote: 'Achtung: Vor Beginn der Tätigkeit ist eine Anzeige bei der Bundesagentur für Arbeit (BA) nach § 19 Abs. 1 BeschV erforderlich.'
+  },
+  {
+    id: 'LEITENDE',
+    label: 'Leitende Angestellte / Vorstände (§ 3 BeschV)',
+    norm: '§ 30 Nr. 1 i. V. m. § 3 BeschV, § 17 Abs. 2 S. 3 AufenthV',
+    desc: 'Geschäftsführer, Vorstände, Prokuristen oder leitende Angestellte mit Generalvollmacht (bis 90 Tage in 180 Tagen).',
+    limitType: '90_180'
+  },
+  {
+    id: 'WISSENSCHAFT',
+    label: 'Wissenschaftler / Gastdozenten (§ 5 BeschV)',
+    norm: '§ 30 Nr. 1 i. V. m. § 5 BeschV, § 17 Abs. 2 S. 3 AufenthV',
+    desc: 'Wissenschaftliches Personal von Hochschulen und Forschungseinrichtungen, Gastwissenschaftler oder Lehrkräfte (bis 90 Tage in 180 Tagen).',
+    limitType: '90_180'
+  },
+  {
+    id: 'WEITERBILDUNG',
+    label: 'Betriebliche Weiterbildung (§ 17 Abs. 2 BeschV)',
+    norm: '§ 30 Nr. 2 i. V. m. § 17 Abs. 2 BeschV, § 17 Abs. 2 S. 1 AufenthV',
+    desc: 'Betriebliche Weiterbildung im Rahmen von Exportlieferungs- oder Lizenzverträgen (bis 90 Tage in 12 Monaten).',
+    limitType: '90_12m'
+  },
+  {
+    id: 'DIENSTLEISTUNG_EU',
+    label: 'EU-Dienstleistungserbringung (§ 21 BeschV)',
+    norm: '§ 30 Nr. 3 i. V. m. § 21 BeschV, § 17 Abs. 2 S. 1 AufenthV',
+    desc: 'Mitarbeiter eines Unternehmens mit Sitz in einem EU-/EWR-Staat zur vorübergehenden Dienstleistungserbringung in DE (bis 90 Tage in 12 Monaten).',
+    limitType: '90_12m'
+  },
+  {
+    id: 'KUENSTLER_SPORT',
+    label: 'Künstler, Sportler, Vortragende (§ 22 Nr. 1–3 BeschV)',
+    norm: '§ 30 Nr. 2 i. V. m. § 22 BeschV, § 17 Abs. 2 S. 1 AufenthV',
+    desc: 'Künstlerische Darbietungen, Berufssportler bei Wettkämpfen, Fotomodelle, Vorträge von besonderem wissenschaftlichen/künstlerischen Wert (bis 90 Tage in 12 Monaten).',
+    limitType: '90_12m'
+  },
+  {
+    id: 'JOURNALIST_MESSE',
+    label: 'Journalisten / Messepersonal / Reiseleiter (§ 22 Nr. 4–5 BeschV)',
+    norm: '§ 30 Nr. 2 i. V. m. § 22 BeschV, § 17 Abs. 2 S. 1 AufenthV',
+    desc: 'Journalisten/Korrespondenten, ausländisches Messepersonal sowie Urlaubsreiseleiter (bis 90 Tage in 12 Monaten).',
+    limitType: '90_12m'
+  },
+  {
+    id: 'BA_ERLAUBNIS',
+    label: 'Arbeitserlaubnis der BA (§ 17 Abs. 3 AufenthV)',
+    norm: '§ 17 Abs. 3 AufenthV i. V. m. § 15a / § 15d BeschV',
+    desc: 'Kurzzeitige Beschäftigung (z. B. Saisonarbeit oder kontingentierte Kurzzeitbeschäftigung), für die eine gültige Arbeitserlaubnis der Bundesagentur für Arbeit vorliegt (bis 90 Tage in 180 Tagen).',
+    limitType: '90_180'
+  }
+];
+
+function StayCalculator() {
+  const dateTime = useDateTime();
+  const todayIso = new Date().toISOString().split('T')[0];
+
+  const [countrySearch, setCountrySearch] = useState('');
+  const [selectedCountryName, setSelectedCountryName] = useState('');
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const [hasBiometricPassport, setHasBiometricPassport] = useState(true);
+  const [hasSchengenPermit, setHasSchengenPermit] = useState(false);
+
+  // Aufenthaltsdaten: Einreisedatum, Kontrolldatum & beliebige vorherige Aufenthalte
+  const [entryDate, setEntryDate] = useState('');
+  const [controlDate, setControlDate] = useState(todayIso);
+  const [previousStays, setPreviousStays] = useState([]);
+
+  // Erwerbstätigkeit & BeschV-Ausnahmen
+  const [isWorking, setIsWorking] = useState(false);
+  const [beschvException, setBeschvException] = useState('NONE');
+
+  const selectedCountry = EU_VISA_COUNTRIES.find(c => c.name === selectedCountryName) || null;
+  const selectedException = BESCHV_EXCEPTIONS.find(e => e.id === beschvException) || BESCHV_EXCEPTIONS[0];
+
+  const filteredCountries = countrySearch.trim()
+    ? EU_VISA_COUNTRIES.filter(c => c.name.toLowerCase().includes(countrySearch.trim().toLowerCase()))
+    : EU_VISA_COUNTRIES;
+
+  const addPreviousStay = () => {
+    setPreviousStays(prev => [...prev, { id: Date.now() + Math.random(), from: '', to: '' }]);
+  };
+
+  const updatePreviousStay = (id, field, value) => {
+    setPreviousStays(prev => prev.map(s => (s.id === id ? { ...s, [field]: value } : s)));
+  };
+
+  const removePreviousStay = (id) => {
+    setPreviousStays(prev => prev.filter(s => s.id !== id));
+  };
+
+  const formatDateDE = (isoStr) => {
+    if (!isoStr) return '-';
+    const parts = isoStr.split('-');
+    if (parts.length !== 3) return isoStr;
+    return `${parts[2]}.${parts[1]}.${parts[0]}`;
+  };
+
+  // Exakte Berechnung der Aufenthaltstage im 180-Tage-Fenster rückwärts ab Kontrolldatum
+  const stayMetrics = React.useMemo(() => {
+    if (!entryDate || !controlDate) return null;
+
+    const parseUTC = (iso) => {
+      const [y, m, d] = iso.split('-').map(Number);
+      if (!y || !m || !d) return null;
+      return Date.UTC(y, m - 1, d);
+    };
+
+    const MS_PER_DAY = 86400000;
+    const entryMs = parseUTC(entryDate);
+    const controlMs = parseUTC(controlDate);
+
+    if (entryMs === null || controlMs === null) return null;
+    if (entryMs > controlMs) {
+      return { error: 'Das Einreisedatum liegt nach dem Kontrolldatum.' };
+    }
+
+    // 180-Tage-Referenzzeitraum: Kontrolldatum minus 179 Tage bis einschl. Kontrolldatum (= 180 Kalendertage)
+    const windowStartMs = controlMs - 179 * MS_PER_DAY;
+    const windowStartIso = new Date(windowStartMs).toISOString().split('T')[0];
+
+    const currentStayTotalDays = Math.floor((controlMs - entryMs) / MS_PER_DAY) + 1;
+
+    const currentWindowSet = new Set();
+    const effCurrentStart = Math.max(entryMs, windowStartMs);
+    for (let t = effCurrentStart; t <= controlMs; t += MS_PER_DAY) {
+      currentWindowSet.add(t);
+    }
+
+    const combinedWindowSet = new Set(currentWindowSet);
+    const prevStayBreakdown = [];
+
+    previousStays.forEach((stay, idx) => {
+      if (!stay.from || !stay.to) return;
+      const fromMs = parseUTC(stay.from);
+      const toMs = parseUTC(stay.to);
+      if (fromMs === null || toMs === null || fromMs > toMs) return;
+
+      const effStart = Math.max(fromMs, windowStartMs);
+      const effEnd = Math.min(toMs, controlMs);
+      let countedDays = 0;
+
+      if (effStart <= effEnd) {
+        for (let t = effStart; t <= effEnd; t += MS_PER_DAY) {
+          countedDays++;
+          combinedWindowSet.add(t);
+        }
+      }
+
+      prevStayBreakdown.push({
+        index: idx + 1,
+        from: stay.from,
+        to: stay.to,
+        totalSpan: Math.floor((toMs - fromMs) / MS_PER_DAY) + 1,
+        countedInWindow: countedDays
+      });
+    });
+
+    const totalDaysIn180 = combinedWindowSet.size;
+    const prevDaysCountedIn180 = totalDaysIn180 - currentWindowSet.size;
+    const remainingDays = Math.max(0, 90 - totalDaysIn180);
+    const overstayDays = Math.max(0, totalDaysIn180 - 90);
+
+    return {
+      error: null,
+      windowStartIso,
+      currentStayTotalDays,
+      currentDaysIn180: currentWindowSet.size,
+      prevDaysCountedIn180,
+      totalDaysIn180,
+      remainingDays,
+      overstayDays,
+      prevStayBreakdown
+    };
+  }, [entryDate, controlDate, previousStays]);
+
+  // Gesamtbewertung nach VO (EU) 2018/1806, AufenthG, AufenthV und BeschV
+  const evaluation = React.useMemo(() => {
+    if (!selectedCountry) return null;
+    if (stayMetrics && stayMetrics.error) return null;
+
+    // 1. EU / EWR / Schweiz
+    if (selectedCountry.status === 'eu') {
+      return {
+        status: 'ok',
+        badge: 'FREIZÜGIGKEIT (VISUMFREI)',
+        headline: 'Kein Visum und kein Aufenthaltstitel erforderlich',
+        summary: `Staatsangehörige aus ${selectedCountry.name} genießen Freizügigkeit (FreizügG/EU bzw. Freizügigkeitsabkommen CH). Einreise, Aufenthalt (auch über 90 Tage) und jede Erwerbstätigkeit sind visum- und erlaubnisfrei.`,
+        legalRefs: ['§ 2 FreizügG/EU (bzw. FZA EU–Schweiz)', 'Kein Anwendungsbereich der VO (EU) 2018/1806'],
+        violations: [],
+        notes: ['Ein gültiger Personalausweis oder Reisepass ist mitzuführen (§ 8 FreizügG/EU).']
+      };
+    }
+
+    const totalDays = stayMetrics ? stayMetrics.totalDaysIn180 : 0;
+    const isOver90 = stayMetrics ? totalDays > 90 : false;
+    const biometricMissing = Boolean(selectedCountry.biometricRequired && !hasBiometricPassport);
+
+    // Grundsätzliche Visumbefreiung für Kurzaufenthalt (bis 90/180 Tage)
+    const isShortStayVisaFreeBase =
+      hasSchengenPermit || (selectedCountry.status === 'visa_free' && !biometricMissing);
+
+    const reasons = [];
+    const legalRefs = [];
+    const violations = [];
+    const notes = [];
+
+    if (selectedCountry.note) notes.push(selectedCountry.note);
+    if (selectedCountry.priv41 === 1) {
+      notes.push('§ 41 Abs. 1 AufenthV (Privilegierter Staat): Ein erforderlicher Aufenthaltstitel (auch zur Erwerbstätigkeit) kann im Inland bei der Ausländerbehörde beantragt werden. Die Erwerbstätigkeit darf jedoch erst NACH Erteilung aufgenommen werden!');
+    } else if (selectedCountry.priv41 === 2) {
+      notes.push('§ 41 Abs. 2 AufenthV (Privilegierter Staat): Ein Aufenthaltstitel für Nicht-Erwerbszwecke kann im Inland beantragt werden. Für eine Erwerbstätigkeit ist vorab ein Visum erforderlich.');
+    }
+
+    if (hasSchengenPermit) {
+      legalRefs.push('Art. 21 SDÜ (Aufenthaltstitel / Visum D eines anderen Schengen-Staates)');
+    } else if (selectedCountry.status === 'visa_free') {
+      legalRefs.push('Art. 4 Abs. 1 i. V. m. Anhang II VO (EU) 2018/1806 (Positivstaat)');
+    } else {
+      legalRefs.push('Art. 3 Abs. 1 i. V. m. Anhang I VO (EU) 2018/1806 (Negativstaat)');
+    }
+
+    // Fall A: Grundsätzlich visumpflichtig (Anhang I ohne Schengen-Titel oder fehlender biometrischer Pass)
+    if (!isShortStayVisaFreeBase) {
+      if (biometricMissing) {
+        reasons.push(`Für ${selectedCountry.name} gilt die Visumfreiheit nach Anhang II VO (EU) 2018/1806 nur mit biometrischem Reisepass. Ohne biometrischen Pass besteht Visumpflicht.`);
+      } else {
+        reasons.push(`${selectedCountry.name} ist ein visumpflichtiger Drittstaat (Anhang I VO (EU) 2018/1806). Ohne gültiges Visum oder Aufenthaltstitel ist bereits die Einreise bzw. der Aufenthalt unerlaubt.`);
+      }
+
+      if (isWorking) {
+        if (beschvException === 'NONE') {
+          reasons.push('Zudem wird eine reguläre Erwerbstätigkeit ausgeübt, die einen Aufenthaltstitel mit ausdrücklicher Erlaubnis zur Erwerbstätigkeit erfordert (§ 4a Abs. 1 AufenthG).');
+          violations.push('§ 404 Abs. 2 Nr. 4 SGB III (OWi – Ausübung einer Beschäftigung ohne Berechtigung)');
+        } else {
+          notes.push(`Ausnahme nach ${selectedException.norm} greift nicht für die Einreise ohne Visum, da bereits keine Visumbefreiung für den Kurzaufenthalt vorliegt.`);
+        }
+      }
+
+      violations.push('§ 95 Abs. 1 Nr. 2 AufenthG (Unerlaubter Aufenthalt ohne erforderlichen Aufenthaltstitel / Visum)');
+      violations.push('§ 95 Abs. 1 Nr. 3 i. V. m. § 14 Abs. 1 Nr. 2 AufenthG (Unerlaubte Einreise)');
+
+      return {
+        status: 'required',
+        badge: 'VISUM / AUFENTHALTSTITEL ERFORDERLICH',
+        headline: 'Aufenthalt ist NICHT visumfrei',
+        summary: reasons.join(' '),
+        legalRefs: [...legalRefs, '§ 4 Abs. 1 AufenthG'],
+        violations,
+        notes
+      };
+    }
+
+    // Fall B: Grundsätzlich visumfrei für Kurzaufenthalt (Positivstaat mit gültigem Pass ODER Schengen-Titel)
+    // Prüfung 1: Überschreitung 90/180 Tage
+    if (isOver90) {
+      reasons.push(`Die zulässige Kurzaufenthaltsdauer von 90 Tagen innerhalb von 180 Tagen wurde überschritten (berechnet: ${totalDays} Tage; Überschreitung um ${stayMetrics.overstayDays} Tag${stayMetrics.overstayDays === 1 ? '' : 'e'}).`);
+      legalRefs.push('Art. 6 Abs. 1 SGK / Art. 4 Abs. 1 VO (EU) 2018/1806 (90/180-Tage-Regel)');
+      violations.push('§ 95 Abs. 1 Nr. 2 AufenthG (Unerlaubter Aufenthalt wegen Überschreitung der visumfreien Aufenthaltsdauer)');
+    }
+
+    // Prüfung 2: Erwerbstätigkeit
+    let workViolated = false;
+    if (isWorking) {
+      if (beschvException === 'NONE') {
+        workViolated = true;
+        reasons.push('Durch die Aufnahme einer regulären Erwerbstätigkeit entfällt die Visumbefreiung nach § 17 Abs. 1 AufenthV vollständig. Es ist ein Visum bzw. Aufenthaltstitel mit Arbeitserlaubnis erforderlich.');
+        legalRefs.push('§ 17 Abs. 1 AufenthV, § 4a Abs. 1 AufenthG');
+        violations.push('§ 95 Abs. 1 Nr. 2 AufenthG (Unerlaubter Aufenthalt – Wegfall der Befreiung nach § 17 Abs. 1 AufenthV)');
+        violations.push('§ 404 Abs. 2 Nr. 4 SGB III (OWi – Beschäftigung ohne Berechtigung)');
+      } else {
+        legalRefs.push(selectedException.norm);
+        if (selectedException.extraNote) notes.push(selectedException.extraNote);
+        if (selectedException.limitType === '90_12m') {
+          notes.push('Hinweis zur Tätigkeitsfrist: Diese Ausnahme nach § 30 Nr. 2/3 BeschV ist auf maximal 90 Tage innerhalb von 12 Monaten begrenzt (§ 17 Abs. 2 S. 1 AufenthV).');
+        } else if (selectedException.limitType === 'transit') {
+          notes.push('Reiner Transit (§ 17 Abs. 2 S. 2 AufenthV): Keine zeitliche Beschränkung der Fahrtätigkeit, aber das allgemeine 90/180-Tage-Schengen-Aufenthaltslimit gilt weiterhin.');
+        }
+      }
+    }
+
+    if (isOver90 || workViolated) {
+      return {
+        status: 'required',
+        badge: 'VISUM / AUFENTHALTSTITEL ERFORDERLICH',
+        headline: 'Aufenthaltstitel bzw. Visum benötigt',
+        summary: reasons.join(' '),
+        legalRefs,
+        violations,
+        notes
+      };
+    }
+
+    // Alles zulässig!
+    return {
+      status: 'ok',
+      badge: 'VISUMFREI (ZULÄSSIG)',
+      headline: isWorking
+        ? 'Visumfrei zulässig (Ausnahme nach BeschV greift)'
+        : 'Visumfreier Kurzaufenthalt zulässig',
+      summary: isWorking
+        ? `Der Aufenthalt ist im Rahmen der 90/180-Tage-Regel visumfrei. Die ausgeübte Tätigkeit fällt unter die Ausnahme „${selectedException.label}“ (${selectedException.norm}), sodass die Visumbefreiung bestehen bleibt.`
+        : `Der Aufenthalt ohne Erwerbstätigkeit ist im Rahmen der 90/180-Tage-Regel visumfrei zulässig${stayMetrics ? ` (${totalDays} von 90 Tagen verbraucht, noch ${stayMetrics.remainingDays} Tage frei)` : ''}.`,
+      legalRefs,
+      violations: [],
+      notes
+    };
+  }, [selectedCountry, hasBiometricPassport, hasSchengenPermit, stayMetrics, isWorking, beschvException, selectedException]);
+
+  const resetAll = () => {
+    setCountrySearch('');
+    setSelectedCountryName('');
+    setHasBiometricPassport(true);
+    setHasSchengenPermit(false);
+    setEntryDate('');
+    setControlDate(todayIso);
+    setPreviousStays([]);
+    setIsWorking(false);
+    setBeschvException('NONE');
+  };
+
+  return (
+    <div className="max-w-md mx-auto bg-slate-50 min-h-screen">
+      {/* PRINT VIEW ONLY */}
+      <div className="print-only print-container">
+        <h1 className="print-title">Aufenthaltsrechtliche Prüfung</h1>
+        <div className="print-meta">Erstellt am: {dateTime}</div>
+
+        <h2 className="print-section">1. Staatsangehörigkeit & Dokumente</h2>
+        <table className="print-table">
+          <tbody>
+            <tr><th>Herkunftsland / Staatsangehörigkeit</th><td><strong>{selectedCountry ? selectedCountry.name : 'Nicht gewählt'}</strong></td></tr>
+            <tr>
+              <th>Einstufung (VO (EU) 2018/1806)</th>
+              <td>
+                {selectedCountry?.status === 'eu' && 'EU / EWR / Schweiz (Freizügigkeit)'}
+                {selectedCountry?.status === 'visa_free' && 'Positivstaat (Anhang II – visumfrei bis 90/180 Tage)'}
+                {selectedCountry?.status === 'visa_required' && 'Negativstaat (Anhang I – grundsätzlich visumpflichtig)'}
+              </td>
+            </tr>
+            {selectedCountry?.biometricRequired && (
+              <tr><th>Biometrischer Reisepass</th><td>{hasBiometricPassport ? 'Ja' : 'Nein'}</td></tr>
+            )}
+            {selectedCountry?.status !== 'eu' && (
+              <tr><th>Aufenthaltstitel / Visum D anderer Schengen-Staat</th><td>{hasSchengenPermit ? 'Ja (Art. 21 SDÜ)' : 'Nein'}</td></tr>
+            )}
+          </tbody>
+        </table>
+
+        {selectedCountry?.status !== 'eu' && (
+          <>
+            <h2 className="print-section">2. Aufenthaltsdauer & 180-Tage-Fenster</h2>
+            <table className="print-table">
+              <tbody>
+                <tr><th>Aktuelles Einreisedatum</th><td>{formatDateDE(entryDate)}</td></tr>
+                <tr><th>Kontrolldatum</th><td>{formatDateDE(controlDate)}</td></tr>
+                {stayMetrics && !stayMetrics.error && (
+                  <>
+                    <tr><th>180-Tage-Referenzzeitraum</th><td>{formatDateDE(stayMetrics.windowStartIso)} bis {formatDateDE(controlDate)}</td></tr>
+                    <tr><th>Aktueller Aufenthalt (Tage im 180-Tage-Fenster)</th><td>{stayMetrics.currentDaysIn180} Tage</td></tr>
+                    <tr><th>Anrechenbare Voraufenthalte im 180-Tage-Fenster</th><td>{stayMetrics.prevDaysCountedIn180} Tage</td></tr>
+                    <tr><th>Gesamtaufenthalt im 180-Tage-Fenster</th><td><strong>{stayMetrics.totalDaysIn180} / 90 Tage</strong></td></tr>
+                  </>
+                )}
+              </tbody>
+            </table>
+
+            {stayMetrics && stayMetrics.prevStayBreakdown && stayMetrics.prevStayBreakdown.length > 0 && (
+              <table className="print-table">
+                <thead>
+                  <tr><th>Voraufenthalt</th><th>Einreise</th><th>Ausreise</th><th>Im 180-T.-Fenster</th></tr>
+                </thead>
+                <tbody>
+                  {stayMetrics.prevStayBreakdown.map(s => (
+                    <tr key={s.index}>
+                      <td>Aufenthalt {s.index}</td>
+                      <td>{formatDateDE(s.from)}</td>
+                      <td>{formatDateDE(s.to)}</td>
+                      <td>{s.countedInWindow} Tage</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+
+            <h2 className="print-section">3. Erwerbstätigkeit & BeschV</h2>
+            <table className="print-table">
+              <tbody>
+                <tr><th>Erwerbstätigkeit / Arbeit</th><td>{isWorking ? 'Ja' : 'Nein'}</td></tr>
+                {isWorking && (
+                  <tr><th>BeschV-Ausnahme</th><td>{selectedException.label} ({selectedException.norm})</td></tr>
+                )}
+              </tbody>
+            </table>
+          </>
+        )}
+
+        {evaluation && (
+          <div className="print-result-box">
+            <div className="print-result-header">
+              Ergebnis: <span className={evaluation.status === 'required' ? 'print-warning' : ''}>{evaluation.badge}</span>
+            </div>
+            <p style={{ margin: '6px 0' }}><strong>{evaluation.headline}</strong></p>
+            <p style={{ margin: '6px 0' }}>{evaluation.summary}</p>
+            {evaluation.legalRefs.length > 0 && (
+              <div style={{ marginTop: '8px', fontSize: '9pt' }}>
+                <strong>Rechtsgrundlagen:</strong> {evaluation.legalRefs.join(' | ')}
+              </div>
+            )}
+            {evaluation.violations.length > 0 && (
+              <div style={{ marginTop: '8px', fontSize: '9pt' }} className="print-warning">
+                <strong>Mögliche Verstöße:</strong> {evaluation.violations.join(' | ')}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+      {/* END PRINT VIEW */}
+
+      {/* HEADER */}
+      <div className="bg-emerald-700/95 backdrop-blur-md p-4 text-white flex items-center justify-between sticky top-0 z-20 shadow-lg shadow-emerald-900/10 no-print">
+        <div>
+          <h1 className="text-xl font-bold flex items-center gap-2 leading-tight tracking-tight">
+            <Globe className="w-6 h-6 shrink-0" /> Aufenthaltsrechner
+          </h1>
+          <p className="text-emerald-100 text-xs opacity-90 mt-0.5 font-mono flex items-center gap-1.5 ml-8">
+            <Clock className="w-3 h-3" /> {dateTime}
+          </p>
+        </div>
+        <HeaderLogo />
+      </div>
+
+      {/* MAIN CONTENT */}
+      <div className="p-2 space-y-2.5 pb-24 no-print">
+        {/* 1. HERKUNFTSLAND */}
+        <div className="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100">
+          <div className="flex items-center gap-2 mb-2.5 text-emerald-700">
+            <Globe className="w-5 h-5" />
+            <span className="text-sm font-black uppercase tracking-wide">1. Herkunftsland (Staatsangehörigkeit)</span>
+          </div>
+
+          <div className="relative">
+            <Search className="absolute left-3 top-3 w-4 h-4 text-slate-400 pointer-events-none" />
+            <input
+              type="text"
+              value={selectedCountryName ? selectedCountryName : countrySearch}
+              onFocus={() => {
+                if (selectedCountryName) {
+                  setCountrySearch('');
+                  setSelectedCountryName('');
+                }
+                setShowDropdown(true);
+              }}
+              onChange={(e) => {
+                setSelectedCountryName('');
+                setCountrySearch(e.target.value);
+                setShowDropdown(true);
+              }}
+              placeholder="Land suchen (z. B. Türkei, Kosovo, USA, Serbien)..."
+              className="w-full pl-9 pr-9 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            />
+            {(selectedCountryName || countrySearch) && (
+              <button
+                onClick={() => {
+                  setSelectedCountryName('');
+                  setCountrySearch('');
+                  setShowDropdown(false);
+                }}
+                className="absolute right-2.5 top-2.5 p-1 rounded-full bg-slate-200/70 hover:bg-slate-300 text-slate-500"
+                title="Auswahl löschen"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+
+            {showDropdown && (
+              <div className="mt-1.5 max-h-56 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-lg divide-y divide-slate-100 custom-scrollbar">
+                {filteredCountries.length > 0 ? (
+                  filteredCountries.map(c => (
+                    <button
+                      key={c.name}
+                      onClick={() => {
+                        setSelectedCountryName(c.name);
+                        setCountrySearch(c.name);
+                        setShowDropdown(false);
+                        setHasBiometricPassport(true);
+                      }}
+                      className="w-full px-3 py-2.5 text-left text-sm hover:bg-emerald-50 flex items-center justify-between gap-2 transition-colors"
+                    >
+                      <span className="font-medium text-slate-800">{c.name}</span>
+                      <span
+                        className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full shrink-0 ${
+                          c.status === 'eu'
+                            ? 'bg-blue-100 text-blue-700'
+                            : c.status === 'visa_free'
+                            ? 'bg-emerald-100 text-emerald-700'
+                            : 'bg-red-100 text-red-700'
+                        }`}
+                      >
+                        {c.status === 'eu' ? 'EU/EWR' : c.status === 'visa_free' ? 'Anhang II' : 'Anhang I'}
+                      </span>
+                    </button>
+                  ))
+                ) : (
+                  <div className="p-3 text-xs text-slate-400 text-center">Kein Land gefunden</div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Zusatzoptionen für Drittstaaten */}
+          {selectedCountry && selectedCountry.status !== 'eu' && (
+            <div className="mt-3 space-y-2 pt-2.5 border-t border-slate-100 animate-in fade-in">
+              {selectedCountry.biometricRequired && (
+                <label className="flex items-start gap-2.5 p-2.5 rounded-xl bg-amber-50 border border-amber-200 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={hasBiometricPassport}
+                    onChange={(e) => setHasBiometricPassport(e.target.checked)}
+                    className="w-4 h-4 mt-0.5 rounded border-amber-300 text-emerald-600 focus:ring-emerald-500"
+                  />
+                  <div className="text-xs text-amber-900">
+                    <span className="font-bold block">Biometrischer Reisepass vorhanden</span>
+                    <span className="text-[10px] opacity-80">Erforderlich für die Visumbefreiung bei {selectedCountry.name}.</span>
+                  </div>
+                </label>
+              )}
+
+              <label className="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={hasSchengenPermit}
+                  onChange={(e) => setHasSchengenPermit(e.target.checked)}
+                  className="w-4 h-4 mt-0.5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                />
+                <div className="text-xs text-slate-700">
+                  <span className="font-bold block">Gültiger Aufenthaltstitel / Visum D eines anderen Schengen-Staates</span>
+                  <span className="text-[10px] text-slate-500">Art. 21 SDÜ – ermöglicht visumfreien Kurzaufenthalt (bis 90/180 Tage).</span>
+                </div>
+              </label>
+            </div>
+          )}
+        </div>
+
+        {/* 2. AUFENTHALTSDAUER (Nur bei Drittstaaten) */}
+        {selectedCountry && selectedCountry.status !== 'eu' && (
+          <div className="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100 animate-in fade-in">
+            <div className="flex items-center gap-2 mb-3 text-emerald-700">
+              <Calendar className="w-5 h-5" />
+              <span className="text-sm font-black uppercase tracking-wide">2. Aufenthaltsdauer (90/180-Tage-Regel)</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2.5 mb-3">
+              <InputWithIcon
+                icon={Calendar}
+                label="Einreisedatum"
+                type="date"
+                value={entryDate}
+                onChange={(e) => setEntryDate(e.target.value)}
+              />
+              <InputWithIcon
+                icon={Calendar}
+                label="Kontrolldatum"
+                type="date"
+                value={controlDate}
+                onChange={(e) => setControlDate(e.target.value)}
+              />
+            </div>
+
+            {/* Vorherige Aufenthalte */}
+            <div className="pt-2.5 border-t border-slate-100">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">
+                  Vorherige Aufenthalte in DE / Schengen
+                </span>
+                {previousStays.length > 0 && (
+                  <span className="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">
+                    {previousStays.length} eingetragen
+                  </span>
+                )}
+              </div>
+
+              {previousStays.length > 0 && (
+                <div className="space-y-2 mb-2.5">
+                  {previousStays.map((stay, idx) => (
+                    <div
+                      key={stay.id}
+                      className="bg-slate-50 p-2.5 rounded-xl border border-slate-200 relative animate-in fade-in"
+                    >
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-[10px] font-black uppercase text-slate-500">
+                          Voraufenthalt {idx + 1}
+                        </span>
+                        <button
+                          onClick={() => removePreviousStay(stay.id)}
+                          className="p-1 text-red-500 hover:bg-red-100 rounded-lg transition-colors"
+                          title="Voraufenthalt entfernen"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-0.5">Einreise</label>
+                          <input
+                            type="date"
+                            value={stay.from}
+                            onChange={(e) => updatePreviousStay(stay.id, 'from', e.target.value)}
+                            className="w-full px-2.5 py-2 text-xs bg-white border border-slate-200 rounded-lg font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-0.5">Ausreise</label>
+                          <input
+                            type="date"
+                            value={stay.to}
+                            onChange={(e) => updatePreviousStay(stay.id, 'to', e.target.value)}
+                            className="w-full px-2.5 py-2 text-xs bg-white border border-slate-200 rounded-lg font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <button
+                onClick={addPreviousStay}
+                className="w-full py-2.5 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-dashed border-emerald-300 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors"
+              >
+                <Calendar className="w-4 h-4" />
+                + Vorherigen Aufenthalt hinzufügen
+              </button>
+            </div>
+
+            {/* Live-Tagesübersicht */}
+            {stayMetrics && stayMetrics.error && (
+              <div className="mt-3 p-2.5 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 font-bold flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0" />
+                <span>{stayMetrics.error}</span>
+              </div>
+            )}
+
+            {stayMetrics && !stayMetrics.error && (
+              <div className="mt-3 p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5 text-xs">
+                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">
+                  180-Tage-Fenster: {formatDateDE(stayMetrics.windowStartIso)} – {formatDateDE(controlDate)}
+                </div>
+                <div className="flex justify-between text-slate-600">
+                  <span>Aktueller Aufenthalt (im Fenster):</span>
+                  <span className="font-bold text-slate-800">{stayMetrics.currentDaysIn180} Tage</span>
+                </div>
+                {stayMetrics.prevDaysCountedIn180 > 0 && (
+                  <div className="flex justify-between text-slate-600">
+                    <span>Anrechenbare Voraufenthalte:</span>
+                    <span className="font-bold text-slate-800">+{stayMetrics.prevDaysCountedIn180} Tage</span>
+                  </div>
+                )}
+                <div className="flex justify-between pt-1.5 border-t border-slate-200 font-black">
+                  <span className="text-slate-700">Gesamt im 180-Tage-Fenster:</span>
+                  <span className={stayMetrics.totalDaysIn180 > 90 ? 'text-red-600' : 'text-emerald-700'}>
+                    {stayMetrics.totalDaysIn180} / 90 Tage
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* 3. ERWERBSTÄTIGKEIT & BESCHV */}
+        {selectedCountry && selectedCountry.status !== 'eu' && (
+          <div className="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100 animate-in fade-in">
+            <div className="flex items-center gap-2 mb-3 text-emerald-700">
+              <Briefcase className="w-5 h-5" />
+              <span className="text-sm font-black uppercase tracking-wide">3. Erwerbstätigkeit / Arbeit</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 mb-3">
+              <button
+                onClick={() => {
+                  setIsWorking(false);
+                  setBeschvException('NONE');
+                }}
+                className={`py-2.5 px-3 rounded-xl font-bold text-xs border-2 transition-all ${
+                  !isWorking
+                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                Keine Erwerbstätigkeit
+              </button>
+              <button
+                onClick={() => setIsWorking(true)}
+                className={`py-2.5 px-3 rounded-xl font-bold text-xs border-2 transition-all ${
+                  isWorking
+                    ? 'bg-amber-600 text-white border-amber-600 shadow-sm'
+                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                Übt Erwerbstätigkeit aus
+              </button>
+            </div>
+
+            {isWorking && (
+              <div className="space-y-2.5 animate-in fade-in">
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1 ml-1">
+                    Ausnahme nach BeschV (§ 30 BeschV / § 17 AufenthV)
+                  </label>
+                  <select
+                    value={beschvException}
+                    onChange={(e) => setBeschvException(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  >
+                    {BESCHV_EXCEPTIONS.map(ex => (
+                      <option key={ex.id} value={ex.id}>
+                        {ex.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-600 leading-relaxed">
+                  <div className="font-bold text-slate-700 mb-0.5">{selectedException.norm}</div>
+                  {selectedException.desc}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ERGEBNISKARTE */}
+        {evaluation && (
+          <div className="space-y-3 animate-in slide-in-from-bottom-3 duration-300">
+            <div
+              className={`rounded-2xl p-4 shadow-xl border-2 ${
+                evaluation.status === 'ok'
+                  ? 'bg-emerald-600 text-white border-emerald-500'
+                  : 'bg-red-600 text-white border-red-500'
+              }`}
+            >
+              <div className="flex items-center gap-2 mb-2">
+                {evaluation.status === 'ok' ? (
+                  <CheckCircle className="w-6 h-6 shrink-0" />
+                ) : (
+                  <AlertTriangle className="w-6 h-6 shrink-0" />
+                )}
+                <span className="text-xs font-black uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full">
+                  {evaluation.badge}
+                </span>
+              </div>
+              <h3 className="text-lg font-black leading-snug mb-1.5">{evaluation.headline}</h3>
+              <p className="text-xs leading-relaxed opacity-95">{evaluation.summary}</p>
+            </div>
+
+            {/* Rechtsgrundlagen */}
+            {evaluation.legalRefs.length > 0 && (
+              <div className="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200">
+                <div className="flex items-center gap-1.5 text-xs font-black uppercase text-slate-500 mb-2">
+                  <ScaleLaw className="w-4 h-4 text-emerald-600" />
+                  <span>Maßgebliche Rechtsgrundlagen</span>
+                </div>
+                <ul className="space-y-1 text-xs text-slate-700 font-medium list-disc list-inside">
+                  {evaluation.legalRefs.map((ref, idx) => (
+                    <li key={idx}>{ref}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Mögliche Verstöße */}
+            {evaluation.violations.length > 0 && (
+              <div className="bg-red-50 p-3.5 rounded-2xl border border-red-200">
+                <div className="flex items-center gap-1.5 text-xs font-black uppercase text-red-700 mb-2">
+                  <Gavel className="w-4 h-4" />
+                  <span>Mögliche Tatbestände / Verstöße</span>
+                </div>
+                <ul className="space-y-1.5 text-xs text-red-900 font-semibold list-disc list-inside">
+                  {evaluation.violations.map((v, idx) => (
+                    <li key={idx}>{v}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Wichtige Hinweise */}
+            {evaluation.notes.length > 0 && (
+              <div className="bg-amber-50 p-3.5 rounded-2xl border border-amber-200">
+                <div className="flex items-center gap-1.5 text-xs font-black uppercase text-amber-800 mb-1.5">
+                  <Info className="w-4 h-4" />
+                  <span>Besondere Hinweise</span>
+                </div>
+                <ul className="space-y-1.5 text-xs text-amber-900 leading-relaxed list-disc list-inside">
+                  {evaluation.notes.map((n, idx) => (
+                    <li key={idx}>{n}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <button
+              onClick={resetAll}
+              className="w-full py-2.5 text-slate-400 text-xs hover:text-slate-600 font-bold tracking-wide uppercase transition-colors"
+            >
+              Alle Eingaben zurücksetzen
+            </button>
+
+            <PrintButton />
+          </div>
+        )}
+      </div>
+
+      <AppVersionFooter />
+    </div>
+  );
+}
+
 // --- Home VIEW ---
 const HomeView = ({ onSelect }) => {
     const dateTime = useDateTime();
     
     // --- HIER UPDATE TEXT EINTRAGEN ---
-    const updateText = "‼️ Update 4.1: LASI Niederzurren um Aufbaukategorien erweitert";
+    const updateText = "‼️ Update 4.2: Aufenthaltsrechner eingefügt";
 
     const tiles = [
         { id: 'age', title: 'Altersrechner', icon: Calendar, color: 'text-purple-500', bg: 'bg-purple-50', desc: '' },
+        { id: 'stay', title: 'Aufenthaltsrechner', icon: Globe, color: 'text-emerald-600', bg: 'bg-emerald-50', desc: 'EU-Visum-VO o BeschV' },
         { id: 'bkat', title: 'BKat', icon: ConstructionConeIcon, color: 'text-orange-500', bg: 'bg-orange-50', desc: 'Bußgeldkatalog' },
         { id: 'license', title: 'Führerschein', icon: CreditCard, color: 'text-sky-500', bg: 'bg-sky-50', desc: 'Schlüsselzahlen o Klassen' },
         { id: 'speed', title: 'Geschwindigkeit', icon: Gauge, color: 'text-amber-500', bg: 'bg-amber-50', desc: 'Laser o Hinterherfahren' },
@@ -8385,6 +9860,7 @@ export default function App() {
             <div className={activeTab === 'weight' ? 'block' : 'hidden'}><WeightModule /></div>
             <div className={activeTab === 'speed' ? 'block' : 'hidden'}><SpeedCalculator /></div>
             <div className={activeTab === 'age' ? 'block' : 'hidden'}><AgeCalculator /></div>
+            <div className={activeTab === 'stay' ? 'block' : 'hidden'}><StayCalculator /></div>
             <div className={activeTab === 'knowledge' ? 'block' : 'hidden'}><KnowledgeBaseView key={knowledgeResetKey} initialView={knowledgeView} onBack={returnTab ? () => handleTabChange(returnTab) : null} /></div>
             <div className={activeTab === 'license' ? 'block' : 'hidden'}><DriverLicenseModule /></div>
             <div className={activeTab === 'info' ? 'block' : 'hidden'}><InfoView /></div>
