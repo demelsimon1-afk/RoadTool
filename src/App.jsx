@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   Scale, AlertTriangle, CheckCircle, Info, Box, Truck, ShieldCheck, 
   ShieldAlert, Trees, Ruler, Clock, CheckSquare, Settings, ChevronRight, ChevronDown, ChevronUp, ChevronLeft,
@@ -11,9 +12,10 @@ import {
 
 // ============================================================================
 // SCHRITT FÜR VS CODE / VERCEL:
-// Lösche in VS Code einfach die zwei Schrägstriche (//) vor der nächsten Zeile:
+// Lösche in VS Code einfach die zwei Schrägstriche (//) vor der nächsten Zeile
+// und kommentiere die Zeile "const tatbestaendeData = [];" aus:
 import tatbestaendeData from './Tatbestaende.json';
-//const tatbestaendeData = [];
+const tatbestaendeData = [];
 // ============================================================================
 
 // --- THEME CONTEXT & STYLES ---
@@ -56,35 +58,128 @@ const darkThemeCSS = `
 const PrintStyles = () => (
   <style>{`
     /* SCREEN ONLY STYLES */
-    .print-only {
+    .print-only,
+    #roadtool-print-root {
       display: none;
     }
 
-    /* IPHONE / IOS FALLBACK DRUCKVORSCHAU AUF DEM BILDSCHIRM */
-    body.force-print-preview {
-      background-color: #ffffff !important;
-      color: #000000 !important;
+    /* EINHEITLICHES PROTOKOLL-DESIGN (FÜR VORSCHAU-MODAL & DRUCK) */
+    .print-preview-sheet,
+    .print-container {
+      color: #0f172a;
+      background-color: #ffffff;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 10.5pt;
+      line-height: 1.4;
     }
-    body.force-print-preview .no-print:not(.print-preview-bar) {
-      display: none !important;
+
+    .print-preview-sheet *,
+    #roadtool-print-root * {
+      color-scheme: light;
     }
-    body.force-print-preview .min-h-screen,
-    body.force-print-preview .max-w-md,
-    body.force-print-preview .flex-1 {
-      display: block !important;
-      max-width: 100% !important;
-      min-height: 0 !important;
-      background-color: #ffffff !important;
-      padding: 0 !important;
-      margin: 0 !important;
+
+    .print-preview-sheet h1.print-title,
+    #roadtool-print-root h1.print-title,
+    .print-container h1.print-title {
+      font-size: 15pt;
+      font-weight: 900;
+      margin-bottom: 4px;
+      border-bottom: 2px solid #0f172a;
+      padding-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: #0f172a !important;
     }
-    body.force-print-preview .print-only {
-      display: block !important;
-      padding: 76px 16px 32px 16px !important;
-      background-color: #ffffff !important;
-      color: #000000 !important;
-      max-width: 800px;
-      margin: 0 auto !important;
+
+    .print-preview-sheet h2.print-section,
+    #roadtool-print-root h2.print-section,
+    .print-container h2.print-section {
+      font-size: 10.5pt;
+      font-weight: 800;
+      margin-top: 16px;
+      margin-bottom: 8px;
+      background-color: #f1f5f9 !important;
+      padding: 5px 10px;
+      border-left: 4px solid #334155;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: #0f172a !important;
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+
+    .print-preview-sheet .print-meta,
+    #roadtool-print-root .print-meta,
+    .print-container .print-meta {
+      font-size: 9pt;
+      color: #475569 !important;
+      margin-bottom: 14px;
+    }
+
+    .print-preview-sheet table.print-table,
+    #roadtool-print-root table.print-table,
+    .print-container table.print-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 14px;
+      font-size: 9.5pt;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    .print-preview-sheet table.print-table th,
+    .print-preview-sheet table.print-table td,
+    #roadtool-print-root table.print-table th,
+    #roadtool-print-root table.print-table td,
+    .print-container table.print-table th,
+    .print-container table.print-table td {
+      border: 1px solid #cbd5e1;
+      padding: 6px 8px;
+      text-align: left;
+      vertical-align: middle;
+      color: #0f172a !important;
+      background-color: #ffffff;
+    }
+
+    .print-preview-sheet table.print-table th,
+    #roadtool-print-root table.print-table th,
+    .print-container table.print-table th {
+      background-color: #f8fafc !important;
+      font-weight: 700;
+      color: #334155 !important;
+    }
+
+    .print-preview-sheet .print-result-box,
+    #roadtool-print-root .print-result-box,
+    .print-container .print-result-box {
+      border: 2px solid #0f172a;
+      border-radius: 6px;
+      padding: 12px 14px;
+      margin-top: 14px;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      background-color: #f8fafc !important;
+      color: #0f172a !important;
+    }
+
+    .print-preview-sheet .print-result-header,
+    #roadtool-print-root .print-result-header,
+    .print-container .print-result-header {
+      font-weight: 900;
+      font-size: 11pt;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      border-bottom: 1px solid #cbd5e1;
+      padding-bottom: 4px;
+      color: #0f172a !important;
+    }
+
+    .print-preview-sheet .print-warning,
+    #roadtool-print-root .print-warning,
+    .print-container .print-warning {
+      color: #dc2626 !important;
+      font-weight: bold;
     }
 
     @media print {
@@ -93,8 +188,46 @@ const PrintStyles = () => (
         margin: 1.4cm;
       }
 
-      /* iOS / WebKit Reset: Flexbox, min-h-screen, max-w-md & Darkmode fuer Druck aufheben */
-      html, body, #root,
+      html, body {
+        display: block !important;
+        position: static !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        overflow: visible !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        font-family: Arial, Helvetica, sans-serif !important;
+        font-size: 10.5pt !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      /* FLACHES DRUCK-PORTAL FÜR IOS SAFARI & DESKTOP:
+         Blendet die gesamte App (#root, Flex-Container, Dark-Mode, Sticky-Bars) sauber aus
+         und druckt ausschließlich das flache #roadtool-print-root direkt unter <body>. */
+      body.has-print-portal > *:not(#roadtool-print-root) {
+        display: none !important;
+      }
+
+      body.has-print-portal > #roadtool-print-root {
+        display: block !important;
+        position: static !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+      }
+
+      /* FALLBACK: Falls der Nutzer manuell über Safari Teilen -> Drucken druckt */
+      #root,
       .min-h-screen, .max-w-md, .flex-1, .dark, .dark .bg-slate-50 {
         display: block !important;
         position: static !important;
@@ -108,127 +241,24 @@ const PrintStyles = () => (
         background-color: #ffffff !important;
         color: #000000 !important;
         box-shadow: none !important;
+        transform: none !important;
+        filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
       }
 
-      body {
-        font-family: Arial, Helvetica, sans-serif !important;
-        font-size: 10.5pt !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-      }
-
-      /* Inaktive Tabs im Druck unbedingt ausgeblendet lassen */
-      .hidden {
-        display: none !important;
-      }
-      
-      /* HIDE SCREEN ELEMENTS */
-      .no-print, .print-preview-bar, nav, footer, button, .screen-only, .fixed, .sticky {
+      .hidden,
+      .no-print,
+      .print-preview-portal,
+      nav, footer, button, .screen-only, .fixed, .sticky {
         display: none !important;
       }
 
-      /* SHOW PRINT ELEMENTS */
       .print-only {
         display: block !important;
         padding: 0 !important;
       }
 
-      /* GENERAL PRINT LAYOUT */
-      .print-container {
-        width: 100%;
-        max-width: 100%;
-        margin: 0;
-        padding: 0;
-        color: #1e293b !important;
-        background-color: #ffffff !important;
-      }
-
-      h1.print-title {
-        font-size: 16pt;
-        font-weight: 900;
-        margin-bottom: 4px;
-        border-bottom: 2px solid #0f172a;
-        padding-bottom: 6px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: #0f172a !important;
-      }
-
-      h2.print-section {
-        font-size: 11pt;
-        font-weight: 800;
-        margin-top: 16px;
-        margin-bottom: 8px;
-        background-color: #f1f5f9 !important;
-        padding: 5px 10px;
-        border-left: 4px solid #334155;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: #0f172a !important;
-        page-break-after: avoid;
-        break-after: avoid;
-      }
-
-      .print-meta {
-        font-size: 9pt;
-        color: #475569 !important;
-        margin-bottom: 16px;
-      }
-
-      /* PRINT TABLES */
-      table.print-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 14px;
-        font-size: 9.5pt;
-        page-break-inside: avoid;
-        break-inside: avoid;
-      }
-      
-      table.print-table th, table.print-table td {
-        border: 1px solid #cbd5e1;
-        padding: 6px 10px;
-        text-align: left;
-        vertical-align: middle;
-        color: #0f172a !important;
-      }
-
-      table.print-table th {
-        background-color: #f8fafc !important;
-        font-weight: 700;
-        color: #334155 !important;
-        width: 38%;
-      }
-
-      /* RESULT BOX IN PRINT */
-      .print-result-box {
-        border: 2px solid #0f172a;
-        border-radius: 6px;
-        padding: 12px 14px;
-        margin-top: 14px;
-        page-break-inside: avoid;
-        break-inside: avoid;
-        background-color: #f8fafc !important;
-        color: #0f172a !important;
-      }
-      
-      .print-result-header {
-        font-weight: 900;
-        font-size: 11pt;
-        margin-bottom: 6px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        border-bottom: 1px solid #cbd5e1;
-        padding-bottom: 4px;
-        color: #0f172a !important;
-      }
-
-      .print-warning {
-        color: #dc2626 !important;
-        font-weight: bold;
-      }
-
-      /* HIDE ICONS GLOBALLY IN PRINT */
       svg:not(.print-safe) {
         display: none !important;
       }
@@ -510,8 +540,527 @@ const AppVersionFooter = () => (
     </div>
 );
 
+// --- OFFLINE A4 PDF GENERATOR (FÜR IOS SAFARI, CHROME IOS & HOME-SCREEN PWA) ---
+// Erzeugt ein echtes, mehrseitiges A4-PDF komplett lokal im Browser (ohne externe Bibliotheken).
+const WIN_ANSI_EXTRA = {
+    0x20AC: 0x80, // €
+    0x201A: 0x82, // ‚
+    0x201E: 0x84, // „
+    0x2026: 0x85, // …
+    0x2018: 0x91, // ‘
+    0x2019: 0x92, // ’
+    0x201C: 0x93, // “
+    0x201D: 0x94, // ”
+    0x2022: 0x95, // •
+    0x2013: 0x96, // –
+    0x2014: 0x97, // —
+    0x2122: 0x99  // ™
+};
+
+const normalizePdfText = (raw) => {
+    if (!raw) return '';
+    return String(raw)
+        .replace(/⚠️|⚠/g, 'ACHTUNG: ')
+        .replace(/α/g, 'alpha')
+        .replace(/β/g, 'beta')
+        .replace(/≥/g, '>=')
+        .replace(/≤/g, '<=')
+        .replace(/➔|→|⇒/g, '->')
+        .replace(/˜|≈/g, '~')
+        .replace(/³/g, '3')
+        .replace(/²/g, '2')
+        .replace(/\u00A0/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+};
+
+const encodePdfString = (raw) => {
+    const clean = normalizePdfText(raw);
+    let out = '';
+    for (let i = 0; i < clean.length; i++) {
+        const code = clean.charCodeAt(i);
+        if (code === 0x28) { out += '\\('; continue; }
+        if (code === 0x29) { out += '\\)'; continue; }
+        if (code === 0x5C) { out += '\\\\'; continue; }
+        if (code >= 0x20 && code <= 0x7E) {
+            out += clean[i];
+        } else if (code >= 0xA0 && code <= 0xFF) {
+            out += '\\' + code.toString(8).padStart(3, '0');
+        } else if (WIN_ANSI_EXTRA[code]) {
+            out += '\\' + WIN_ANSI_EXTRA[code].toString(8).padStart(3, '0');
+        } else {
+            out += ' ';
+        }
+    }
+    return out;
+};
+
+const estimatePdfTextWidth = (raw, fontSize, isBold = false) => {
+    const clean = normalizePdfText(raw);
+    let w = 0;
+    for (let i = 0; i < clean.length; i++) {
+        const ch = clean[i];
+        if ('ilI1.,:;|!\' '.includes(ch)) w += 0.28;
+        else if ('fjrt()[]-/'.includes(ch)) w += 0.35;
+        else if ('mwMW@%'.includes(ch)) w += 0.84;
+        else if (ch >= 'A' && ch <= 'Z') w += 0.67;
+        else w += 0.54;
+    }
+    return w * fontSize * (isBold ? 1.06 : 1.0);
+};
+
+const wrapPdfText = (raw, maxWidth, fontSize, isBold = false) => {
+    const clean = normalizePdfText(raw);
+    if (!clean) return [];
+    const words = clean.split(' ');
+    const lines = [];
+    let current = '';
+
+    const pushLongToken = (token) => {
+        let chunk = '';
+        for (let i = 0; i < token.length; i++) {
+            const candidate = chunk + token[i];
+            if (estimatePdfTextWidth(candidate, fontSize, isBold) > maxWidth && chunk.length > 0) {
+                lines.push(chunk);
+                chunk = token[i];
+            } else {
+                chunk = candidate;
+            }
+        }
+        return chunk;
+    };
+
+    for (const word of words) {
+        const candidate = current ? `${current} ${word}` : word;
+        if (estimatePdfTextWidth(candidate, fontSize, isBold) <= maxWidth) {
+            current = candidate;
+        } else {
+            if (current) lines.push(current);
+            if (estimatePdfTextWidth(word, fontSize, isBold) > maxWidth) {
+                current = pushLongToken(word);
+            } else {
+                current = word;
+            }
+        }
+    }
+    if (current) lines.push(current);
+    return lines;
+};
+
+const rasterizeSvgToJpeg = (svgEl) => {
+    return new Promise((resolve) => {
+        try {
+            const clone = svgEl.cloneNode(true);
+            clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+            const vb = (clone.getAttribute('viewBox') || '0 0 130 220').trim().split(/\s+/).map(Number);
+            const vbW = vb[2] || 130;
+            const vbH = vb[3] || 220;
+            const scale = 3;
+            const pxW = Math.round(vbW * scale);
+            const pxH = Math.round(vbH * scale);
+            clone.setAttribute('width', String(pxW));
+            clone.setAttribute('height', String(pxH));
+            const styleNode = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+            styleNode.textContent = 'text { font-family: Helvetica, Arial, sans-serif; }';
+            clone.insertBefore(styleNode, clone.firstChild);
+
+            const svgString = new XMLSerializer().serializeToString(clone);
+            const dataUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgString);
+            const img = new Image();
+            const timer = setTimeout(() => resolve(null), 2000);
+
+            img.onload = () => {
+                clearTimeout(timer);
+                try {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = pxW;
+                    canvas.height = pxH;
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, pxW, pxH);
+                    ctx.drawImage(img, 0, 0, pxW, pxH);
+                    const jpegDataUrl = canvas.toDataURL('image/jpeg', 0.92);
+                    const base64 = jpegDataUrl.split(',')[1];
+                    if (!base64) {
+                        resolve(null);
+                        return;
+                    }
+                    const binaryStr = atob(base64);
+                    const bytes = new Uint8Array(binaryStr.length);
+                    for (let i = 0; i < binaryStr.length; i++) {
+                        bytes[i] = binaryStr.charCodeAt(i);
+                    }
+                    resolve({ bytes, width: pxW, height: pxH, aspect: vbW / vbH });
+                } catch (e) {
+                    resolve(null);
+                }
+            };
+
+            img.onerror = () => {
+                clearTimeout(timer);
+                resolve(null);
+            };
+
+            img.src = dataUrl;
+        } catch (e) {
+            resolve(null);
+        }
+    });
+};
+
+// Baut aus den einzelnen Seiten-Streams und optionalen JPEG-Grafiken ein gültiges A4-PDF (PDF 1.4)
+const assemblePdfBlob = (pageStreams, images = []) => {
+    const strToBytes = (str) => {
+        const arr = new Uint8Array(str.length);
+        for (let i = 0; i < str.length; i++) {
+            arr[i] = str.charCodeAt(i) & 0xFF;
+        }
+        return arr;
+    };
+
+    const chunks = [];
+    let byteOffset = 0;
+    const pushBytes = (bytes) => {
+        chunks.push(bytes);
+        byteOffset += bytes.length;
+    };
+    const pushStr = (str) => pushBytes(strToBytes(str));
+
+    const objects = [];
+    const addObject = (parts) => {
+        const id = objects.length + 1;
+        objects.push({ id, parts });
+        return id;
+    };
+
+    // 1: Catalog, 2: Pages (Platzhalter, werden nach Seitenanlage befüllt)
+    const catalogId = addObject([]);
+    const pagesId = addObject([]);
+
+    // 3 & 4: Standard-Schriften mit WinAnsiEncoding (für deutsche Umlaute ä/ö/ü/ß/€)
+    const fontRegularId = addObject([
+        '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>'
+    ]);
+    const fontBoldId = addObject([
+        '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>'
+    ]);
+
+    // Optionale JPEG-XObjects für SVG-Grafiken (z. B. PKW-Transporter)
+    const xObjectEntries = [];
+    images.forEach((img, idx) => {
+        const imgObjId = addObject([
+            `<< /Type /XObject /Subtype /Image /Width ${img.width} /Height ${img.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${img.bytes.length} >>\nstream\n`,
+            img.bytes,
+            '\nendstream'
+        ]);
+        xObjectEntries.push(`/Im${idx + 1} ${imgObjId} 0 R`);
+    });
+
+    const xObjectDict = xObjectEntries.length > 0 ? ` /XObject << ${xObjectEntries.join(' ')} >>` : '';
+
+    // Seiten und zugehörige Content-Streams erzeugen
+    const pageIds = [];
+    const safeStreams = pageStreams.length > 0 ? pageStreams : [''];
+    safeStreams.forEach((streamStr) => {
+        const streamBytes = strToBytes(streamStr);
+        const contentId = addObject([
+            `<< /Length ${streamBytes.length} >>\nstream\n`,
+            streamBytes,
+            '\nendstream'
+        ]);
+        const pageId = addObject([
+            `<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 ${fontRegularId} 0 R /F2 ${fontBoldId} 0 R >>${xObjectDict} >> /Contents ${contentId} 0 R >>`
+        ]);
+        pageIds.push(pageId);
+    });
+
+    objects[catalogId - 1].parts = [`<< /Type /Catalog /Pages ${pagesId} 0 R >>`];
+    objects[pagesId - 1].parts = [
+        `<< /Type /Pages /Kids [${pageIds.map(id => `${id} 0 R`).join(' ')}] /Count ${pageIds.length} >>`
+    ];
+
+    // PDF-Header + binärer Kommentar
+    pushBytes(new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2D, 0x31, 0x2E, 0x34, 0x0A, 0x25, 0xE2, 0xE3, 0xCF, 0xD3, 0x0A]));
+
+    const offsets = [0];
+    objects.forEach((obj) => {
+        offsets.push(byteOffset);
+        pushStr(`${obj.id} 0 obj\n`);
+        obj.parts.forEach((part) => {
+            if (typeof part === 'string') pushStr(part);
+            else pushBytes(part);
+        });
+        pushStr('\nendobj\n');
+    });
+
+    const xrefOffset = byteOffset;
+    pushStr(`xref\n0 ${objects.length + 1}\n`);
+    pushStr('0000000000 65535 f \n');
+    for (let i = 1; i <= objects.length; i++) {
+        pushStr(`${String(offsets[i]).padStart(10, '0')} 00000 n \n`);
+    }
+
+    pushStr(`trailer\n<< /Size ${objects.length + 1} /Root ${catalogId} 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`);
+
+    return new Blob(chunks, { type: 'application/pdf' });
+};
+
+const buildPdfBlobSync = (sourceContainer, svgMap = new Map(), images = []) => {
+    const PAGE_W = 595.28;
+    const PAGE_H = 841.89;
+    const MARGIN_X = 40;
+    const MARGIN_TOP = 42;
+    const MARGIN_BOTTOM = 44;
+    const CONTENT_W = PAGE_W - MARGIN_X * 2;
+
+    const pages = [[]];
+    let pageIdx = 0;
+    let cursorY = MARGIN_TOP;
+
+    const cmd = (s) => pages[pageIdx].push(s);
+    const toPdfY = (y) => (PAGE_H - y).toFixed(2);
+    const ensureSpace = (needed) => {
+        if (cursorY + needed > PAGE_H - MARGIN_BOTTOM && cursorY > MARGIN_TOP + 10) {
+            pages.push([]);
+            pageIdx++;
+            cursorY = MARGIN_TOP;
+        }
+    };
+
+    const drawTextLine = (text, x, yBaseline, size, fontKey = 'F1', rgb = '0.06 0.09 0.16') => {
+        cmd(`BT /${fontKey} ${size} Tf ${rgb} rg ${x.toFixed(2)} ${toPdfY(yBaseline)} Td (${encodePdfString(text)}) Tj ET`);
+    };
+
+    const drawRect = (x, yTop, w, h, fillRgb, strokeRgb, lineWidth = 0.6) => {
+        const yBottom = PAGE_H - (yTop + h);
+        cmd('q');
+        if (fillRgb) cmd(`${fillRgb} rg`);
+        if (strokeRgb) cmd(`${strokeRgb} RG ${lineWidth} w`);
+        cmd(`${x.toFixed(2)} ${yBottom.toFixed(2)} ${w.toFixed(2)} ${h.toFixed(2)} re ${fillRgb && strokeRgb ? 'B' : fillRgb ? 'f' : 'S'}`);
+        cmd('Q');
+    };
+
+    const drawLine = (x1, y1, x2, y2, strokeRgb = '0.06 0.09 0.16', lineWidth = 1) => {
+        cmd(`q ${strokeRgb} RG ${lineWidth} w ${x1.toFixed(2)} ${toPdfY(y1)} m ${x2.toFixed(2)} ${toPdfY(y2)} l S Q`);
+    };
+
+    const drawWrappedParagraph = (text, x, maxW, size = 9.5, isBold = false, rgb = '0.06 0.09 0.16', spaceAfter = 5) => {
+        const lines = wrapPdfText(text, maxW, size, isBold);
+        if (lines.length === 0) return;
+        const lineH = size * 1.38;
+        for (const line of lines) {
+            ensureSpace(lineH + 2);
+            drawTextLine(line, x, cursorY + size, size, isBold ? 'F2' : 'F1', rgb);
+            cursorY += lineH;
+        }
+        cursorY += spaceAfter;
+    };
+
+    const drawTable = (tableEl, boxX = MARGIN_X, boxW = CONTENT_W) => {
+        const rows = Array.from(tableEl.querySelectorAll('tr'));
+        if (rows.length === 0) return;
+
+        let maxCols = 0;
+        const parsedRows = rows.map(tr => {
+            const cells = Array.from(tr.children).filter(c => c.tagName === 'TH' || c.tagName === 'TD');
+            const totalSpan = cells.reduce((sum, c) => sum + (parseInt(c.getAttribute('colspan'), 10) || 1), 0);
+            if (totalSpan > maxCols) maxCols = totalSpan;
+            return cells;
+        });
+        if (maxCols === 0) return;
+
+        const isKeyValue = maxCols === 2 && parsedRows.some(r => r[0]?.tagName === 'TH' && r[1]?.tagName === 'TD');
+        const colWidths = isKeyValue
+            ? [boxW * 0.38, boxW * 0.62]
+            : Array.from({ length: maxCols }, () => boxW / maxCols);
+
+        const cellPadX = 5;
+        const cellPadY = 4.5;
+        const fontSize = maxCols >= 5 ? 8.2 : 9;
+        const lineH = fontSize * 1.35;
+
+        for (const cells of parsedRows) {
+            let colCursor = 0;
+            const preparedCells = cells.map(cell => {
+                const span = parseInt(cell.getAttribute('colspan'), 10) || 1;
+                let w = 0;
+                for (let s = 0; s < span; s++) w += colWidths[colCursor + s] || (boxW / maxCols);
+                const x = boxX + colWidths.slice(0, colCursor).reduce((a, b) => a + b, 0);
+                colCursor += span;
+                const isTh = cell.tagName === 'TH';
+                const isWarn = cell.classList.contains('print-warning') || Boolean(cell.querySelector('.print-warning'));
+                const isStrong = isTh || isWarn || Boolean(cell.querySelector('strong, b'));
+                const lines = wrapPdfText(cell.textContent || '', Math.max(20, w - cellPadX * 2), fontSize, isStrong);
+                return { x, w, isTh, isWarn, isStrong, lines };
+            });
+
+            const maxLines = Math.max(1, ...preparedCells.map(c => c.lines.length));
+            const rowH = maxLines * lineH + cellPadY * 2;
+            ensureSpace(rowH + 2);
+
+            for (const c of preparedCells) {
+                drawRect(c.x, cursorY, c.w, rowH, c.isTh ? '0.97 0.98 0.99' : '1 1 1', '0.80 0.84 0.88', 0.5);
+                const rgb = c.isWarn ? '0.86 0.15 0.15' : c.isTh ? '0.20 0.25 0.33' : '0.06 0.09 0.16';
+                c.lines.forEach((line, lIdx) => {
+                    drawTextLine(line, c.x + cellPadX, cursorY + cellPadY + fontSize + lIdx * lineH, fontSize, c.isStrong ? 'F2' : 'F1', rgb);
+                });
+            }
+            cursorY += rowH;
+        }
+        cursorY += 8;
+    };
+
+    const drawSvgRow = (svgElements) => {
+        const items = svgElements.map(el => svgMap.get(el)).filter(Boolean);
+        if (items.length === 0) return;
+
+        const gap = 16;
+        const slotW = items.length === 1 ? Math.min(220, CONTENT_W) : (CONTENT_W - gap) / 2;
+        const maxH = 310;
+        const dims = items.map(it => {
+            let drawW = Math.min(slotW, 200);
+            let drawH = drawW / it.aspect;
+            if (drawH > maxH) {
+                drawH = maxH;
+                drawW = drawH * it.aspect;
+            }
+            return { ...it, drawW, drawH };
+        });
+
+        const rowH = Math.max(...dims.map(d => d.drawH));
+        ensureSpace(rowH + 14);
+
+        dims.forEach((d, i) => {
+            const slotStartX = items.length === 1
+                ? MARGIN_X + (CONTENT_W - d.drawW) / 2
+                : MARGIN_X + i * (slotW + gap) + (slotW - d.drawW) / 2;
+            const yBottom = PAGE_H - (cursorY + d.drawH);
+            drawRect(slotStartX - 4, cursorY - 4, d.drawW + 8, d.drawH + 8, '1 1 1', '0.85 0.88 0.92', 0.6);
+            cmd(`q ${d.drawW.toFixed(2)} 0 0 ${d.drawH.toFixed(2)} ${slotStartX.toFixed(2)} ${yBottom.toFixed(2)} cm /${d.name} Do Q`);
+        });
+        cursorY += rowH + 16;
+    };
+
+    const processNode = (node, indentX = MARGIN_X, maxW = CONTENT_W) => {
+        if (!node || node.nodeType !== 1) return;
+        const tag = node.tagName;
+        if (tag === 'STYLE' || tag === 'SCRIPT' || tag === 'BUTTON') return;
+
+        if (tag === 'H1') {
+            const lines = wrapPdfText(node.textContent, maxW, 14.5, true);
+            ensureSpace(lines.length * 19 + 12);
+            lines.forEach(line => {
+                drawTextLine(line.toUpperCase(), indentX, cursorY + 14, 14.5, 'F2', '0.06 0.09 0.16');
+                cursorY += 18;
+            });
+            drawLine(indentX, cursorY + 2, indentX + maxW, cursorY + 2, '0.06 0.09 0.16', 1.5);
+            cursorY += 10;
+            return;
+        }
+
+        if (tag === 'H2' || tag === 'H3') {
+            const title = (node.textContent || '').trim();
+            if (!title) return;
+            const lines = wrapPdfText(title.toUpperCase(), maxW - 16, 10, true);
+            const boxH = lines.length * 13.5 + 9;
+            ensureSpace(boxH + 24);
+            cursorY += 4;
+            drawRect(indentX, cursorY, maxW, boxH, '0.95 0.96 0.98', null);
+            drawRect(indentX, cursorY, 3.5, boxH, '0.20 0.25 0.33', null);
+            lines.forEach((line, i) => {
+                drawTextLine(line, indentX + 10, cursorY + 13 + i * 13.5, 10, 'F2', '0.06 0.09 0.16');
+            });
+            cursorY += boxH + 7;
+            return;
+        }
+
+        if (tag === 'TABLE') {
+            drawTable(node, indentX, maxW);
+            return;
+        }
+
+        if (node.classList.contains('print-meta')) {
+            drawWrappedParagraph(node.textContent, indentX, maxW, 8.5, false, '0.28 0.33 0.41', 8);
+            return;
+        }
+
+        if (node.classList.contains('print-result-box')) {
+            ensureSpace(48);
+            cursorY += 4;
+            drawLine(indentX, cursorY, indentX + maxW, cursorY, '0.06 0.09 0.16', 1.4);
+            cursorY += 8;
+            Array.from(node.children).forEach(child => processNode(child, indentX + 6, maxW - 12));
+            drawLine(indentX, cursorY + 2, indentX + maxW, cursorY + 2, '0.06 0.09 0.16', 1.4);
+            cursorY += 12;
+            return;
+        }
+
+        if (node.classList.contains('print-result-header')) {
+            drawWrappedParagraph((node.textContent || '').toUpperCase(), indentX, maxW, 10.5, true, '0.06 0.09 0.16', 4);
+            drawLine(indentX, cursorY - 2, indentX + maxW, cursorY - 2, '0.80 0.84 0.88', 0.6);
+            cursorY += 3;
+            return;
+        }
+
+        // Container mit PKW-Transporter SVGs nebeneinander erkennen
+        const directSvgs = Array.from(node.querySelectorAll('svg.print-safe'));
+        const hasBlockTextSiblings = Array.from(node.querySelectorAll('h1, h2, table')).length > 0;
+        if (directSvgs.length > 0 && !hasBlockTextSiblings) {
+            drawSvgRow(directSvgs);
+            return;
+        }
+
+        const blockChildren = Array.from(node.children).filter(c =>
+            ['DIV', 'H1', 'H2', 'H3', 'P', 'TABLE', 'UL', 'OL'].includes(c.tagName)
+        );
+        if (blockChildren.length > 0) {
+            Array.from(node.children).forEach(child => processNode(child, indentX, maxW));
+        } else {
+            const txt = (node.textContent || '').trim();
+            if (!txt) return;
+            const isWarn = node.classList.contains('print-warning') || Boolean(node.querySelector('.print-warning'));
+            const isBold = isWarn || tag === 'STRONG' || tag === 'B' || (Boolean(node.querySelector('strong, b')) && txt.length < 90);
+            drawWrappedParagraph(txt, indentX, maxW, 9.2, isBold, isWarn ? '0.86 0.15 0.15' : '0.06 0.09 0.16', 4);
+        }
+    };
+
+    Array.from(sourceContainer.children).forEach(child => processNode(child, MARGIN_X, CONTENT_W));
+
+    // Fußzeile mit Seitenzahlen auf jede Seite setzen
+    const totalPages = pages.length;
+    pages.forEach((cmds, idx) => {
+        const footerY = PAGE_H - 22;
+        cmds.push(`q 0.85 0.88 0.92 RG 0.5 w ${MARGIN_X} ${(PAGE_H - (footerY - 10)).toFixed(2)} m ${(PAGE_W - MARGIN_X).toFixed(2)} ${(PAGE_H - (footerY - 10)).toFixed(2)} l S Q`);
+        cmds.push(`BT /F1 8 Tf 0.45 0.50 0.58 rg ${MARGIN_X} ${(PAGE_H - footerY).toFixed(2)} Td (RoadTool Protokoll) Tj ET`);
+        const pageLabel = `Seite ${idx + 1} / ${totalPages}`;
+        const labelW = estimatePdfTextWidth(pageLabel, 8, false);
+        cmds.push(`BT /F1 8 Tf 0.45 0.50 0.58 rg ${(PAGE_W - MARGIN_X - labelW).toFixed(2)} ${(PAGE_H - footerY).toFixed(2)} Td (${encodePdfString(pageLabel)}) Tj ET`);
+    });
+
+    return assemblePdfBlob(pages.map(p => p.join('\n')), images);
+};
+
+const buildPdfFromPrintContainer = async (sourceContainer) => {
+    const svgMap = new Map();
+    const images = [];
+    const svgNodes = Array.from(sourceContainer.querySelectorAll('svg.print-safe'));
+    for (const svg of svgNodes) {
+        const raster = await rasterizeSvgToJpeg(svg);
+        if (raster) {
+            images.push(raster);
+            svgMap.set(svg, { name: `Im${images.length}`, ...raster });
+        }
+    }
+    return buildPdfBlobSync(sourceContainer, svgMap, images);
+};
+
 const PrintButton = () => {
+    const buttonRef = useRef(null);
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+    const [previewHtml, setPreviewHtml] = useState('');
+    const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+    const [statusMsg, setStatusMsg] = useState('');
+    const [readyPdf, setReadyPdf] = useState(null); // { blob, url, filename } für 1-Tap iOS Teilen-Fallback
 
     const isIOS = typeof navigator !== 'undefined' && (
         /iPad|iPhone|iPod/.test(navigator.userAgent) ||
@@ -523,83 +1072,350 @@ const PrintButton = () => {
         (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
     );
 
-    useEffect(() => {
-        if (isPreviewOpen) {
-            document.body.classList.add('force-print-preview');
-            window.scrollTo(0, 0);
-        } else {
-            document.body.classList.remove('force-print-preview');
-        }
-        return () => {
-            document.body.classList.remove('force-print-preview');
-        };
-    }, [isPreviewOpen]);
+    const isIOSAltBrowser = typeof navigator !== 'undefined' && /CriOS|FxiOS|EdgiOS|OPiOS/.test(navigator.userAgent);
 
-    const triggerPrint = () => {
-        // Wichtig für iOS Safari: window.print() synchron im Klick-Handler ausführen
-        window.scrollTo(0, 0);
-        if (isIOS && isStandalone) {
-            // In iOS Home-Screen-PWAs blockiert Apple window.print() oft -> direkt Protokoll-Ansicht öffnen
-            setIsPreviewOpen(true);
-            try { window.print(); } catch (e) {}
-            return;
+    useEffect(() => {
+        return () => {
+            if (readyPdf?.url) URL.revokeObjectURL(readyPdf.url);
+        };
+    }, [readyPdf]);
+
+    // Findet genau den aktiven .print-container des aktuellen Rechners
+    const findActivePrintContainer = () => {
+        if (buttonRef.current) {
+            const sectionRoot = buttonRef.current.closest('.min-h-screen');
+            if (sectionRoot) {
+                const localPrint = sectionRoot.querySelector('.print-container');
+                if (localPrint) return localPrint;
+            }
         }
+        const all = Array.from(document.querySelectorAll('.print-container'));
+        return all.find(el => !el.closest('.hidden')) || all[0] || null;
+    };
+
+    const getPdfFilename = (container) => {
+        const rawTitle = container?.querySelector('h1.print-title')?.textContent?.trim() || 'RoadTool-Protokoll';
+        const safeTitle = rawTitle
+            .replace(/ä/gi, 'ae').replace(/ö/gi, 'oe').replace(/ü/gi, 'ue').replace(/ß/g, 'ss')
+            .replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        const dateTag = new Date().toISOString().slice(0, 10);
+        return `${safeTitle || 'Protokoll'}_${dateTag}.pdf`;
+    };
+
+    // Synchrones flaches Druck-Portal direkt unter <body> für fehlerfreies window.print() (auch in iOS Safari)
+    const runNativePrint = () => {
+        const source = findActivePrintContainer();
+        if (!source) return;
+
+        let portal = document.getElementById('roadtool-print-root');
+        if (!portal) {
+            portal = document.createElement('div');
+            portal.id = 'roadtool-print-root';
+            document.body.appendChild(portal);
+        }
+        portal.innerHTML = `<div class="print-container">${source.innerHTML}</div>`;
+        document.body.classList.add('has-print-portal');
+
+        const cleanup = () => {
+            document.body.classList.remove('has-print-portal');
+            window.removeEventListener('afterprint', cleanup);
+        };
+        window.addEventListener('afterprint', cleanup);
+
+        // Wichtig für iOS Safari: KEIN window.scrollTo() vor window.print() und strikt synchron aufrufen
         try {
             window.print();
         } catch (e) {
-            setIsPreviewOpen(true);
+            cleanup();
+            openPreview();
+            return;
+        }
+        // Fallback-Cleanup falls iOS afterprint nicht feuert
+        setTimeout(cleanup, 1500);
+    };
+
+    // Hilfsfunktion zum sofortigen Teilen/Öffnen eines bereits erzeugten PDF-Blobs (erhält iOS User-Gesture)
+    const deliverPdfBlob = (pdfBlob, filename, allowSaveFallback = true) => {
+        const pdfFile = typeof File !== 'undefined' ? new File([pdfBlob], filename, { type: 'application/pdf' }) : null;
+
+        // 1. Primär auf iOS: Natives Teilen-Menü (enthält direkt "Drucken" / AirPrint & "In Dateien sichern")
+        if (isIOS && pdfFile && typeof navigator !== 'undefined' && navigator.share && navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+            navigator.share({
+                files: [pdfFile],
+                title: filename.replace('.pdf', '')
+            }).catch((shareErr) => {
+                if (shareErr && shareErr.name === 'AbortError') return;
+                // Falls iOS nach async SVG-Export das Teilen blockiert hat -> 1-Tap-Button bereitstellen
+                if (allowSaveFallback) {
+                    const url = URL.createObjectURL(pdfBlob);
+                    setReadyPdf(prev => {
+                        if (prev?.url) URL.revokeObjectURL(prev.url);
+                        return { blob: pdfBlob, url, filename };
+                    });
+                    setStatusMsg('PDF ist bereit – tippe unten auf "PDF teilen / drucken".');
+                }
+            });
+            return;
+        }
+
+        // 2. Fallback: PDF direkt öffnen (iOS PDF-Viewer mit Drucken-Symbol) oder herunterladen
+        const blobUrl = URL.createObjectURL(pdfBlob);
+        if (isIOS) {
+            const win = window.open(blobUrl, '_blank');
+            if (!win) {
+                setReadyPdf(prev => {
+                    if (prev?.url) URL.revokeObjectURL(prev.url);
+                    return { blob: pdfBlob, url: blobUrl, filename };
+                });
+                setStatusMsg('PDF ist bereit – tippe unten auf "PDF teilen / drucken".');
+                return;
+            }
+            setStatusMsg('PDF geöffnet – tippe unten auf Teilen → Drucken.');
+        } else {
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            setStatusMsg('PDF wurde heruntergeladen.');
+        }
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+    };
+
+    // Echtes A4-PDF erzeugen (synchron ohne SVGs, asynchron mit SVGs) und für iOS AirPrint bereitstellen
+    const handleExportPdf = async () => {
+        const source = findActivePrintContainer();
+        if (!source) return;
+
+        setStatusMsg('');
+        setReadyPdf(prev => {
+            if (prev?.url) URL.revokeObjectURL(prev.url);
+            return null;
+        });
+
+        const filename = getPdfFilename(source);
+        const hasSvgs = source.querySelectorAll('svg.print-safe').length > 0;
+
+        // Ohne SVGs komplett synchron -> iOS Safari User-Gesture für navigator.share / window.open bleibt 100% erhalten!
+        if (!hasSvgs) {
+            try {
+                const pdfBlob = buildPdfBlobSync(source);
+                deliverPdfBlob(pdfBlob, filename, true);
+            } catch (err) {
+                setStatusMsg('PDF konnte nicht erstellt werden. Bitte Vorschau nutzen.');
+            }
+            return;
+        }
+
+        // Mit SVGs (z. B. PKW-Transporter): SVGs erst asynchron rasterisieren
+        setIsGeneratingPdf(true);
+        try {
+            const pdfBlob = await buildPdfFromPrintContainer(source);
+            deliverPdfBlob(pdfBlob, filename, true);
+        } catch (err) {
+            setStatusMsg('PDF konnte nicht erstellt werden. Bitte Vorschau nutzen.');
+        } finally {
+            setIsGeneratingPdf(false);
         }
     };
 
+    const openPreview = () => {
+        const source = findActivePrintContainer();
+        if (!source) return;
+        setPreviewHtml(source.innerHTML);
+        setIsPreviewOpen(true);
+    };
+
+    const triggerPrimaryPrint = () => {
+        // In iOS Home-Screen-PWAs und alternativen iOS-Browsern blockiert Apple window.print() oft ->
+        // direkt echtes PDF über das iOS Teilen-/Drucken-Menü öffnen!
+        if (isIOS && (isStandalone || isIOSAltBrowser)) {
+            handleExportPdf();
+            return;
+        }
+        runNativePrint();
+    };
+
+    useEffect(() => {
+        if (!isPreviewOpen) return;
+        const prevOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = prevOverflow;
+        };
+    }, [isPreviewOpen]);
+
     return (
         <>
-            <div className="mt-8 mb-4 space-y-2 no-print">
+            <div ref={buttonRef} className="mt-8 mb-4 space-y-2 no-print">
                 <button 
                     type="button"
-                    onClick={triggerPrint} 
-                    className="w-full py-3 bg-slate-800 text-white rounded-xl font-bold uppercase tracking-widest hover:bg-slate-700 active:scale-[0.99] transition-all flex items-center justify-center gap-2 shadow-lg"
+                    onClick={triggerPrimaryPrint}
+                    disabled={isGeneratingPdf}
+                    className="w-full py-3 bg-slate-800 text-white rounded-xl font-bold uppercase tracking-widest hover:bg-slate-700 active:scale-[0.99] transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-60"
                 >
                     <Printer className="w-5 h-5" />
-                    Druckprotokoll erstellen
+                    {isGeneratingPdf ? 'PDF wird erstellt...' : 'Druckprotokoll erstellen'}
                 </button>
-                <button
-                    type="button"
-                    onClick={() => setIsPreviewOpen(true)}
-                    className="w-full py-2 bg-white text-slate-600 border border-slate-200 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-slate-50 transition-colors flex items-center justify-center gap-1.5"
-                >
-                    <Eye className="w-4 h-4" />
-                    Protokoll-Vorschau {isIOS ? '(iPhone / PDF)' : 'anzeigen'}
-                </button>
+
+                <div className="grid grid-cols-2 gap-2">
+                    <button
+                        type="button"
+                        onClick={handleExportPdf}
+                        disabled={isGeneratingPdf}
+                        className="py-2.5 px-2 bg-emerald-600 text-white rounded-xl text-[11px] font-bold uppercase tracking-wider hover:bg-emerald-700 active:scale-[0.99] transition-all flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-60"
+                    >
+                        <Download className="w-4 h-4 shrink-0" />
+                        <span>{isIOS ? 'PDF / iOS Druck' : 'Als PDF'}</span>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={openPreview}
+                        className="py-2.5 px-2 bg-white text-slate-700 border border-slate-200 rounded-xl text-[11px] font-bold uppercase tracking-wider hover:bg-slate-50 active:scale-[0.99] transition-colors flex items-center justify-center gap-1.5"
+                    >
+                        <Eye className="w-4 h-4 shrink-0" />
+                        <span>Vorschau</span>
+                    </button>
+                </div>
+
+                {readyPdf && (
+                    <div className="flex gap-2">
+                        <button
+                            type="button"
+                            onClick={() => deliverPdfBlob(readyPdf.blob, readyPdf.filename, false)}
+                            className="flex-1 py-2.5 px-3 bg-indigo-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-indigo-700 active:scale-[0.99] transition-all flex items-center justify-center gap-1.5 shadow-md"
+                        >
+                            <Printer className="w-4 h-4 shrink-0" />
+                            <span>PDF teilen / drucken</span>
+                        </button>
+                        <a
+                            href={readyPdf.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            download={readyPdf.filename}
+                            className="py-2.5 px-3 bg-white text-indigo-700 border border-indigo-200 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1"
+                        >
+                            <Download className="w-4 h-4 shrink-0" />
+                            <span>Öffnen</span>
+                        </a>
+                    </div>
+                )}
+
+                {statusMsg && (
+                    <div className="text-[11px] text-center font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl py-1.5 px-3">
+                        {statusMsg}
+                    </div>
+                )}
             </div>
 
-            {isPreviewOpen && (
-                <div className="print-preview-bar no-print fixed top-0 left-0 right-0 z-[200] bg-slate-900 text-white px-3 py-2.5 shadow-xl border-b border-slate-700">
-                    <div className="max-w-md mx-auto flex flex-col gap-1.5">
-                        <div className="flex items-center justify-between gap-2">
+            {isPreviewOpen && typeof document !== 'undefined' && createPortal(
+                <div className="print-preview-portal no-print fixed inset-0 z-[200] bg-slate-900/95 flex flex-col">
+                    <div className="bg-slate-900 text-white px-3 py-2.5 shadow-xl border-b border-slate-700 shrink-0">
+                        <div className="max-w-3xl mx-auto flex items-center justify-between gap-2">
                             <button
                                 type="button"
                                 onClick={() => setIsPreviewOpen(false)}
-                                className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-bold flex items-center gap-1"
+                                className="px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-bold flex items-center gap-1"
                             >
                                 <X className="w-4 h-4" /> Schließen
                             </button>
-                            <button
-                                type="button"
-                                onClick={() => { try { window.print(); } catch (e) {} }}
-                                className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-bold flex items-center gap-1.5"
-                            >
-                                <Printer className="w-4 h-4" /> Jetzt drucken
-                            </button>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    onClick={handleExportPdf}
+                                    disabled={isGeneratingPdf}
+                                    className="px-3 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-bold flex items-center gap-1.5 disabled:opacity-60"
+                                >
+                                    <Download className="w-4 h-4" /> {isIOS ? 'PDF / Teilen' : 'PDF'}
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={runNativePrint}
+                                    className="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-xs font-bold flex items-center gap-1.5"
+                                >
+                                    <Printer className="w-4 h-4" /> Drucken
+                                </button>
+                            </div>
                         </div>
                         {isIOS && (
-                            <p className="text-[10px] text-slate-300 leading-tight text-center">
-                                iPhone-Tipp: Falls sich kein Druckdialog öffnet, tippe unten in Safari auf <strong>Teilen</strong> &rarr; <strong>Drucken</strong> (oder öffne die Seite direkt in Safari statt vom Home-Bildschirm).
+                            <p className="max-w-3xl mx-auto text-[10px] text-slate-300 leading-tight text-center mt-2">
+                                iPhone / iPad: Tippe oben auf <strong>PDF / Teilen</strong> und wähle im iOS-Menü direkt <strong>Drucken</strong> (AirPrint) oder <strong>In Dateien sichern</strong>.
                             </p>
                         )}
                     </div>
-                </div>
+                    <div className="flex-1 overflow-y-auto p-3 sm:p-6" style={{ WebkitOverflowScrolling: 'touch' }}>
+                        <div
+                            className="print-preview-sheet max-w-3xl mx-auto bg-white rounded-xl shadow-2xl p-4 sm:p-8"
+                            dangerouslySetInnerHTML={{ __html: previewHtml }}
+                        />
+                    </div>
+                </div>,
+                document.body
             )}
         </>
+    );
+};
+
+// --- FEHLENDE HILFSKOMPONENTEN FÜR RECHENWEGE & FORMELN ---
+const CalculationToggle = ({ children }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    return (
+        <div className="mt-3 no-print">
+            <button
+                type="button"
+                onClick={() => setIsOpen(!isOpen)}
+                className="w-full flex items-center justify-between px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-bold uppercase tracking-wide transition-colors"
+            >
+                <span className="flex items-center gap-1.5">
+                    <Calculator className="w-3.5 h-3.5" />
+                    {isOpen ? 'Rechenweg ausblenden' : 'Rechenweg anzeigen'}
+                </span>
+                {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </button>
+            {isOpen && <div className="animate-in fade-in duration-200">{children}</div>}
+        </div>
+    );
+};
+
+const FormulaFraction = ({ label, equals = '=', numerator, denominator }) => (
+    <div className="flex items-center justify-center gap-2 font-mono text-xs text-slate-700 overflow-x-auto py-1">
+        {label && <span className="font-bold shrink-0">{label}</span>}
+        {equals && <span className="font-bold shrink-0">{equals}</span>}
+        <div className="inline-flex flex-col items-center">
+            <div className="px-2 pb-1 border-b border-slate-500 text-center whitespace-nowrap">{numerator}</div>
+            <div className="px-2 pt-1 text-center whitespace-nowrap">{denominator}</div>
+        </div>
+    </div>
+);
+
+const LashingDetailTable = ({ data }) => {
+    if (!Array.isArray(data) || data.length === 0) return null;
+    return (
+        <div className="overflow-x-auto mt-2">
+            <table className="w-full text-[11px] text-left border-collapse border border-slate-200 bg-white">
+                <thead>
+                    <tr className="bg-slate-100 text-slate-500 uppercase text-[9px]">
+                        <th className="p-1.5 border border-slate-200">Richtung</th>
+                        <th className="p-1.5 border border-slate-200 text-center">c</th>
+                        <th className="p-1.5 border border-slate-200 text-center">Formschl.</th>
+                        <th className="p-1.5 border border-slate-200 text-center">f<sub>s</sub></th>
+                        <th className="p-1.5 border border-slate-200 text-center">Gurte</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {data.map((row, idx) => (
+                        <tr key={idx}>
+                            <td className="p-1.5 border border-slate-200 font-bold text-slate-700">{row.label}</td>
+                            <td className="p-1.5 border border-slate-200 text-center font-mono">{String(row.c).replace('.', ',')}</td>
+                            <td className="p-1.5 border border-slate-200 text-center font-mono">{row.hasFit ? `${row.force} daN` : '-'}</td>
+                            <td className="p-1.5 border border-slate-200 text-center font-mono">{String(row.safetyFactor).replace('.', ',')}</td>
+                            <td className="p-1.5 border border-slate-200 text-center font-black text-indigo-600">{row.result}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
     );
 };
 
