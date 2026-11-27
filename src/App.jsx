@@ -4015,19 +4015,19 @@ function LashingCalculator({ onOpenKnowledge }) {
                        <span>Code L</span>
                        <span className={`text-[10px] font-normal leading-tight mt-0.5 ${bodyCert === 'L' ? 'text-indigo-100' : 'text-slate-400'}`}>(Planenauflieger, Hamburger Verdeck, Polensprinter)</span>
                    </button>
-                    <button onClick={() => setBodyCert('XL')} className={`col-span-2 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm border-2 flex flex-col items-center justify-between text-center transition-all ${bodyCert === 'XL' ? 'bg-indigo-600 text-white border-indigo-600 shadow-md transform scale-[1.01]' : 'bg-white text-slate-600 border-slate-100 hover:border-indigo-200'}`}>
+                    <button onClick={() => setBodyCert('XL')} className={`col-span-2 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm border-2 flex flex-col items-center justify-between text-center transition-all ${bodyCert === 'XL' ? 'bg-emerald-600 text-white border-emerald-600 shadow-md transform scale-[1.01]' : 'bg-white text-slate-600 border-slate-100 hover:border-emerald-200'}`}>
                        <div className="grid grid-cols-2 gap-3 items-end mb-1.5 w-full max-w-[320px]">
                          <div className="flex flex-col items-center">
                            <TautlinerSemiSvg codeLabel="CODE XL" badgeColor={bodyCert === 'XL' ? '#065f46' : '#059669'} className={`w-full h-12 ${bodyCert === 'XL' ? 'text-white' : 'text-emerald-700'}`} />
-                           <span className={`text-[9px] font-semibold mt-0.5 ${bodyCert === 'XL' ? 'text-indigo-100' : 'text-slate-500'}`}>Planenauflieger</span>
+                           <span className={`text-[9px] font-semibold mt-0.5 ${bodyCert === 'XL' ? 'text-emerald-100' : 'text-slate-500'}`}>Planenauflieger</span>
                          </div>
                          <div className="flex flex-col items-center">
                            <BoxSemiSvg codeLabel="CODE XL" badgeColor={bodyCert === 'XL' ? '#065f46' : '#059669'} className={`w-full h-12 ${bodyCert === 'XL' ? 'text-white' : 'text-emerald-700'}`} />
-                           <span className={`text-[9px] font-semibold mt-0.5 ${bodyCert === 'XL' ? 'text-indigo-100' : 'text-slate-500'}`}>Festaufbau (Koffer)</span>
+                           <span className={`text-[9px] font-semibold mt-0.5 ${bodyCert === 'XL' ? 'text-emerald-100' : 'text-slate-500'}`}>Festaufbau (Koffer)</span>
                          </div>
                        </div>
                        <span>Code XL</span>
-                       <span className={`text-[10px] font-normal leading-tight mt-0.5 ${bodyCert === 'XL' ? 'text-indigo-100' : 'text-slate-400'}`}>(Zertifizierter Planenauflieger / Festaufbau)</span>
+                       <span className={`text-[10px] font-normal leading-tight mt-0.5 ${bodyCert === 'XL' ? 'text-emerald-100' : 'text-slate-400'}`}>(Zertifizierter Planenauflieger / Festaufbau)</span>
                    </button>
                </div>
 
