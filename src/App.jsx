@@ -5673,7 +5673,132 @@ const ESCOOTER_TUNING_MODELS = [
     { id: 'freie_sw', label: 'Freie Waffen & Sonstige' },
     { id: 'reiz_elektro', label: 'Reizstoff, Elektro & Brand' },
     { id: 'zubehoer_mun', label: 'Zubehör, Magazine & Munition' },
-    { id: 'regeln', label: 'Verbote & Begriffe' }
+    { id: 'begriffe', label: 'Begriffe (Anlage 1)' },
+    { id: 'regeln', label: 'Verbote (§§ 42–42c)' }
+  ];
+
+  // Vollständige Begriffsbestimmungen aus Anlage 1 (zu § 1 Abs. 4) WaffG
+  const WAFFG_DEFINITIONS = [
+    {
+      groupId: 'abschn2',
+      groupTitle: 'Abschnitt 2: Waffenrechtliche Begriffe',
+      groupRef: 'Anl. 1 Abschn. 2 Nr. 1–14',
+      items: [
+        { nr: 'Nr. 1', term: 'Erwerben', text: 'Erwirbt eine Waffe oder Munition, wer die tatsächliche Gewalt darüber erlangt.' },
+        { nr: 'Nr. 2', term: 'Besitzen', text: 'Besitzt eine Waffe oder Munition, wer die tatsächliche Gewalt darüber ausübt.' },
+        { nr: 'Nr. 3', term: 'Überlassen', text: 'Überlässt eine Waffe oder Munition, wer die tatsächliche Gewalt darüber einem anderen einräumt.' },
+        { nr: 'Nr. 4', term: 'Führen', text: 'Führt eine Waffe, wer die tatsächliche Gewalt darüber außerhalb der eigenen Wohnung, Geschäftsräume, des eigenen befriedeten Besitztums oder einer Schießstätte ausübt.' },
+        { nr: 'Nr. 5', term: 'Verbringen', text: 'Verbringt eine Waffe oder Munition, wer diese über die Grenze zum dortigen Verbleib oder mit dem Ziel des Besitzwechsels in den, durch den oder aus dem Geltungsbereich des Gesetzes zu einer anderen Person oder zu sich selbst transportieren lässt oder selbst transportiert.' },
+        { nr: 'Nr. 6', term: 'Mitnehmen', text: 'Nimmt eine Waffe oder Munition mit, wer diese vorübergehend auf einer Reise ohne Aufgabe des Besitzes zur Verwendung über die Grenze in den, durch den oder aus dem Geltungsbereich des Gesetzes bringt.' },
+        { nr: 'Nr. 7', term: 'Schießen', text: 'Schießt, wer mit einer Schusswaffe Geschosse durch einen Lauf verschießt, Kartuschenmunition abschießt, mit Patronen- oder Kartuschenmunition Reiz- oder andere Wirkstoffe verschießt oder pyrotechnische Munition verschießt.' },
+        { nr: 'Nr. 8.1', term: 'Herstellen', text: 'Aus Rohteilen oder Materialien wird ein Endprodukt oder wesentliche Teile erzeugt, oder das führende wesentliche Teil wird durch ein noch nicht verbautes Teil ersetzt. Eine Schusswaffe ist hergestellt, wenn sie weißfertig (§ 2 Abs. 5 BeschG) oder der Austausch des führenden wesentlichen Teils abgeschlossen ist. Als Herstellen von Munition gilt auch das Wiederladen von Hülsen.' },
+        { nr: 'Nr. 8.1a', term: 'Fertiggestellt', text: 'Eine Waffe ist fertiggestellt, sobald sie mit dem amtlichen Beschusszeichen (§ 6 BeschG) versehen wurde oder – sofern keine Beschusspflicht besteht – sobald sie zum Inverkehrbringen bereitgehalten wird.' },
+        { nr: 'Nr. 8.2', term: 'Bearbeiten (Umbau & Instandsetzung)', text: 'Eine Schusswaffe wird bearbeitet, wenn sie (8.2.1 Umbau) verkürzt, in der Schussfolge verändert oder auf andere Munition/Kaliber geändert wird; (8.2.2) wesentliche Teile mit erforderlicher Nacharbeit ausgetauscht werden; oder (8.2.3 Instandsetzung) Arbeiten durchgeführt werden, die eine Beschusspflicht nach § 3 Abs. 2 BeschG auslösen. Geringfügige Änderungen (insb. an Schaft oder Zieleinrichtung) sind keine Bearbeitung.' },
+        { nr: 'Nr. 8.3', term: 'Unbrauchbarmachen', text: 'Eine Schusswaffe wird unbrauchbar gemacht, wenn an ihr die Maßnahmen des Anhangs I Tabelle II bis III der Durchführungsverordnung (EU) 2015/2403 durchgeführt werden.' },
+        { nr: 'Nr. 9', term: 'Waffenhandel treiben', text: 'Treibt Waffenhandel, wer gewerbsmäßig oder selbstständig im Rahmen einer wirtschaftlichen Unternehmung Schusswaffen oder Munition ankauft, feilhält, Bestellungen entgegennimmt oder aufsucht, anderen überlässt oder den Erwerb, Vertrieb oder das Überlassen vermittelt.' },
+        { nr: 'Nr. 10', term: 'Kinder', text: 'Personen, die noch nicht 14 Jahre alt sind.' },
+        { nr: 'Nr. 11', term: 'Jugendliche', text: 'Personen, die mindestens 14, aber noch nicht 18 Jahre alt sind.' },
+        { nr: 'Nr. 12', term: 'Schussbereit', text: 'Eine Waffe ist schussbereit, wenn sie geladen ist – also Munition oder Geschosse in der Trommel, im in die Waffe eingefügten Magazin oder im Patronen- oder Geschosslager sind, auch wenn sie nicht gespannt ist.' },
+        { nr: 'Nr. 13', term: 'Zugriffsbereit / Nicht zugriffsbereit', text: 'Eine Schusswaffe ist zugriffsbereit, wenn sie unmittelbar in Anschlag gebracht werden kann; sie ist nicht zugriffsbereit, wenn sie in einem verschlossenen Behältnis mitgeführt wird. Ein Messer ist nicht zugriffsbereit, wenn es nur mit mehr als drei Handgriffen erreicht werden kann.' },
+        { nr: 'Nr. 14', term: 'Mitgliedstaaten', text: 'Die Mitgliedstaaten der Europäischen Union sowie die Vertragsstaaten des Schengener Übereinkommens.' }
+      ]
+    },
+    {
+      groupId: 'ua1_sw',
+      groupTitle: 'Abschnitt 1 UA 1: Schusswaffen, Gleichgestellte & Arten',
+      groupRef: 'Anl. 1 Abschn. 1 UA 1 Nr. 1–2',
+      items: [
+        { nr: 'Nr. 1.1', term: 'Schusswaffen', text: 'Gegenstände, die zum Angriff oder zur Verteidigung, zur Signalgebung, zur Jagd, zur Distanzinjektion, zur Markierung, zum Sport oder zum Spiel bestimmt sind und bei denen Geschosse durch einen Lauf getrieben werden.' },
+        { nr: 'Nr. 1.2.1', term: 'Gleichgestellte: Munitionsabschussgeräte', text: 'Tragbare Gegenstände, die zum Abschießen von Munition für die in Nr. 1.1 genannten Zwecke bestimmt sind.' },
+        { nr: 'Nr. 1.2.2', term: 'Gleichgestellte: Befestigungs- & Schussgeräte', text: 'Tragbare Befestigungsgeräte mit Treibladung und andere Schussgeräte (z. B. Schlacht-, technische/industrielle Zwecke nach Anhang IV Nr. 18 RL 2006/42/EG), sofern sie weder die Anforderungen des § 7 BeschG samt Prüfzeichen noch den Nachweis nach EG-Maschinenrichtlinie erfüllen.' },
+        { nr: 'Nr. 1.2.3', term: 'Gleichgestellte: Armbrüste & Pfeilabschussgeräte', text: 'Tragbare Gegenstände, bei denen bestimmungsgemäß feste Körper gezielt verschossen werden und die Antriebsenergie (Muskelkraft oder andere Quelle) durch eine Sperrvorrichtung gespeichert oder gehalten werden kann. Ausnahme: elastische Geschossspitzen (z. B. Gummisaugnapf) mit max. 0,16 J/cm².' },
+        { nr: 'Nr. 1.4', term: 'Unbrauchbar gemachte Schusswaffen (Dekowaffen)', text: 'Schusswaffen, für die eine zuständige EU-Behörde eine Deaktivierungsbescheinigung nach Art. 3 Abs. 4 DVO (EU) 2015/2403 ausgestellt und die Waffe nach Art. 5 gekennzeichnet hat.' },
+        { nr: 'Nr. 1.5', term: 'Salutwaffen', text: 'Veränderte Langwaffen (u. a. für Theater, Film/TV), bei denen (a) das Patronenlager keine Patronen-/Pyromunition aufnimmt, (b) der Lauf im hinteren Drittel mind. 6 kalibergroße Bohrungen hat und davor mit einem gehärteten Stahlstift verschlossen ist, (c) der Lauf fest mit dem Gehäuse verbunden ist, (d) Änderungen nicht mit allg. Werkzeugen rückbaubar sind und (e) der Verschluss das BeschV-Kennzeichen trägt (1.5.1), sowie vor dem 01.04.1976 nach § 3 der 1. WaffV 1972 geänderte Schusswaffen (1.5.2).' },
+        { nr: 'Nr. 1.6', term: 'Anscheinswaffen', text: 'Schusswaffen ohne heiße Gase (1.6.1), Nachbildungen (1.6.2) oder unbrauchbar gemachte Schusswaffen (1.6.3), die nach ihrer äußeren Form im Gesamterscheinungsbild den Anschein einer Feuerwaffe hervorrufen. Ausgenommen: erkennbares Spielzeug (Größe weicht um mind. 50 % ab, Neonfarben oder keine Feuerwaffen-Kennzeichnungen), Brauchtum, kulturhistorische Sammlungen (§ 17) oder Waffen mit Führerlaubnispflicht (§ 10 Abs. 4).' },
+        { nr: 'Nr. 2.1', term: 'Feuerwaffen', text: 'Schusswaffen nach Nr. 1.1, bei denen ein Geschoss mittels heißer Gase durch einen oder aus einem Lauf getrieben wird.' },
+        { nr: 'Nr. 2.2', term: 'Automatische Schusswaffen (Voll- & Halbautomaten)', text: 'Schusswaffen, die nach Schussabgabe selbsttätig erneut schussbereit werden: mehrere Schüsse pro Abzugsbetätigung = Vollautomaten; jeweils ein Schuss = Halbautomaten. Eingeschlossen sind Waffen, die mit allg. gebräuchlichen Werkzeugen zu Automaten/Vollautomaten umgebaut bzw. rückgebaut werden können. Wichtig: Double-Action-Revolver sind KEINE halbautomatischen Schusswaffen.' },
+        { nr: 'Nr. 2.3', term: 'Repetierwaffen', text: 'Schusswaffen, bei denen das Zuführen der Patrone aus einem Magazin, das Abfeuern und das Entfernen der Patrone/Hülse mittels eines nur von Hand zu betätigenden Mechanismus erfolgt.' },
+        { nr: 'Nr. 2.4', term: 'Einzelladerwaffen', text: 'Schusswaffen ohne Magazin mit einem oder mehreren Läufen, die vor jedem Schuss aus demselben Lauf von Hand geladen werden.' },
+        { nr: 'Nr. 2.5', term: 'Langwaffen & Kurzwaffen', text: 'Langwaffen sind Schusswaffen, deren Lauf und Verschluss in geschlossener Stellung insgesamt länger als 30 cm sind UND deren kürzeste bestimmungsgemäß verwendbare Gesamtlänge 60 cm überschreitet. Alle anderen Schusswaffen sind Kurzwaffen.' },
+        { nr: 'Nr. 2.6', term: 'Schreckschusswaffen', text: 'Schusswaffen mit einem Kartuschenlager, die zum Abschießen von Kartuschenmunition bestimmt sind.' },
+        { nr: 'Nr. 2.7', term: 'Reizstoffwaffen', text: 'Schusswaffen mit einem Patronen- oder Kartuschenlager, die zum Verschießen von Reiz- oder anderen Wirkstoffen bestimmt sind.' },
+        { nr: 'Nr. 2.8', term: 'Signalwaffen', text: 'Schusswaffen mit einem Patronen- oder Kartuschenlager oder gleichgestellte Gegenstände nach Nr. 1.2.1, die zum Verschießen pyrotechnischer Munition bestimmt sind.' },
+        { nr: 'Nr. 2.9', term: 'Druckluft-, Federdruck- & Kaltgaswaffen', text: 'Federdruckwaffen: Federkraft direkt oder federbelasteter Kolben mit Luftpolster. Druckluftwaffen: vorkomprimierte Luft im Druckbehälter mit Ventilsystem. Kaltgaswaffen (z. B. Druckgas-/CO₂-Waffen): Antrieb mittels kalter Treibgase.' }
+      ]
+    },
+    {
+      groupId: 'ua1_teile',
+      groupTitle: 'Abschnitt 1 UA 1: Wesentliche Teile, Vorrichtungen & Nachbildungen',
+      groupRef: 'Anl. 1 Abschn. 1 UA 1 Nr. 1.3, 3–6',
+      items: [
+        { nr: 'Nr. 1.3', term: 'Gleichstellung wesentlicher Teile & Schalldämpfer', text: 'Wesentliche Teile und Schalldämpfer stehen den Schusswaffen gleich, für die sie bestimmt sind (auch verbunden mit anderen Gegenständen, wenn Gebrauchsfähigkeit besteht oder mit allg. Werkzeugen wiederherstellbar ist). Auch nicht vom KrWaffKontrG erfasste wesentliche Kriegswaffenteile und Schalldämpfer fallen unter das WaffG.' },
+        { nr: 'Nr. 1.3.1.1', term: 'Lauf & Gaslauf', text: 'Lauf: rohrförmiger Gegenstand aus ausreichend festem Werkstoff zur Geschossführung (i. d. R. Führungslänge mind. 2× Kaliber). Gaslauf: Lauf ausschließlich zur Ableitung von Verbrennungsgasen.' },
+        { nr: 'Nr. 1.3.1.2', term: 'Verschluss (Verschlusskopf & Verschlussträger)', text: 'Baugruppe, die das Patronen- oder Kartuschenlager nach hinten abschließt. Bei teilbaren Verschlüssen sind Verschlusskopf (unmittelbarer Abschluss) und Verschlussträger (steuert Ver-/Entriegelung) jeweils wesentliche Teile.' },
+        { nr: 'Nr. 1.3.1.3', term: 'Patronen- oder Kartuschenlager', text: 'Wenn nicht bereits Bestandteil des Laufes: Hohlkörper aus hinreichend festem Material zur Aufnahme und Zündung von Patronen-, Kartuschenmunition oder Ladungen.' },
+        { nr: 'Nr. 1.3.1.4', term: 'Verbrennungskammer & Gemischerzeugung', text: 'Bei Schusswaffen mit entzündbarem flüssigem oder gasförmigem Gemisch: die Verbrennungskammer und die Einrichtung zur Erzeugung des Gemisches.' },
+        { nr: 'Nr. 1.3.1.5', term: 'Antriebsvorrichtung (anderer Antrieb)', text: 'Bei Schusswaffen mit anderem Antrieb: die Antriebsvorrichtung, sofern sie fest mit der Schusswaffe verbunden ist.' },
+        { nr: 'Nr. 1.3.1.6', term: 'Gehäuse (Ober-/Unterteil & Griffstück)', text: 'Bauteil, das Lauf, Abzugsmechanik und Verschluss aufnimmt. Bei zweiteiligem Gehäuse sind Oberteil (Lauf & Verschluss) und Unterteil (Abzugsmechanik; bei Kurzwaffen: Griffstück) jeweils wesentliche Teile.' },
+        { nr: 'Nr. 1.3.1.7', term: 'Vorgearbeitete wesentliche Teile & Laufrohlinge', text: 'Vorgearbeitete wesentliche Teile sowie Teile/Reststücke von Läufen und Laufrohlingen, wenn sie mit allgemein gebräuchlichen Werkzeugen fertiggestellt werden können.' },
+        { nr: 'Nr. 1.3.2', term: 'Führendes wesentliches Teil', text: 'Hierarchie: 1. Gehäuse (bei Zweiteilung: Gehäuseunterteil / Griffstück bei Kurzwaffen); 2. falls kein Gehäuse vorhanden: Verschluss; 3. falls kein Verschluss vorhanden: Lauf.' },
+        { nr: 'Nr. 1.3.3', term: 'Schalldämpfer', text: 'Vorrichtungen, die der wesentlichen Dämpfung des Mündungsknalls dienen und für Schusswaffen bestimmt sind.' },
+        { nr: 'Nr. 3.1', term: 'Austauschläufe', text: 'Läufe für ein bestimmtes Waffenmodell oder -system, die ohne Nacharbeit ausgetauscht werden können.' },
+        { nr: 'Nr. 3.2', term: 'Wechselläufe', text: 'Läufe, die für eine bestimmte Waffe zum Austausch vorgefertigt sind und noch eingepasst werden müssen.' },
+        { nr: 'Nr. 3.3', term: 'Einsteckläufe', text: 'Läufe ohne eigenen Verschluss, die in die Läufe von Waffen größeren Kalibers eingesteckt werden können.' },
+        { nr: 'Nr. 3.4', term: 'Wechseltrommeln', text: 'Trommeln für ein bestimmtes Revolvermodell, die ohne Nacharbeit gewechselt werden können.' },
+        { nr: 'Nr. 3.5', term: 'Wechselsysteme', text: 'Austauschläufe einschl. zugehörigem Verschluss und technisch erforderlicher Gehäuseteile, sofern sie zusammen keine bestimmungsgemäß verwendbare Waffe ergeben.' },
+        { nr: 'Nr. 3.6', term: 'Einstecksysteme', text: 'Einsteckläufe einschl. zugehörigem Verschluss und technisch erforderlicher Gehäuseteile, sofern sie zusammen keine bestimmungsgemäß verwendbare Waffe ergeben.' },
+        { nr: 'Nr. 3.7', term: 'Einsätze', text: 'Teile, die den Innenmaßen des Patronenlagers angepasst und zum Verschießen von Munition kleinerer Abmessungen bestimmt sind.' },
+        { nr: 'Nr. 4.1', term: 'Zielscheinwerfer', text: 'Für Schusswaffen bestimmte Vorrichtungen, die das Ziel bei ungünstigen Lichtverhältnissen/Dunkelheit beleuchten – unerheblich, ob sichtbares oder unsichtbares (z. B. Infrarot-)Licht.' },
+        { nr: 'Nr. 4.2', term: 'Laser oder Zielpunktprojektoren', text: 'Für Schusswaffen bestimmte Vorrichtungen, die das Ziel durch Projektion eines für den Schützen erkennbaren Zielpunkts markieren.' },
+        { nr: 'Nr. 4.3', term: 'Nachtsicht- & Nachtzielgeräte', text: 'Für Schusswaffen bestimmte Vorrichtungen mit elektronischer Verstärkung oder Bildwandler und Montageeinrichtung für Schusswaffen; hierzu zählen auch Nachtsichtvorsätze und -aufsätze für Zielfernrohre.' },
+        { nr: 'Nr. 4.4', term: 'Magazine & Magazingehäuse', text: 'Munitionsbehältnisse zur Aufbewahrung/Zuführung von Patronen: (4.4.1) Eingebaute Magazine bleiben beim Befüllen mit der Waffe verbunden; (4.4.2) Wechselmagazine werden beim Befüllen getrennt; (4.4.3) Magazingehäuse sind die Patronen aufnehmenden Bestandteile von Wechselmagazinen.' },
+        { nr: 'Nr. 5', term: 'Reizstoffe', text: 'Stoffe, die bei bestimmungsgemäßer Anwendung auf den Menschen eine belästigende Wirkung durch Haut- und Schleimhautreizung (insb. Augenreiz) ausüben und resorptiv nicht giftig wirken.' },
+        { nr: 'Nr. 6', term: 'Nachbildungen von Schusswaffen', text: 'Gegenstände, die nicht als Schusswaffen hergestellt wurden, die äußere Form einer Schusswaffe haben, aus denen nicht geschossen werden kann und die nicht mit allg. gebräuchlichen Werkzeugen schussfähig umgebaut werden können.' }
+      ]
+    },
+    {
+      groupId: 'ua2_tragbar',
+      groupTitle: 'Abschnitt 1 UA 2: Tragbare Gegenstände',
+      groupRef: 'Anl. 1 Abschn. 1 UA 2 Nr. 1–2',
+      items: [
+        { nr: 'Nr. 1.1', term: 'Hieb- und Stoßwaffen (§ 1 Abs. 2 Nr. 2a)', text: 'Gegenstände, die ihrem Wesen nach dazu bestimmt sind, unter unmittelbarer Ausnutzung der Muskelkraft durch Hieb, Stoß, Stich, Schlag oder Wurf Verletzungen beizubringen.' },
+        { nr: 'Nr. 1.2.1', term: 'Nicht-mechanische Verletzungsgeräte (Elektroimpuls)', text: 'Gegenstände, die unter Ausnutzung einer anderen als mechanischen Energie Verletzungen beibringen (z. B. Elektroimpulsgeräte).' },
+        { nr: 'Nr. 1.2.2', term: 'Reizstoffsprühgeräte (bis 2 m)', text: 'Gegenstände, aus denen Reizstoffe versprüht oder ausgestoßen werden, die eine Reichweite bis zu 2 m haben.' },
+        { nr: 'Nr. 1.2.3', term: 'Fernwirkungsgeräte (> 2 m)', text: 'Gegenstände, bei denen in mehr als 2 m Entfernung bei Menschen (a) durch gezieltes Versprühen/Ausstoßen von Reiz-/Wirkstoffen eine angriffsunfähig machende Wirkung oder (b) durch nicht-kinetische Energie (insb. elektromagnetische Strahlung) eine gesundheitsschädliche Wirkung hervorgerufen werden kann.' },
+        { nr: 'Nr. 1.2.4', term: 'Flammenwerfende Gegenstände (> 20 cm)', text: 'Gegenstände, bei denen gasförmige, flüssige oder feste Stoffe den Gegenstand gezielt und brennend mit einer Flamme von mehr als 20 cm Länge verlassen.' },
+        { nr: 'Nr. 1.2.5', term: 'Brand- & Explosionsgegenstände', text: 'Gegenstände, bei denen leicht entflammbare Stoffe so verteilt und entzündet werden, dass schlagartig ein Brand entstehen kann, oder in denen mit explosionsgefährlichen/-fähigen Stoffen eine Explosion ausgelöst werden kann.' },
+        { nr: 'Nr. 1.2.6', term: 'Drossel- / Würgegeräte', text: 'Gegenstände, die nach ihrer Beschaffenheit und Handhabung dazu bestimmt sind, durch Drosseln die Gesundheit zu schädigen (z. B. Nunchakus).' },
+        { nr: 'Nr. 1.3', term: 'Präzisionsschleudern', text: 'Schleudern, die zur Erreichung einer höchstmöglichen Bewegungsenergie eine Armstütze oder vergleichbare Vorrichtung besitzen oder dafür eingerichtet sind, sowie die Armstützen/Vorrichtungen selbst.' },
+        { nr: 'Nr. 2.1.1', term: 'Springmesser (§ 1 Abs. 2 Nr. 2b)', text: 'Messer, deren Klingen auf Knopf- oder Hebeldruck hervorschnellen und hierdurch oder beim Loslassen der Sperrvorrichtung festgestellt werden können.' },
+        { nr: 'Nr. 2.1.2', term: 'Fallmesser', text: 'Messer, deren Klingen beim Lösen einer Sperrvorrichtung durch Schwerkraft oder Schleuderbewegung aus dem Griff hervorschnellen und selbsttätig oder beim Loslassen festgestellt werden.' },
+        { nr: 'Nr. 2.1.3', term: 'Faustmesser', text: 'Messer mit einem quer zur feststehenden oder feststellbaren Klinge verlaufenden Griff, die bestimmungsgemäß in der geschlossenen Faust geführt oder eingesetzt werden.' },
+        { nr: 'Nr. 2.1.4', term: 'Butterflymesser', text: 'Faltmesser mit zweigeteilten, schwenkbaren Griffen.' },
+        { nr: 'Nr. 2.2', term: 'Tier-Elektroimpulsgeräte', text: 'Gegenstände, die bestimmungsgemäß unter Ausnutzung anderer als mechanischer Energie Tieren Schmerzen beibringen – ausgenommen bestimmungsgemäß in der Tierhaltung oder sachgerechten Hundeausbildung verwendete Geräte (z. B. Viehtreiber).' }
+      ]
+    },
+    {
+      groupId: 'ua3_mun',
+      groupTitle: 'Abschnitt 1 UA 3: Munition, Ladungen & Geschosse',
+      groupRef: 'Anl. 1 Abschn. 1 UA 3 Nr. 1–3',
+      items: [
+        { nr: 'Nr. 1.1', term: 'Patronenmunition', text: 'Zum Verschießen aus Schusswaffen bestimmte Hülsen mit Ladungen, die ein Geschoss enthalten, sowie Geschosse mit Eigenantrieb.' },
+        { nr: 'Nr. 1.2', term: 'Kartuschenmunition', text: 'Hülsen mit Ladungen, die kein Geschoss enthalten (z. B. Platz- oder Reizstoffkartuschen).' },
+        { nr: 'Nr. 1.3', term: 'Hülsenlose Munition', text: 'Ladung mit oder ohne Geschoss, wobei die Treibladung eine den Innenabmessungen einer Schusswaffe oder eines gleichgestellten Gegenstands angepasste Form hat.' },
+        { nr: 'Nr. 1.4', term: 'Pyrotechnische Munition', text: 'Geschosse mit explosionsgefährlichen Stoffen/Stoffgemischen (pyrotechnische Sätze) für Licht-, Schall-, Rauch-, Nebel-, Heiz-, Druck- oder Bewegungswirkungen ohne zweckbestimmte Durchschlagskraft: (1.4.1) pyrotechnische Patronenmunition, (1.4.2) unpatronierte pyrotechnische Munition, (1.4.3) fest mit der Antriebsvorrichtung verbunden.' },
+        { nr: 'Nr. 2', term: 'Ladungen', text: 'Hauptenergieträger (in loser Schüttung, vorgefertigt oder lose in Waffen/Geräten) zum Antrieb von Geschossen/Wirkstoffen oder zur Erzeugung von Schall-/Lichtimpulsen sowie Anzündsätze, die direkt zum Geschossantrieb dienen.' },
+        { nr: 'Nr. 3', term: 'Geschosse', text: 'Als Waffen oder für Schusswaffen bestimmte (3.1) feste Körper oder (3.2) gasförmige, flüssige oder feste Stoffe in Umhüllungen.' }
+      ]
+    },
+    {
+      groupId: 'abschn3_kat',
+      groupTitle: 'Abschnitt 3: EU-Kategorien A bis C (RL 91/477/EWG)',
+      groupRef: 'Anl. 1 Abschn. 3 Nr. 1–3',
+      items: [
+        { nr: 'Nr. 1 (Kat. A)', term: 'Kategorie A (Verbotene Feuerwaffen & Munition)', text: '1.1 Kriegsschusswaffen (Nr. 29, 30 KWL); 1.2 Vollautomaten; 1.3 getarnte Schusswaffen; 1.4 Pistolen-/Revolver-Expansivgeschosse (außer befugte Jäger/Sportschützen); 1.5 panzerbrechende, Spreng-, Brand-, Leuchtspurmunition; 1.6 zu Halbautomaten umgebaute Vollautomaten; 1.7 halbautomatische Zentralfeuerwaffen mit Magazin > 20 Patronen (KW) bzw. > 10 Patronen (LW); 1.8 ohne Werkzeug/Klapp-/Teleskopschaft unter 60 cm kürzbare HA-Langwaffen; 1.9 zu Platz-/Reizstoff-/Salut-/Akustikwaffen umgebaute Kat.-A-Waffen.' },
+        { nr: 'Nr. 2 (Kat. B)', term: 'Kategorie B (Genehmigungspflichtige Feuerwaffen)', text: '2.1 Kurze Repetierfeuerwaffen; 2.2 kurze Zentralfeuer-Einzellader; 2.3 kurze Randfeuer-Einzellader < 28 cm Gesamtlänge; 2.4 HA-Langwaffen mit Kapazität > 3 Patronen (Zentralfeuer < 12); 2.5 sonstige HA-Kurzwaffen; 2.6 HA-Langwaffen bis 3 Patronen mit Wechselmagazin oder leicht umbaubar; 2.7 lange Repetier-/HA-Flinten (glatter Lauf ≤ 60 cm); 2.8 zu Platz-/Salut-/Akustikwaffen umgebaute Kat.-B-Waffen; 2.9 zivile Halbautomaten mit Aussehen von Vollautomaten.' },
+        { nr: 'Nr. 3 (Kat. C)', term: 'Kategorie C (Melde-/Erlaubnispflichtige Feuerwaffen)', text: '3.1 Sonstige lange Repetierfeuerwaffen (nicht Nr. 2.7); 3.2 lange Einzellader mit gezogenem Lauf; 3.3 sonstige HA-Langwaffen; 3.4 kurze Randfeuer-Einzellader ab 28 cm Gesamtlänge; 3.5 zu Platz-/Salut-/Akustikwaffen umgebaute Kat.-C-Waffen; 3.6 nach DVO (EU) 2015/2403 deaktivierte Feuerwaffen; 3.7 ab 14.09.2018 in Verkehr gebrachte lange Einzellader mit glattem Lauf.' }
+      ]
+    }
   ];
 
   // Status-Typen: 'frei' | 'fuehrverbot' | 'erlaubnis' | 'verboten'
@@ -6815,6 +6940,11 @@ const ESCOOTER_TUNING_MODELS = [
     const [activeCat, setActiveCat] = useState('messer');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedItem, setSelectedItem] = useState(null);
+    const [openDefGroups, setOpenDefGroups] = useState({ abschn2: true });
+
+    const toggleDefGroup = (groupId) => {
+      setOpenDefGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
+    };
 
     const statusBadgeClass = (status) => {
       if (status === 'verboten') return 'bg-red-100 text-red-700 border-red-200';
@@ -6844,6 +6974,25 @@ const ESCOOTER_TUNING_MODELS = [
       return WAFFG_ITEMS.filter((item) => item.category === activeCat);
     }, [activeCat, searchTerm]);
 
+    const filteredDefinitions = React.useMemo(() => {
+      const q = searchTerm.trim().toLowerCase();
+      if (!q) return [];
+      const matches = [];
+      WAFFG_DEFINITIONS.forEach((group) => {
+        group.items.forEach((def) => {
+          if (
+            def.term.toLowerCase().includes(q) ||
+            def.text.toLowerCase().includes(q) ||
+            def.nr.toLowerCase().includes(q) ||
+            group.groupTitle.toLowerCase().includes(q)
+          ) {
+            matches.push({ ...def, groupTitle: group.groupTitle, groupRef: group.groupRef });
+          }
+        });
+      });
+      return matches;
+    }, [searchTerm]);
+
     return (
       <div className="space-y-3 animate-in fade-in">
         {/* Schnellsuche */}
@@ -6854,7 +7003,7 @@ const ESCOOTER_TUNING_MODELS = [
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Waffe, Gegenstand oder § suchen (z. B. Taser, 1.4.1, KWS)..."
+              placeholder="Waffe, Begriff oder § suchen (z. B. Taser, Wechsellauf, Verbringen)..."
               className="w-full pl-9 pr-8 py-2 text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500"
             />
             {searchTerm && (
@@ -6887,26 +7036,94 @@ const ESCOOTER_TUNING_MODELS = [
           </div>
         )}
 
-        {/* Reiter: Verbote & Begriffe */}
-        {!searchTerm && activeCat === 'regeln' ? (
+        {/* Reiter: Alle Begriffsbestimmungen (Anlage 1 WaffG) */}
+        {!searchTerm && activeCat === 'begriffe' ? (
+          <div className="space-y-2.5 animate-in fade-in">
+            <div className="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-red-700">
+                <BookOpen className="w-5 h-5 shrink-0" />
+                <div>
+                  <h3 className="font-black uppercase tracking-wide text-xs">Anlage 1 (zu § 1 Abs. 4) WaffG</h3>
+                  <p className="text-[10px] text-slate-500 font-medium">Alle waffenrechtlichen &amp; technischen Begriffsbestimmungen</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const allOpen = WAFFG_DEFINITIONS.every((g) => openDefGroups[g.groupId]);
+                  if (allOpen) {
+                    setOpenDefGroups({});
+                  } else {
+                    const next = {};
+                    WAFFG_DEFINITIONS.forEach((g) => { next[g.groupId] = true; });
+                    setOpenDefGroups(next);
+                  }
+                }}
+                className="text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 shrink-0 transition-colors"
+              >
+                {WAFFG_DEFINITIONS.every((g) => openDefGroups[g.groupId]) ? 'Alle zu' : 'Alle auf'}
+              </button>
+            </div>
+
+            {WAFFG_DEFINITIONS.map((group) => {
+              const isOpen = Boolean(openDefGroups[group.groupId]);
+              return (
+                <div key={group.groupId} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => toggleDefGroup(group.groupId)}
+                    className={`w-full p-3.5 text-left flex items-center justify-between gap-2 transition-colors ${
+                      isOpen ? 'bg-red-50/70 border-b border-red-100' : 'hover:bg-slate-50'
+                    }`}
+                  >
+                    <div className="min-w-0">
+                      <div className="font-black text-slate-800 text-xs leading-snug">{group.groupTitle}</div>
+                      <div className="text-[10px] font-mono text-slate-500 mt-0.5">{group.groupRef} · {group.items.length} Begriffe</div>
+                    </div>
+                    {isOpen ? (
+                      <ChevronUp className="w-4 h-4 text-red-600 shrink-0" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
+                    )}
+                  </button>
+                  {isOpen && (
+                    <div className="p-3 space-y-2 animate-in fade-in duration-150">
+                      {group.items.map((def) => (
+                        <div key={`${group.groupId}-${def.nr}`} className="bg-slate-50 p-3 rounded-xl border border-slate-200/80">
+                          <div className="flex items-start justify-between gap-2 mb-1">
+                            <span className="font-black text-slate-800 text-xs leading-snug">{def.term}</span>
+                            <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-white border border-slate-200 text-slate-500 shrink-0">
+                              {def.nr}
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-700 leading-relaxed">{def.text}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        ) : !searchTerm && activeCat === 'regeln' ? (
           <div className="space-y-3 animate-in fade-in">
             <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-3">
               <div className="flex items-center gap-2 text-red-700 pb-2 border-b border-slate-100">
                 <ShieldAlert className="w-5 h-5" />
-                <h3 className="font-black uppercase tracking-wide text-xs">Zentrale Führverbote & Kontrollbefugnis</h3>
+                <h3 className="font-black uppercase tracking-wide text-xs">Zentrale Führverbote, Kontrollbefugnis &amp; Einziehung</h3>
               </div>
 
               <div className="bg-red-50 border border-red-200 p-3 rounded-xl text-xs space-y-1">
-                <div className="font-black text-red-800">§ 42 Abs. 1 & 4a WaffG – Öffentliche Veranstaltungen</div>
+                <div className="font-black text-red-800">§ 42 Abs. 1 &amp; 4a WaffG – Öffentliche Veranstaltungen</div>
                 <p className="text-red-900 leading-relaxed">
                   Verbot des Führens von <strong>Waffen</strong> (Abs. 1 → <strong>Straftat § 52 Abs. 3 Nr. 9</strong>) sowie <strong>Messern</strong> jeder Art (Abs. 4a → <strong>OWi § 53 Abs. 1 Nr. 21a</strong>) bei Volksfesten, Sportveranstaltungen, Märkten, Messen, Diskotheken, Kinos, Theatern u. Ä.
                 </p>
               </div>
 
               <div className="bg-amber-50 border border-amber-200 p-3 rounded-xl text-xs space-y-1">
-                <div className="font-black text-amber-900">§ 42a WaffG – Anscheinswaffen, Hieb-/Stoßwaffen & bestimmte Messer</div>
+                <div className="font-black text-amber-900">§ 42a WaffG – Anscheinswaffen, Hieb-/Stoßwaffen &amp; bestimmte Messer</div>
                 <p className="text-amber-950 leading-relaxed">
-                  Führverbot für Anscheinswaffen (Nr. 1), Hieb-/Stoßwaffen (Nr. 2) sowie Einhandmesser und feststehende Messer über 12 cm Klingenlänge (Nr. 3). Verstoß: <strong>OWi § 53 Abs. 1 Nr. 21b</strong> (bis 10.000 €). Ausnahmen: Transport im verschlossenen Behältnis oder berechtigtes Interesse (Nr. 2 & 3).
+                  Führverbot für Anscheinswaffen (Nr. 1), Hieb-/Stoßwaffen (Nr. 2) sowie Einhandmesser und feststehende Messer über 12 cm Klingenlänge (Nr. 3). Verstoß: <strong>OWi § 53 Abs. 1 Nr. 21b</strong> (bis 10.000 €). Ausnahmen: Transport im verschlossenen Behältnis oder berechtigtes Interesse (Nr. 2 &amp; 3).
                 </p>
               </div>
 
@@ -6918,69 +7135,80 @@ const ESCOOTER_TUNING_MODELS = [
               </div>
 
               <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl text-xs space-y-1">
-                <div className="font-black text-slate-800">§ 42 Abs. 5 & § 42c WaffG – Verbotszonen & Kontrollen</div>
+                <div className="font-black text-slate-800">§ 42 Abs. 5 &amp; § 42c WaffG – Verbotszonen &amp; Kontrollen</div>
                 <p className="text-slate-700 leading-relaxed">
                   Landesrechtliche Waffen- und Messerverbotszonen (§ 42 Abs. 5 → <strong>OWi § 53 Abs. 1 Nr. 23</strong>; Kleiner Waffenschein ist dort keine Ausnahme!). <strong>§ 42c WaffG</strong> ermächtigt zur anlasslosen Kontrolle (Anhalten, Befragen, Inaugenscheinnahme, Durchsuchung) im Geltungsbereich von §§ 42, 42b und Verbotszonen.
                 </p>
               </div>
-            </div>
 
-            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-2.5">
-              <div className="flex items-center gap-2 text-slate-700 pb-2 border-b border-slate-100">
-                <ScaleLaw className="w-5 h-5 text-red-600" />
-                <h3 className="font-black uppercase tracking-wide text-xs">Wichtige Begriffe (Anlage 1 Abschn. 2 & § 54)</h3>
+              <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl text-xs space-y-1">
+                <div className="font-black text-slate-800">§ 54 WaffG – Einziehung</div>
+                <p className="text-slate-700 leading-relaxed">
+                  Bei Straftaten nach §§ 51, 52 Abs. 1, 2, 3 Nr. 1–3 und Abs. 5 werden die betroffenen Gegenstände <strong>zwingend</strong> eingezogen (Abs. 1). Bei sonstigen Straftaten nach § 52 sowie Ordnungswidrigkeiten nach § 53 <strong>können</strong> sie eingezogen werden (Abs. 2).
+                </p>
               </div>
-              <ul className="space-y-2 text-xs text-slate-700 leading-relaxed">
-                <li className="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                  <strong>Führen (Nr. 4):</strong> Ausübung der tatsächlichen Gewalt außerhalb der eigenen Wohnung, Geschäftsräume, des eigenen befriedeten Besitztums oder einer Schießstätte.
-                </li>
-                <li className="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                  <strong>Schussbereit (Nr. 12):</strong> Waffe ist geladen (Munition/Geschosse in Trommel, eingefügtem Magazin oder Patronen-/Geschosslager), auch wenn nicht gespannt.
-                </li>
-                <li className="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                  <strong>Nicht zugriffsbereit (Nr. 13):</strong> Schusswaffe im <strong>verschlossenen Behältnis</strong>; ein Messer ist nicht zugriffsbereit, wenn es nur mit <strong>mehr als drei Handgriffen</strong> erreicht werden kann.
-                </li>
-                <li className="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                  <strong>Einziehung (§ 54 WaffG):</strong> Bei Straftaten nach §§ 51, 52 Abs. 1, 2, 3 Nr. 1–3, Abs. 5 <strong>zwingend</strong> (Abs. 1); bei sonstigen Straftaten nach § 52 und OWis nach § 53 <strong>möglich</strong> (Abs. 2).
-                </li>
-              </ul>
             </div>
           </div>
         ) : (
-          /* 2-Spalten-Raster der Waffen-Grafiken */
-          <div className="space-y-2">
+          /* 2-Spalten-Raster der Waffen-Grafiken (+ Begriffs-Treffer bei aktiver Suche) */
+          <div className="space-y-3">
             {searchTerm && (
               <div className="text-[11px] font-bold text-slate-500 px-1">
-                {filteredItems.length} Treffer für „{searchTerm}“
+                {filteredItems.length} Waffen · {filteredDefinitions.length} Begriffe für „{searchTerm}“
               </div>
             )}
-            {filteredItems.length === 0 ? (
+            {filteredItems.length === 0 && filteredDefinitions.length === 0 ? (
               <div className="bg-white p-6 rounded-2xl border border-slate-200 text-center text-xs text-slate-500">
                 Keine passenden Einträge im Waffengesetz gefunden.
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-2.5">
-                {filteredItems.map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => setSelectedItem(item)}
-                    className="bg-white p-3 rounded-2xl shadow-sm border border-slate-200 hover:border-red-300 hover:shadow-md transition-all active:scale-[0.98] flex flex-col items-center text-center group"
-                  >
-                    <div className="w-full bg-slate-50 rounded-xl p-2 mb-2 border border-slate-100 group-hover:bg-white transition-colors">
-                      <WeaponSvg id={item.id} className="w-full h-14" />
+              <>
+                {filteredItems.length > 0 && (
+                  <div className="grid grid-cols-2 gap-2.5">
+                    {filteredItems.map((item) => (
+                      <button
+                        key={item.id}
+                        onClick={() => setSelectedItem(item)}
+                        className="bg-white p-3 rounded-2xl shadow-sm border border-slate-200 hover:border-red-300 hover:shadow-md transition-all active:scale-[0.98] flex flex-col items-center text-center group"
+                      >
+                        <div className="w-full bg-slate-50 rounded-xl p-2 mb-2 border border-slate-100 group-hover:bg-white transition-colors">
+                          <WeaponSvg id={item.id} className="w-full h-14" />
+                        </div>
+                        <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full border mb-1.5 ${statusBadgeClass(item.status)}`}>
+                          {item.badge}
+                        </span>
+                        <div className="font-bold text-slate-800 text-xs leading-snug line-clamp-2">
+                          {item.name}
+                        </div>
+                        <div className="text-[9px] font-mono text-slate-400 mt-1">
+                          {item.shortRef}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {searchTerm && filteredDefinitions.length > 0 && (
+                  <div className="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200 space-y-2">
+                    <div className="flex items-center gap-1.5 text-red-700 pb-1.5 border-b border-slate-100">
+                      <BookOpen className="w-4 h-4" />
+                      <span className="text-xs font-black uppercase tracking-wide">Begriffsbestimmungen (Anlage 1 WaffG)</span>
                     </div>
-                    <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full border mb-1.5 ${statusBadgeClass(item.status)}`}>
-                      {item.badge}
-                    </span>
-                    <div className="font-bold text-slate-800 text-xs leading-snug line-clamp-2">
-                      {item.name}
-                    </div>
-                    <div className="text-[9px] font-mono text-slate-400 mt-1">
-                      {item.shortRef}
-                    </div>
-                  </button>
-                ))}
-              </div>
+                    {filteredDefinitions.map((def, idx) => (
+                      <div key={`search-def-${idx}`} className="bg-slate-50 p-3 rounded-xl border border-slate-200/80">
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <span className="font-black text-slate-800 text-xs leading-snug">{def.term}</span>
+                          <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-white border border-slate-200 text-slate-500 shrink-0">
+                            {def.nr}
+                          </span>
+                        </div>
+                        <div className="text-[10px] text-slate-400 font-medium mb-1">{def.groupTitle}</div>
+                        <p className="text-xs text-slate-700 leading-relaxed">{def.text}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}
@@ -6988,11 +7216,12 @@ const ESCOOTER_TUNING_MODELS = [
         {/* DETAIL-MODAL BEIM ANTIPPEN EINER WAFFE */}
         {selectedItem && (
           <div
-            className="fixed inset-0 z-[110] bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-2 sm:p-4 animate-in fade-in duration-150"
+            className="fixed inset-0 z-[110] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-150"
             onClick={() => setSelectedItem(null)}
           >
             <div
-              className="bg-white w-full max-w-md max-h-[88vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-200"
+              className="bg-white w-full max-w-md max-h-[85vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-200"
+              style={{ maxHeight: 'calc(100dvh - 2rem)' }}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal-Kopf */}
@@ -7013,7 +7242,7 @@ const ESCOOTER_TUNING_MODELS = [
               </div>
 
               {/* Modal-Inhalt */}
-              <div className="p-4 overflow-y-auto space-y-3 custom-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }}>
+              <div className="p-4 pb-6 flex-1 min-h-0 overflow-y-auto overscroll-contain space-y-3 custom-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }}>
                 <div className="bg-slate-50 rounded-2xl p-3 border border-slate-200 flex items-center justify-center">
                   <WeaponSvg id={selectedItem.id} className="w-48 h-20" />
                 </div>
@@ -12669,7 +12898,7 @@ export default function App() {
         <div className="app-shell min-h-screen font-sans text-slate-800 flex flex-col relative selection:bg-indigo-100 transition-colors duration-300 bg-slate-50">
           <PrintStyles />
 
-          <div className="app-content flex-1 z-10 relative pb-24">
+          <div className="app-content flex-1 relative pb-24">
             <div className={activeTab === 'home' ? 'block' : 'hidden'}><HomeView onSelect={handleTabChange} /></div>
             <div className={activeTab === 'weight' ? 'block' : 'hidden'}><WeightModule /></div>
             <div className={activeTab === 'speed' ? 'block' : 'hidden'}><SpeedCalculator /></div>
