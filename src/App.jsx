@@ -4274,10 +4274,10 @@ function LashingCalculator({ onOpenKnowledge }) {
     }
     if (bodyCert === 'L') {
       if (codeLType === 'planenauflieger') {
-        return `Code L – Planenauflieger (${hasSlats ? 'Mit Einstecklatten: 30% der Nutzlast' : 'Ohne Einstecklatten: 15% der Nutzlast'})`;
+        return `Code L – Planenauflieger (${hasSlats ? 'Mit Einstecklatten / Spriegel: 30% der Nutzlast' : 'Ohne Einstecklatten / Spriegel: 15% der Nutzlast'})`;
       } else {
         const parts = [];
-        if (fitBordwand) parts.push('Formschluss Bordwand (24%)');
+        if (fitBordwand) parts.push('Formschluss Ladebordwand (24%)');
         if (fitPlane) parts.push('Formschluss Planenaufbau (6%)');
         const totalPct = (fitBordwand ? 24 : 0) + (fitPlane ? 6 : 0);
         const selectionText = parts.length > 0 ? `${parts.join(' + ')} = ${totalPct}% der Nutzlast` : 'Kein seitlicher Formschluss gewählt (0%)';
@@ -4365,10 +4365,10 @@ function LashingCalculator({ onOpenKnowledge }) {
                  <td>{fitSide ? 'Ja (Aktiv)' : 'Nein'}</td>
                  <td><strong>{fitSide ? `${Number(wallSide || 0).toLocaleString('de-DE')} daN` : '0 daN'}</strong></td>
                  <td>
-                   {bodyCert === 'L' && codeLType === 'planenauflieger' && (hasSlats ? 'Planenauflieger mit Einstecklatten (30%)' : 'Planenauflieger ohne Einstecklatten (15%)')}
+                   {bodyCert === 'L' && codeLType === 'planenauflieger' && (hasSlats ? 'Planenauflieger mit Einstecklatten / Spriegel (30%)' : 'Planenauflieger ohne Einstecklatten / Spriegel (15%)')}
                    {bodyCert === 'L' && codeLType === 'hamburger' && (
                      (fitBordwand || fitPlane)
-                       ? `Planen-Transporter: ${[fitBordwand ? 'Bordwand (24%)' : '', fitPlane ? 'Planenaufbau (6%)' : ''].filter(Boolean).join(' + ')}`
+                       ? `Planen-Transporter: ${[fitBordwand ? 'Ladebordwand (24%)' : '', fitPlane ? 'Planenaufbau (6%)' : ''].filter(Boolean).join(' + ')}`
                        : 'Planen-Transporter (Kein seitl. Formschluss)'
                    )}
                    {bodyCert === 'XL' && 'Code XL (30% Nutzlast)'}
@@ -4847,13 +4847,13 @@ function LashingCalculator({ onOpenKnowledge }) {
                                        onClick={() => setHasSlats(true)}
                                        className={`py-2.5 px-2 rounded-lg font-bold text-xs border transition-all flex items-center justify-center text-center ${hasSlats ? 'bg-indigo-100 text-indigo-900 border-indigo-400 shadow-sm ring-1 ring-indigo-300' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}`}
                                    >
-                                       Mit Einstecklatten
+                                       Mit Einstecklatten / Spriegel
                                    </button>
                                    <button
                                        onClick={() => setHasSlats(false)}
                                        className={`py-2.5 px-2 rounded-lg font-bold text-xs border transition-all flex items-center justify-center text-center ${!hasSlats ? 'bg-indigo-100 text-indigo-900 border-indigo-400 shadow-sm ring-1 ring-indigo-300' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}`}
                                    >
-                                       Ohne Einstecklatten
+                                       Ohne Einstecklatten / Spriegel
                                    </button>
                                </div>
                            )}
@@ -4866,7 +4866,7 @@ function LashingCalculator({ onOpenKnowledge }) {
                                        className={`py-2.5 px-2 rounded-lg font-bold text-xs border transition-all flex items-center justify-center gap-1.5 text-center ${fitBordwand ? 'bg-indigo-100 text-indigo-900 border-indigo-400 shadow-sm ring-1 ring-indigo-300' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'}`}
                                    >
                                        <input type="checkbox" checked={fitBordwand} readOnly className="w-3.5 h-3.5 rounded border-slate-300 text-indigo-600 pointer-events-none" />
-                                       <span>Formschluss Bordwand</span>
+                                       <span>Formschluss Ladebordwand</span>
                                    </button>
                                    <button
                                        onClick={() => setFitPlane(!fitPlane)}
@@ -8098,8 +8098,8 @@ const ESCOOTER_TUNING_MODELS = [
                                         <ul className="space-y-1 text-slate-700 list-disc list-inside">
                                             <li><strong>Stirnwand:</strong> 40 % der Nutzlast (max. <strong>5.000 daN</strong>)</li>
                                             <li><strong>Heck:</strong> 25 % der Nutzlast (max. <strong>3.100 daN</strong>)</li>
-                                            <li><strong>Seite – Planenauflieger:</strong> mit Einstecklatten = <strong>30 %</strong> | ohne Einstecklatten = <strong>15 %</strong> der Nutzlast</li>
-                                            <li><strong>Seite – Hamburger Verdeck / Polensprinter (ab Erstzulassung 2017):</strong> Formschluss Bordwand = <strong>24 %</strong> | Formschluss Planenaufbau = <strong>6 %</strong> (kombiniert = <strong>30 %</strong>)</li>
+                                            <li><strong>Seite – Planenauflieger:</strong> mit Einstecklatten / Spriegel = <strong>30 %</strong> | ohne Einstecklatten / Spriegel = <strong>15 %</strong> der Nutzlast</li>
+                                            <li><strong>Seite – Hamburger Verdeck / Polensprinter (ab Erstzulassung 2017):</strong> Formschluss Ladebordwand = <strong>24 %</strong> | Formschluss Planenaufbau = <strong>6 %</strong> (kombiniert = <strong>30 %</strong>)</li>
                                         </ul>
                                     </div>
 
