@@ -87,6 +87,16 @@ const PrintStyles = () => (
         padding: 0 !important;
         margin: 0 !important;
         overflow: visible !important;
+      /* iOS WebKit: Flex- und Höhen-Container aufbrechen, damit A4-Seiten vollflächig gedruckt werden */
+      #root, .app-shell, .app-content, .max-w-md {
+        display: block !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: visible !important;
         background: #ffffff !important;
       }
       
@@ -98,6 +108,13 @@ const PrintStyles = () => (
       /* SHOW PRINT ELEMENTS */
       .print-only {
         display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
       }
 
       /* GENERAL PRINT LAYOUT */
@@ -108,33 +125,6 @@ const PrintStyles = () => (
         padding: 0;
         color: #1e293b;
         background: #ffffff !important;
-      }
-      body {
-        background-color: white !important;
-        color: #000 !important;
-        font-family: Arial, Helvetica, sans-serif !important;
-        font-size: 11pt !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-      }
-      
-      /* HIDE SCREEN ELEMENTS */
-      .no-print, nav, footer, button, .screen-only, .fixed, .sticky {
-        display: none !important;
-      }
-
-      /* SHOW PRINT ELEMENTS */
-      .print-only {
-        display: block !important;
-      }
-
-      /* GENERAL PRINT LAYOUT */
-      .print-container {
-        width: 100%;
-        max-width: 100%;
-        margin: 0;
-        padding: 0;
-        color: #1e293b;
       }
 
       h1.print-title {
@@ -149,12 +139,12 @@ const PrintStyles = () => (
       }
 
       h2.print-section {
-        font-size: 11pt;
+        font-size: 10.5pt;
         font-weight: 800;
-        margin-top: 16px;
-        margin-bottom: 8px;
+        margin-top: 12px;
+        margin-bottom: 6px;
         background-color: #f1f5f9 !important;
-        padding: 5px 10px;
+        padding: 4px 10px;
         border-left: 4px solid #334155;
         text-transform: uppercase;
         letter-spacing: 0.5px;
@@ -164,21 +154,21 @@ const PrintStyles = () => (
       .print-meta {
         font-size: 9pt;
         color: #475569;
-        margin-bottom: 16px;
+        margin-bottom: 12px;
       }
 
       /* PRINT TABLES */
       table.print-table {
         width: 100%;
         border-collapse: collapse;
-        margin-bottom: 14px;
+        margin-bottom: 10px;
         font-size: 9.5pt;
         page-break-inside: avoid;
       }
       
       table.print-table th, table.print-table td {
         border: 1px solid #cbd5e1;
-        padding: 6px 10px;
+        padding: 5px 8px;
         text-align: left;
         vertical-align: middle;
       }
@@ -194,20 +184,20 @@ const PrintStyles = () => (
       .print-result-box {
         border: 2px solid #0f172a;
         border-radius: 6px;
-        padding: 12px 14px;
-        margin-top: 14px;
+        padding: 10px 12px;
+        margin-top: 10px;
         page-break-inside: avoid;
         background-color: #f8fafc !important;
       }
       
       .print-result-header {
         font-weight: 900;
-        font-size: 11pt;
-        margin-bottom: 6px;
+        font-size: 10.5pt;
+        margin-bottom: 5px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         border-bottom: 1px solid #cbd5e1;
-        padding-bottom: 4px;
+        padding-bottom: 3px;
       }
 
       .print-warning {
@@ -226,17 +216,27 @@ const PrintStyles = () => (
       display: none;
     }
 
-    /* AKTIVER DRUCKMODUS (für iOS Safari / iPadOS / PWA) */
+    /* AKTIVER DRUCKMODUS (A4-Blattbreite für Vorschau & iOS Safari) */
     .is-printing-mode .no-print {
       display: none !important;
     }
+    .is-printing-mode .max-w-md {
+      max-width: 100% !important;
+      width: 100% !important;
+      min-height: auto !important;
+      background: #ffffff !important;
+    }
     .is-printing-mode .print-only {
       display: block !important;
+      width: 100% !important;
+      max-width: 210mm !important;
+      min-height: 297mm;
+      margin: 0 auto 24px auto !important;
+      padding: 12mm 14mm !important;
       background: #ffffff !important;
-      padding: 16px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      margin-bottom: 24px;
+      border-radius: 4px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+      box-sizing: border-box;
     }
     .is-printing-mode .print-only svg:not(.print-safe) {
       display: none !important;
@@ -3051,18 +3051,17 @@ function LashingCalculator({ onOpenKnowledge }) {
       {/* PRINT VIEW ONLY (Niederzurren) */}
       {lashingType === 'nieder' && (
       <div className="print-only print-container">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '3px solid #0f172a', paddingBottom: '10px', marginBottom: '18px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '16px', borderBottom: '3px solid #0f172a', paddingBottom: '8px', marginBottom: '14px' }}>
           <div>
             <div style={{ fontSize: '8.5pt', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1.5px', color: '#475569', marginBottom: '2px' }}>
               Prüf- & Berechnungsdokumentation
             </div>
-            <h1 className="print-title" style={{ borderBottom: 'none', marginBottom: 0, paddingBottom: 0, fontSize: '18pt' }}>
+            <h1 className="print-title" style={{ borderBottom: 'none', marginBottom: 0, paddingBottom: 0, fontSize: '16.5pt' }}>
               Ladungssicherungs-Protokoll (Niederzurren)
             </h1>
           </div>
-          <div style={{ textAlign: 'right', fontSize: '9pt', color: '#334155', lineHeight: '1.4' }}>
+          <div style={{ textAlign: 'right', fontSize: '9pt', color: '#334155', lineHeight: '1.4', whiteSpace: 'nowrap', flexShrink: 0 }}>
             <div><strong>Datum / Uhrzeit:</strong> {dateTime}</div>
-            <div><strong>Berechnungsnorm:</strong> {(!allowedWeight || parseFloat(allowedWeight) <= 3500) ? 'Spezialformel (≤ 3,5 t)' : 'VDI 2700 / DIN EN 12195-1 (> 3,5 t)'}</div>
           </div>
         </div>
   
@@ -10069,7 +10068,7 @@ export default function App() {
               </div>
             )}
 
-            <div className={`app-content flex-1 z-10 relative ${isPrinting ? 'max-w-2xl w-full mx-auto p-3 pb-10' : 'pb-24'}`}>
+            <div className={`app-content flex-1 z-10 relative ${isPrinting ? 'w-full max-w-[210mm] mx-auto p-2 sm:p-4 pb-10' : 'pb-24'}`}>
               <div className={activeTab === 'home' ? 'block' : 'hidden'}><HomeView onSelect={handleTabChange} /></div>
               <div className={activeTab === 'weight' ? 'block' : 'hidden'}><WeightModule /></div>
               <div className={activeTab === 'speed' ? 'block' : 'hidden'}><SpeedCalculator /></div>
