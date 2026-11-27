@@ -2721,6 +2721,7 @@ function LashingCalculator({ onOpenKnowledge }) {
   const [fitFront, setFitFront] = useState(false);
   const [fitSide, setFitSide] = useState(false);
   const [fitRear, setFitRear] = useState(false);
+  const [isTippingHazard, setIsTippingHazard] = useState(false);
   const [bodyCert, setBodyCert] = useState('NONE'); 
   const [codeLType, setCodeLType] = useState('planenauflieger'); // 'planenauflieger' | 'hamburger'
   const [hasSlats, setHasSlats] = useState(true); // Einstecklatten bei Planenauflieger (true = 30%, false = 15%)
@@ -2739,6 +2740,7 @@ function LashingCalculator({ onOpenKnowledge }) {
   const [showInfoX, setShowInfoX] = useState(false);
   const [showInfoY, setShowInfoY] = useState(false);
   const [showWeightInfo, setShowWeightInfo] = useState(false);
+  const [showTippingInfo, setShowTippingInfo] = useState(false);
   
   // State für die Handy-Winkelmessung
   const [isMeasureModalOpen, setIsMeasureModalOpen] = useState(false);
@@ -2876,6 +2878,12 @@ function LashingCalculator({ onOpenKnowledge }) {
     } else {
         accFwd = 0.80; accSide = 0.50; accRear = 0.50;
     }
+
+    if (isTippingHazard) {
+        accFwd = Number((accFwd * 1.2).toFixed(3));
+        accSide = Number((accSide * 1.2).toFixed(3));
+        accRear = Number((accRear * 1.2).toFixed(3));
+    }
   
     // --- NIEDERZURREN CALCULATION ---
     const calculateN = (acc, blockingDaN, direction) => {
@@ -2966,7 +2974,7 @@ function LashingCalculator({ onOpenKnowledge }) {
         { label: 'Hinten', mu: mu, c: accRear, angle: angle, hasFit: fitRear, force: fitRear ? wallRear : 0, safetyFactor: isSpecialFormula ? 1.0 : 1.1, result: nRear },
       ]
     });
-  }, [loadWeight, friction, stf, angle, angleBeta, allowedWeight, emptyWeight, fitFront, fitSide, fitRear, wallFront, wallSide, wallRear, bodyCert]);
+  }, [loadWeight, friction, stf, angle, angleBeta, allowedWeight, emptyWeight, fitFront, fitSide, fitRear, wallFront, wallSide, wallRear, bodyCert, isTippingHazard]);
   
   const renderUnsecured = (directionLabel, numN, strapForceN, c, muVal, loadWeightStr) => {
       if (numN <= 0) return null; 
@@ -3083,7 +3091,7 @@ function LashingCalculator({ onOpenKnowledge }) {
                 <th>Rechnerische Nutzlast</th>
                 <td>{calculatedPayload > 0 ? `${calculatedPayload.toLocaleString('de-DE')} kg` : '-'}</td>
                 <th>Gewichtsklasse (c-Werte)</th>
-                <td>{lashingResult?.weightClassInfo || '-'}</td>
+                <td>{lashingResult?.weightClassInfo || '-'}{isTippingHazard ? ' (Kippgefährdet)' : ''}</td>
               </tr>
               <tr>
                 <th>Ladungsgewicht (m)</th>
@@ -3649,6 +3657,64 @@ function LashingCalculator({ onOpenKnowledge }) {
                 <InputWithIcon icon={ShieldCheck} label="Zul. Gesamt (kg)" value={allowedWeight} onChange={(e) => setAllowedWeight(e.target.value)} placeholder="0" />
               </div>
               <InputWithIcon icon={Box} label="Ladungsgewicht (kg)" value={loadWeight} onChange={(e) => setLoadWeight(e.target.value)} placeholder="0" />
+
+              <div className="mt-2.5 flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setIsTippingHazard(!isTippingHazard)}
+                  className={`flex-1 py-2.5 px-3 rounded-xl font-bold text-xs border-2 flex items-center justify-between transition-all ${
+                    isTippingHazard
+                      ? 'bg-amber-50 text-amber-900 border-amber-400 shadow-sm'
+                      : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-indigo-200'
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <RotateCw className={`w-4 h-4 ${isTippingHazard ? 'text-amber-600' : 'text-slate-400'}`} />
+                    <span>Ladung kippgefährdet</span>
+                  </span>
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${isTippingHazard ? 'bg-amber-500 text-white' : 'bg-slate-200 text-slate-500'}`}>
+                    {isTippingHazard ? 'Aktiv' : 'Aus'}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowTippingInfo(!showTippingInfo)}
+                  className={`p-2.5 rounded-xl border-2 transition-colors flex items-center justify-center shrink-0 ${
+                    showTippingInfo
+                      ? 'bg-amber-500 text-white border-amber-500 shadow-sm'
+                      : 'bg-indigo-50 text-indigo-600 border-indigo-100 hover:bg-indigo-100'
+                  }`}
+                  title="Was bedeutet kippgefährdet?"
+                >
+                  <Info className="w-4 h-4" />
+                </button>
+              </div>
+
+              {showTippingInfo && (
+                <div className="mt-2.5 p-3 bg-amber-50/80 border border-amber-200 rounded-xl text-xs text-slate-700 animate-in fade-in slide-in-from-top-1">
+                  <div className="font-black text-amber-900 uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                    <RotateCw className="w-3.5 h-3.5 text-amber-600" />
+                    <span>Wann ist eine Ladung kippgefährdet?</span>
+                  </div>
+                  <div className="flex items-center gap-3 justify-between">
+                    <div className="flex-1 leading-relaxed font-medium space-y-1.5">
+                      <p>1. Wenn <strong>b größer c</strong> (Schwerpunkthöhe <em>b</em> größer als halbe Standbreite <em>c</em>), dann besteht <strong className="text-red-600">Kippgefahr</strong>.</p>
+                      <p>2. Somit müssen alle Beschleunigungswerte gemäß VDI 2700 erhöht werden (Faktor <strong>1,2</strong>).</p>
+                    </div>
+                    <div className="flex-shrink-0 bg-white p-2 rounded-lg border border-amber-200 shadow-sm w-[95px]">
+                      <svg viewBox="0 0 200 240" className="w-full h-auto mx-auto block">
+                        <rect x="20" y="20" width="160" height="200" fill="#ffffff" stroke="#f59e0b" strokeWidth="4" rx="4" />
+                        <circle cx="100" cy="100" r="6" fill="#ef4444" />
+                        <text x="115" y="106" fontSize="18" fontFamily="sans-serif" fill="#334155" fontWeight="bold">a</text>
+                        <line x1="100" y1="100" x2="100" y2="220" stroke="#3b82f6" strokeWidth="5" strokeLinecap="round" />
+                        <text x="115" y="165" fontSize="18" fontFamily="sans-serif" fill="#334155" fontWeight="bold">b</text>
+                        <line x1="100" y1="220" x2="180" y2="220" stroke="#3b82f6" strokeWidth="5" strokeLinecap="round" />
+                        <text x="138" y="238" fontSize="18" fontFamily="sans-serif" fill="#334155" fontWeight="bold">c</text>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              )}
            </div>
   
            {/* SETTINGS CARD */}
