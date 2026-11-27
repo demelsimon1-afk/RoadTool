@@ -12,12 +12,13 @@ import {
 // ============================================================================
 // SCHRITT FÜR VS CODE / VERCEL:
 // Lösche in VS Code einfach die zwei Schrägstriche (//) vor der nächsten Zeile:
-import tatbestaendeData from './Tatbestaende.json';
+//import tatbestaendeData from './Tatbestaende.json';
 //const tatbestaendeData = [];
 // ============================================================================
 
 // --- THEME CONTEXT & STYLES ---
 const ThemeContext = React.createContext({ isDarkMode: false, toggleDarkMode: () => {} });
+const PrintContext = React.createContext({ isPrinting: false, triggerPrint: () => {}, cancelPrint: () => {} });
 
 const darkThemeCSS = `
   .dark { background-color: #0f172a; min-height: 100vh; }
@@ -58,7 +59,55 @@ const PrintStyles = () => (
     @media print {
       @page {
         size: A4;
-        margin: 1.5cm;
+        margin: 1.2cm;
+      }
+      html, body {
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        font-family: Arial, Helvetica, sans-serif !important;
+        font-size: 10.5pt !important;
+        height: auto !important;
+        min-height: 0 !important;
+        overflow: visible !important;
+        position: static !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      /* iOS WebKit: Flex- und Höhen-Container aufbrechen, damit mehrere Seiten sauber gedruckt werden */
+      #root, .app-shell, .app-content {
+        display: block !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: visible !important;
+        background: #ffffff !important;
+      }
+      
+      /* HIDE SCREEN ELEMENTS */
+      .no-print, nav, footer, button, .screen-only, .fixed, .sticky {
+        display: none !important;
+      }
+
+      /* SHOW PRINT ELEMENTS */
+      .print-only {
+        display: block !important;
+      }
+
+      /* GENERAL PRINT LAYOUT */
+      .print-container {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+        color: #1e293b;
+        background: #ffffff !important;
       }
       body {
         background-color: white !important;
@@ -175,6 +224,22 @@ const PrintStyles = () => (
     /* SCREEN ONLY STYLES */
     .print-only {
       display: none;
+    }
+
+    /* AKTIVER DRUCKMODUS (für iOS Safari / iPadOS / PWA) */
+    .is-printing-mode .no-print {
+      display: none !important;
+    }
+    .is-printing-mode .print-only {
+      display: block !important;
+      background: #ffffff !important;
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      margin-bottom: 24px;
+    }
+    .is-printing-mode .print-only svg:not(.print-safe) {
+      display: none !important;
     }
   `}</style>
 );
@@ -449,19 +514,23 @@ const HeaderLogo = () => {
 
 const AppVersionFooter = () => (
     <div className="text-center text-[10px] text-slate-300 font-mono py-2 select-none no-print">
-        RoadTool v. 4.2
+        Version 4.2
     </div>
 );
 
-const PrintButton = () => (
-    <button 
-        onClick={() => window.print()} 
-        className="w-full mt-8 mb-4 py-3 bg-slate-800 text-white rounded-xl font-bold uppercase tracking-widest hover:bg-slate-700 transition-colors flex items-center justify-center gap-2 no-print shadow-lg"
-    >
-        <Printer className="w-5 h-5" />
-        Druckprotokoll erstellen
-    </button>
-);
+const PrintButton = () => {
+    const { triggerPrint } = React.useContext(PrintContext);
+    return (
+        <button 
+            type="button"
+            onClick={triggerPrint} 
+            className="w-full mt-8 mb-4 py-3 bg-slate-800 text-white rounded-xl font-bold uppercase tracking-widest hover:bg-slate-700 transition-colors flex items-center justify-center gap-2 no-print shadow-lg"
+        >
+            <Printer className="w-5 h-5" />
+            Druckprotokoll erstellen
+        </button>
+    );
+};
 
 const FormulaFraction = ({ numerator, denominator, label, equals, className = "" }) => (
   <div className={`flex items-center justify-center gap-2 font-mono text-sm ${className}`}>
@@ -1086,7 +1155,13 @@ const SvgPkwTransporter = ({ deckName, cars, showOrientation = false }) => {
             className="flex justify-center bg-white p-4 rounded-xl border border-slate-200 shadow-inner mb-6"
             style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
         >
-            <svg viewBox={`0 0 130 ${svgHeight}`} className="w-full max-w-[220px] h-auto font-sans print-safe" style={{ overflow: 'visible' }}>
+            <svg
+                width="180"
+                height={Math.round(svgHeight * (180 / 130))}
+                viewBox={`0 0 130 ${svgHeight}`}
+                className="w-full max-w-[220px] h-auto font-sans print-safe"
+                style={{ overflow: 'visible', maxWidth: '100%', height: 'auto' }}
+            >
                 {/* Deck Title */}
                 <text x="65" y="15" textAnchor="middle" fontSize="8" fontWeight="bold" fill="#334155" className="uppercase tracking-widest">{deckName}</text>
                 
@@ -2228,9 +2303,6 @@ function OverloadCalculator({ onSwitch }) {
               size: A4; 
               margin: 1.2cm; 
             }
-            .print-container {
-              zoom: 0.9; 
-            }
             .print-section { 
               page-break-after: avoid !important; 
               break-after: avoid !important; 
@@ -2242,7 +2314,7 @@ function OverloadCalculator({ onSwitch }) {
             }
             .print-table th, .print-table td {
               padding: 4px 6px !important;
-              font-size: 11px !important;
+              font-size: 10.5px !important;
             }
           }
         `}
@@ -9901,8 +9973,45 @@ export default function App() {
   const [knowledgeResetKey, setKnowledgeResetKey] = useState(0); // <--- NEU: Zähler für den Reset
   const [returnTab, setReturnTab] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isPrinting, setIsPrinting] = useState(false);
+
+  const triggerPrint = () => {
+      setIsPrinting(true);
+      window.scrollTo(0, 0);
+  };
+
+  const cancelPrint = () => {
+      setIsPrinting(false);
+  };
+
+  // Startet window.print() erst, nachdem iOS Safari das Protokoll sichtbar gerendert hat
+  useEffect(() => {
+      if (!isPrinting) return;
+      let timerId = null;
+      const rafId = requestAnimationFrame(() => {
+          timerId = setTimeout(() => {
+              try {
+                  window.print();
+              } catch (e) {
+                  console.error('Druckdialog konnte nicht automatisch geöffnet werden:', e);
+              }
+          }, 250);
+      });
+      return () => {
+          cancelAnimationFrame(rafId);
+          if (timerId) clearTimeout(timerId);
+      };
+  }, [isPrinting]);
+
+  // Setzt den Druckmodus nach Abschluss/Abbruch auf Desktop-Browsern automatisch zurück
+  useEffect(() => {
+      const handleAfterPrint = () => setIsPrinting(false);
+      window.addEventListener('afterprint', handleAfterPrint);
+      return () => window.removeEventListener('afterprint', handleAfterPrint);
+  }, []);
 
   const handleNavigateKnowledge = (viewId) => {
+      setIsPrinting(false);
       setKnowledgeView(viewId);
       setReturnTab(activeTab); // Merkt sich den vorherigen Tab (z.B. den Rechner)
       setActiveTab('knowledge');
@@ -9910,6 +10019,7 @@ export default function App() {
   };
 
   const handleTabChange = (tabId) => {
+      setIsPrinting(false);
       setActiveTab(tabId);
       setReturnTab(null); // Setzt den Zurück-Button zurück, wenn man manuell im Menü navigiert
       
@@ -9925,40 +10035,71 @@ export default function App() {
 
   return (
     <ThemeContext.Provider value={{ isDarkMode, toggleDarkMode: () => setIsDarkMode(!isDarkMode) }}>
-      <div className={isDarkMode ? 'dark' : ''}>
-        <style>{darkThemeCSS}</style>
-        <div className="min-h-screen bg-slate-50 font-sans text-slate-800 flex flex-col relative selection:bg-indigo-100 transition-colors duration-300">
-          <PrintStyles />
-          <div className="flex-1 pb-24 z-10 relative">
-            <div className={activeTab === 'home' ? 'block' : 'hidden'}><HomeView onSelect={handleTabChange} /></div>
-            <div className={activeTab === 'weight' ? 'block' : 'hidden'}><WeightModule /></div>
-            <div className={activeTab === 'speed' ? 'block' : 'hidden'}><SpeedCalculator /></div>
-            <div className={activeTab === 'age' ? 'block' : 'hidden'}><AgeCalculator /></div>
-            <div className={activeTab === 'stay' ? 'block' : 'hidden'}><StayCalculator /></div>
-            <div className={activeTab === 'knowledge' ? 'block' : 'hidden'}><KnowledgeBaseView key={knowledgeResetKey} initialView={knowledgeView} onBack={returnTab ? () => handleTabChange(returnTab) : null} /></div>
-            <div className={activeTab === 'license' ? 'block' : 'hidden'}><DriverLicenseModule /></div>
-            <div className={activeTab === 'info' ? 'block' : 'hidden'}><InfoView /></div>
-            <div className={activeTab === 'donate' ? 'block' : 'hidden'}><DonateView /></div>
-            <div className={activeTab === 'lashing' ? 'block' : 'hidden'}><LashingCalculator onOpenKnowledge={handleNavigateKnowledge} /></div>
-            <div className={activeTab === 'bkat' ? 'block' : 'hidden'}><BkatModule /></div>
-          </div>
-          <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] pb-safe z-50 no-print transition-colors duration-300">
-            <div className="max-w-md mx-auto flex justify-evenly items-center p-2">
-              <button onClick={() => handleTabChange('home')} className={`w-20 flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-300 ${activeTab === 'home' ? 'text-indigo-600 bg-indigo-50 shadow-sm' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'}`}>
-                <Home className="w-6 h-6" />
-                <span className="text-[10px] font-bold uppercase tracking-widest mt-0.5">Home</span>
-              </button>
-              <button onClick={() => handleTabChange('info')} className={`w-20 flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-300 ${activeTab === 'info' ? 'text-slate-800 bg-slate-100 shadow-sm' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'}`}>
-                <FileText className="w-6 h-6" />
-                <span className="text-[10px] font-bold uppercase tracking-widest mt-0.5">Infos</span>
-              </button>
-              <button onClick={() => handleTabChange('donate')} className={`w-20 flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-300 ${activeTab === 'donate' ? 'text-pink-600 bg-pink-50 shadow-sm' : 'text-slate-400 hover:text-pink-500 hover:bg-slate-50'}`}>
-                <Heart className="w-6 h-6" />
-              </button>
+      <PrintContext.Provider value={{ isPrinting, triggerPrint, cancelPrint }}>
+        <div className={!isPrinting && isDarkMode ? 'dark' : ''}>
+          <style>{darkThemeCSS}</style>
+          <div className={`app-shell min-h-screen font-sans text-slate-800 flex flex-col relative selection:bg-indigo-100 transition-colors duration-300 ${isPrinting ? 'is-printing-mode bg-white' : 'bg-slate-50'}`}>
+            <PrintStyles />
+
+            {/* Steuerleiste für iOS-Druckvorschau (wird beim eigentlichen Ausdruck ausgeblendet) */}
+            {isPrinting && (
+              <div className="no-print sticky top-0 z-50 bg-slate-900 text-white px-4 py-3 shadow-lg border-b border-slate-700">
+                <div className="max-w-2xl mx-auto flex items-center justify-between gap-2">
+                  <button
+                    type="button"
+                    onClick={cancelPrint}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold uppercase tracking-wide transition-colors"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    Zurück
+                  </button>
+                  <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">Druckvorschau</span>
+                  <button
+                    type="button"
+                    onClick={() => window.print()}
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-black uppercase tracking-wide shadow-md transition-colors"
+                  >
+                    <Printer className="w-4 h-4" />
+                    Drucken / PDF
+                  </button>
+                </div>
+                <p className="max-w-2xl mx-auto text-[10px] text-slate-400 text-center mt-2">
+                  iOS-Hinweis: Falls der Dialog nicht automatisch erscheint, tippen Sie auf <strong>„Drucken / PDF“</strong> oder in Safari auf <strong>Teilen (↑) → Drucken</strong>.
+                </p>
+              </div>
+            )}
+
+            <div className={`app-content flex-1 z-10 relative ${isPrinting ? 'max-w-2xl w-full mx-auto p-3 pb-10' : 'pb-24'}`}>
+              <div className={activeTab === 'home' ? 'block' : 'hidden'}><HomeView onSelect={handleTabChange} /></div>
+              <div className={activeTab === 'weight' ? 'block' : 'hidden'}><WeightModule /></div>
+              <div className={activeTab === 'speed' ? 'block' : 'hidden'}><SpeedCalculator /></div>
+              <div className={activeTab === 'age' ? 'block' : 'hidden'}><AgeCalculator /></div>
+              <div className={activeTab === 'stay' ? 'block' : 'hidden'}><StayCalculator /></div>
+              <div className={activeTab === 'knowledge' ? 'block' : 'hidden'}><KnowledgeBaseView key={knowledgeResetKey} initialView={knowledgeView} onBack={returnTab ? () => handleTabChange(returnTab) : null} /></div>
+              <div className={activeTab === 'license' ? 'block' : 'hidden'}><DriverLicenseModule /></div>
+              <div className={activeTab === 'info' ? 'block' : 'hidden'}><InfoView /></div>
+              <div className={activeTab === 'donate' ? 'block' : 'hidden'}><DonateView /></div>
+              <div className={activeTab === 'lashing' ? 'block' : 'hidden'}><LashingCalculator onOpenKnowledge={handleNavigateKnowledge} /></div>
+              <div className={activeTab === 'bkat' ? 'block' : 'hidden'}><BkatModule /></div>
+            </div>
+            <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] pb-safe z-50 no-print transition-colors duration-300">
+              <div className="max-w-md mx-auto flex justify-evenly items-center p-2">
+                <button onClick={() => handleTabChange('home')} className={`w-20 flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-300 ${activeTab === 'home' ? 'text-indigo-600 bg-indigo-50 shadow-sm' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'}`}>
+                  <Home className="w-6 h-6" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest mt-0.5">Home</span>
+                </button>
+                <button onClick={() => handleTabChange('info')} className={`w-20 flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-300 ${activeTab === 'info' ? 'text-slate-800 bg-slate-100 shadow-sm' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'}`}>
+                  <FileText className="w-6 h-6" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest mt-0.5">Infos</span>
+                </button>
+                <button onClick={() => handleTabChange('donate')} className={`w-20 flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-300 ${activeTab === 'donate' ? 'text-pink-600 bg-pink-50 shadow-sm' : 'text-slate-400 hover:text-pink-500 hover:bg-slate-50'}`}>
+                  <Heart className="w-6 h-6" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </PrintContext.Provider>
     </ThemeContext.Provider>
   );
 }
