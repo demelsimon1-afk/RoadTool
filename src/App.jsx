@@ -12,7 +12,7 @@ import {
 // ============================================================================
 // SCHRITT FÜR VS CODE / VERCEL:
 // Lösche in VS Code einfach die zwei Schrägstriche (//) vor der nächsten Zeile:
-import tatbestaendeData from './Tatbestaende.json';
+//import tatbestaendeData from './Tatbestaende.json';
 //const tatbestaendeData = [];
 // ============================================================================
 
@@ -5661,6 +5661,1431 @@ const ESCOOTER_TUNING_MODELS = [
     { brand: 'VMAX', model: 'VX2 / VX3 GT / R25', method: '-', speed: '-', detection: '-' },
     { brand: 'ePowerFun', model: 'ePF-2 / ePF-2 PRO / PULSE / PULSE+', method: 'Controller und Display tausch', speed: '28-34 km/h', detection: 'Sportmodus bis 34 km/h, Normalmodus bis 25 km/h' }
   ];
+
+  // ============================================================================
+  // WAFFENGESETZ (WaffG – Stand 22.10.2026) – VOLLSTÄNDIGE ANLAGEN-ÜBERSICHT
+  // ============================================================================
+  const WAFFG_CATEGORIES = [
+    { id: 'messer', label: 'Messer' },
+    { id: 'hieb', label: 'Hieb- & Schlagwaffen' },
+    { id: 'verbotene_sw', label: 'Verbotene Schusswaffen' },
+    { id: 'erlaubnis_sw', label: 'Erlaubnispfl. Schusswaffen' },
+    { id: 'freie_sw', label: 'Freie Waffen & Sonstige' },
+    { id: 'reiz_elektro', label: 'Reizstoff, Elektro & Brand' },
+    { id: 'zubehoer_mun', label: 'Zubehör, Magazine & Munition' },
+    { id: 'regeln', label: 'Verbote & Begriffe' }
+  ];
+
+  // Status-Typen: 'frei' | 'fuehrverbot' | 'erlaubnis' | 'verboten'
+  const WAFFG_ITEMS = [
+    // ==================== 1. MESSER ====================
+    {
+      id: 'springmesser',
+      category: 'messer',
+      name: 'Springmesser',
+      shortRef: 'Anl. 2 Abschn. 1 Nr. 1.4.1',
+      status: 'verboten',
+      badge: 'Verboten',
+      definition: 'Messer, deren Klingen auf Knopf- oder Hebeldruck hervorschnellen und festgestellt werden können (Anl. 1 Abschn. 1 UA 2 Nr. 2.1.1).',
+      besitz: {
+        level: 'verboten',
+        label: 'Grundsätzlich verboten (§ 2 Abs. 3)',
+        detail: 'Ausnahme nur, wenn die Klinge seitlich herausspringt, höchstens 8,5 cm lang und nicht zweiseitig geschliffen ist UND ein berechtigtes Interesse für einhändige Nutzung oder Berufsausübung besteht.'
+      },
+      fuehren: {
+        level: 'verboten',
+        label: 'Verboten',
+        detail: 'Bei verbotenen Springmessern generell verboten (§ 2 Abs. 3). Bei erlaubter Ausnahme greift das Führverbot nach § 42a Abs. 1 Nr. 3 sowie §§ 42 Abs. 4a, 42b WaffG.'
+      },
+      straftat: '§ 52 Abs. 3 Nr. 1 WaffG (Freiheitsstrafe bis 3 Jahre oder Geldstrafe; fahrlässig Abs. 4: bis 1 Jahr oder Geldstrafe). Einziehung nach § 54 Abs. 1.',
+      owi: 'Bei Vorliegen der Ausnahme (Nr. 1.4.1): § 53 Abs. 1 Nr. 21b (§ 42a), Nr. 21a (§ 42 Abs. 4a), Nr. 21c (§ 42b) oder Nr. 23 (Verbotszone) – bis 10.000 €.'
+    },
+    {
+      id: 'fallmesser',
+      category: 'messer',
+      name: 'Fallmesser',
+      shortRef: 'Anl. 2 Abschn. 1 Nr. 1.4.1',
+      status: 'verboten',
+      badge: 'Verboten',
+      definition: 'Messer, deren Klingen beim Lösen einer Sperrvorrichtung durch Schwerkraft oder Schleuderbewegung aus dem Griff hervorschnellen und festgestellt werden (Anl. 1 Abschn. 1 UA 2 Nr. 2.1.2).',
+      besitz: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Jeglicher Umgang (Erwerb, Besitz, Überlassen, Verbringen) ist ohne Ausnahme verboten (nur BKA-Ausnahme nach § 40 Abs. 4 möglich).' },
+      fuehren: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Das Führen ist ausnahmslos verboten.' },
+      straftat: '§ 52 Abs. 3 Nr. 1 WaffG (Freiheitsstrafe bis 3 Jahre oder Geldstrafe; fahrlässig Abs. 4). Zwingende Einziehung nach § 54 Abs. 1.',
+      owi: 'Keine (Vorrang der Straftat nach § 52 Abs. 3 Nr. 1 WaffG).'
+    },
+    {
+      id: 'faustmesser',
+      category: 'messer',
+      name: 'Faustmesser',
+      shortRef: 'Anl. 2 Abschn. 1 Nr. 1.4.2',
+      status: 'verboten',
+      badge: 'Verboten',
+      definition: 'Messer mit einem quer zur feststehenden oder feststellbaren Klinge verlaufenden Griff, die bestimmungsgemäß in der geschlossenen Faust geführt werden (Anl. 1 Abschn. 1 UA 2 Nr. 2.1.3).',
+      besitz: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Ausnahme nach § 40 Abs. 3 Satz 1 WaffG nur für Inhaber einer jagdrechtlichen Erlaubnis und Angehörige Leder oder Pelz verarbeitender Berufe zur Berufsausübung.' },
+      fuehren: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Nur im Rahmen der gesetzlichen Ausnahme nach § 40 Abs. 3 Satz 1 zulässig.' },
+      straftat: '§ 52 Abs. 3 Nr. 1 WaffG (Freiheitsstrafe bis 3 Jahre oder Geldstrafe; fahrlässig Abs. 4). Einziehung nach § 54 Abs. 1.',
+      owi: 'Keine (Vorrang der Straftat; im Ausnahmefall §§ 42 Abs. 4a, 42b beachten).'
+    },
+    {
+      id: 'butterfly',
+      category: 'messer',
+      name: 'Butterflymesser (Faltmesser)',
+      shortRef: 'Anl. 2 Abschn. 1 Nr. 1.4.3',
+      status: 'verboten',
+      badge: 'Verboten',
+      definition: 'Faltmesser mit zweigeteilten, schwenkbaren Griffen (Anl. 1 Abschn. 1 UA 2 Nr. 2.1.4).',
+      besitz: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Erwerb, Besitz, Überlassen, Verbringen und Handel sind verboten.' },
+      fuehren: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Das Führen ist ausnahmslos verboten.' },
+      straftat: '§ 52 Abs. 3 Nr. 1 WaffG (Freiheitsstrafe bis 3 Jahre oder Geldstrafe; fahrlässig Abs. 4). Zwingende Einziehung nach § 54 Abs. 1.',
+      owi: 'Keine (Vorrang der Straftat).'
+    },
+    {
+      id: 'einhandmesser',
+      category: 'messer',
+      name: 'Einhandmesser',
+      shortRef: '§ 42a Abs. 1 Nr. 3 WaffG',
+      status: 'fuehrverbot',
+      badge: 'Führverbot § 42a',
+      definition: 'Klappmesser mit einhändig feststellbarer Klinge (unabhängig von der Klingenlänge), sofern keine Hieb- und Stoßwaffe nach § 1 Abs. 2 Nr. 2a.',
+      besitz: { level: 'frei', label: 'Erlaubnisfrei', detail: 'Erwerb und Besitz sind nach dem WaffG frei (keine Waffe i.S.d. § 1 Abs. 2, sofern nicht als Hieb-/Stoßwaffe eingestuft).' },
+      fuehren: { level: 'verboten', label: 'Führverbot (§ 42a Abs. 1 Nr. 3)', detail: 'Verboten, außer bei berechtigtem Interesse (§ 42a Abs. 2 Nr. 3, Abs. 3: Beruf, Brauchtum, Sport, allgemein anerkannter Zweck) oder Transport im verschlossenen Behältnis. Zusätzliche Verbote nach §§ 42 Abs. 4a, 42b.' },
+      straftat: 'Keine nach dem WaffG (sofern keine Hieb- und Stoßwaffe).',
+      owi: '§ 53 Abs. 1 Nr. 21b (§ 42a), Nr. 21a (öff. Veranstaltung § 42 Abs. 4a), Nr. 21c (Fernverkehr § 42b), Nr. 23 (Verbotszone § 42 Abs. 5) – jeweils bis 10.000 €. Einziehung möglich (§ 54 Abs. 2).'
+    },
+    {
+      id: 'feststehend12',
+      category: 'messer',
+      name: 'Feststehendes Messer > 12 cm',
+      shortRef: '§ 42a Abs. 1 Nr. 3 WaffG',
+      status: 'fuehrverbot',
+      badge: 'Führverbot § 42a',
+      definition: 'Messer mit feststehender Klinge über 12 cm Klingenlänge (z. B. lange Küchen-, Fahrten- oder Jagdmesser), sofern keine Hieb- und Stoßwaffe.',
+      besitz: { level: 'frei', label: 'Erlaubnisfrei', detail: 'Erwerb und Besitz sind nach dem WaffG frei.' },
+      fuehren: { level: 'verboten', label: 'Führverbot (§ 42a Abs. 1 Nr. 3)', detail: 'Verboten, außer bei berechtigtem Interesse (§ 42a Abs. 2 Nr. 3, Abs. 3) oder Transport im verschlossenen Behältnis. Zusätzliche Verbote nach §§ 42 Abs. 4a, 42b.' },
+      straftat: 'Keine nach dem WaffG (sofern keine Hieb- und Stoßwaffe).',
+      owi: '§ 53 Abs. 1 Nr. 21b (§ 42a), Nr. 21a (§ 42 Abs. 4a), Nr. 21c (§ 42b), Nr. 23 (Verbotszone) – jeweils bis 10.000 €. Einziehung möglich (§ 54 Abs. 2).'
+    },
+    {
+      id: 'alltagsmesser',
+      category: 'messer',
+      name: 'Zweihand- / Messer ≤ 12 cm',
+      shortRef: '§§ 42 Abs. 4a, 42b WaffG',
+      status: 'frei',
+      badge: 'Frei (Zonen beachten)',
+      definition: 'Zweihändig zu öffnende Taschenmesser (auch feststellbar), nicht feststellbare Einhandmesser oder feststehende Messer bis 12 cm Klingenlänge (keine Waffe).',
+      besitz: { level: 'frei', label: 'Erlaubnisfrei', detail: 'Erwerb und Besitz sind frei.' },
+      fuehren: { level: 'frei', label: 'Grundsätzlich erlaubt (Ausnahme: Verbotsbereiche)', detail: 'Führen im Alltag erlaubt, aber VERBOTEN bei öffentlichen Veranstaltungen (§ 42 Abs. 4a), im öffentlichen Personenfernverkehr (§ 42b) und in Messerverbotszonen (§ 42 Abs. 5) – außer nicht zugriffsbereit (> 3 Handgriffe) oder gesetzliche Ausnahme.' },
+      straftat: 'Keine nach dem WaffG.',
+      owi: '§ 53 Abs. 1 Nr. 21a (öff. Veranstaltung § 42 Abs. 4a), Nr. 21c (Personenfernverkehr § 42b), Nr. 23 (Verbotszone § 42 Abs. 5) – bis 10.000 €.'
+    },
+
+    // ==================== 2. HIEB- & SCHLAGWAFFEN ====================
+    {
+      id: 'hieb_stoss',
+      category: 'hieb',
+      name: 'Hieb- & Stoßwaffen (Dolch, Schlagstock, Schwert)',
+      shortRef: 'Anl. 1 UA 2 Nr. 1.1 / § 42a',
+      status: 'fuehrverbot',
+      badge: 'Frei ab 18 / § 42a',
+      definition: 'Gegenstände, die ihrem Wesen nach dazu bestimmt sind, unter unmittelbarer Ausnutzung der Muskelkraft durch Hieb, Stoß, Stich, Schlag oder Wurf Verletzungen beizubringen (z. B. Dolche, Bajonette, Kampfmesser, Schwerter, Teleskopschlagstöcke, Tonfas).',
+      besitz: { level: 'frei', label: 'Erlaubnisfrei ab 18 Jahren (§ 2 Abs. 1)', detail: 'Erwerb und Besitz sind für volljährige Personen ohne Erlaubnis zulässig.' },
+      fuehren: { level: 'verboten', label: 'Führverbot (§ 42a Abs. 1 Nr. 2)', detail: 'Führen verboten (Ausnahmen: berechtigtes Interesse nach § 42a Abs. 2 Nr. 3 / Abs. 3 oder Transport im verschlossenen Behältnis). Generelles Verbot bei öffentlichen Veranstaltungen (§ 42 Abs. 1), im Fernverkehr (§ 42b) und in Verbotszonen (§ 42 Abs. 5).' },
+      straftat: '§ 52 Abs. 3 Nr. 9 WaffG (Führen bei öffentlichen Veranstaltungen nach § 42 Abs. 1 – FS bis 3 J. oder Geldstrafe); § 52 Abs. 1 Nr. 3 (Vertrieb im Reisegewerbe/auf Märkten § 35 Abs. 3).',
+      owi: '§ 53 Abs. 1 Nr. 1 (Erwerb/Besitz unter 18 J.), Nr. 16 (Überlassen an Minderjährige), Nr. 21b (Führen § 42a), Nr. 21c (Fernverkehr § 42b), Nr. 23 (Verbotszone) – bis 10.000 €.'
+    },
+    {
+      id: 'getarnte_hieb',
+      category: 'hieb',
+      name: 'Getarnte Hieb- & Stoßwaffen',
+      shortRef: 'Anl. 2 Abschn. 1 Nr. 1.3.1',
+      status: 'verboten',
+      badge: 'Verboten',
+      definition: 'Hieb- oder Stoßwaffen, die ihrer Form nach geeignet sind, einen anderen Gegenstand vorzutäuschen oder mit Gegenständen des täglichen Gebrauchs verkleidet sind (z. B. Stockdegen, Gürtelschnallenmesser, Schirmdegen).',
+      besitz: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Jeglicher Umgang ist verboten.' },
+      fuehren: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Das Führen ist ausnahmslos verboten.' },
+      straftat: '§ 52 Abs. 3 Nr. 1 WaffG (Freiheitsstrafe bis 3 Jahre oder Geldstrafe; fahrlässig Abs. 4). Zwingende Einziehung nach § 54 Abs. 1.',
+      owi: 'Keine (Vorrang der Straftat).'
+    },
+    {
+      id: 'schlagring',
+      category: 'hieb',
+      name: 'Schlagringe',
+      shortRef: 'Anl. 2 Abschn. 1 Nr. 1.3.2',
+      status: 'verboten',
+      badge: 'Verboten',
+      definition: 'Verbotene Schlagwaffen nach Anlage 2 Abschnitt 1 Nr. 1.3.2 WaffG (auch Modelle aus Kunststoff oder mit Deko-/Gürtelschnallen-Optik, wenn als Schlagring einsetzbar).',
+      besitz: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Jeglicher Umgang (Erwerb, Besitz, Überlassen, Verbringen) ist verboten.' },
+      fuehren: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Das Führen ist ausnahmslos verboten.' },
+      straftat: '§ 52 Abs. 3 Nr. 1 WaffG (Freiheitsstrafe bis 3 Jahre oder Geldstrafe; fahrlässig Abs. 4). Zwingende Einziehung nach § 54 Abs. 1.',
+      owi: 'Keine (Vorrang der Straftat).'
+    },
+    {
+      id: 'stahlrute',
+      category: 'hieb',
+      name: 'Stahlruten & Totschläger',
+      shortRef: 'Anl. 2 Abschn. 1 Nr. 1.3.2',
+      status: 'verboten',
+      badge: 'Verboten',
+      definition: 'Biegsame Schlagwaffen (z. B. aus Spiralfedern/Stahlgliedern mit beschwertem Kopf) zur Verstärkung der Schlagwucht (Anl. 2 Abschn. 1 Nr. 1.3.2).',
+      besitz: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Jeglicher Umgang ist verboten.' },
+      fuehren: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Das Führen ist ausnahmslos verboten.' },
+      straftat: '§ 52 Abs. 3 Nr. 1 WaffG (Freiheitsstrafe bis 3 Jahre oder Geldstrafe; fahrlässig Abs. 4). Zwingende Einziehung nach § 54 Abs. 1.',
+      owi: 'Keine (Vorrang der Straftat).'
+    },
+    {
+      id: 'wurfstern',
+      category: 'hieb',
+      name: 'Wurfsterne (Shuriken)',
+      shortRef: 'Anl. 2 Abschn. 1 Nr. 1.3.3',
+      status: 'verboten',
+      badge: 'Verboten',
+      definition: 'Sternförmige Scheiben, die nach ihrer Beschaffenheit und Handhabung zum Wurf auf ein Ziel bestimmt und geeignet sind, die Gesundheit zu beschädigen.',
+      besitz: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Jeglicher Umgang ist verboten.' },
+      fuehren: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Das Führen ist ausnahmslos verboten.' },
+      straftat: '§ 52 Abs. 3 Nr. 1 WaffG (Freiheitsstrafe bis 3 Jahre oder Geldstrafe; fahrlässig Abs. 4). Zwingende Einziehung nach § 54 Abs. 1.',
+      owi: 'Keine (Vorrang der Straftat).'
+    },
+    {
+      id: 'nunchaku',
+      category: 'hieb',
+      name: 'Würgegeräte (Nunchakus)',
+      shortRef: 'Anl. 2 Abschn. 1 Nr. 1.3.8',
+      status: 'verboten',
+      badge: 'Verboten',
+      definition: 'Gegenstände, die nach ihrer Beschaffenheit und Handhabung dazu bestimmt sind, durch Drosseln die Gesundheit zu schädigen (Anl. 1 Abschn. 1 UA 2 Nr. 1.2.6; auch Soft-Nunchakus mit fester Verbindung).',
+      besitz: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Jeglicher Umgang ist verboten.' },
+      fuehren: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Das Führen ist ausnahmslos verboten.' },
+      straftat: '§ 52 Abs. 3 Nr. 1 WaffG (Freiheitsstrafe bis 3 Jahre oder Geldstrafe; fahrlässig Abs. 4). Zwingende Einziehung nach § 54 Abs. 1.',
+      owi: 'Keine (Vorrang der Straftat).'
+    },
+    {
+      id: 'praezisionsschleuder',
+      category: 'hieb',
+      name: 'Präzisionsschleudern (mit Armstütze)',
+      shortRef: 'Anl. 2 Abschn. 1 Nr. 1.3.7',
+      status: 'verboten',
+      badge: 'Verboten',
+      definition: 'Schleudern, die zur Erreichung einer höchstmöglichen Bewegungsenergie eine Armstütze oder vergleichbare Vorrichtung besitzen oder dafür eingerichtet sind – einschließlich einzelner Armstützen (Anl. 1 Abschn. 1 UA 2 Nr. 1.3).',
+      besitz: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Verboten sind die Schleudern sowie die Armstützen/Vorrichtungen selbst (einfache Schleudern ohne Armstütze fallen nicht unter das WaffG).' },
+      fuehren: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Das Führen ist ausnahmslos verboten.' },
+      straftat: '§ 52 Abs. 3 Nr. 1 WaffG (Freiheitsstrafe bis 3 Jahre oder Geldstrafe; fahrlässig Abs. 4). Zwingende Einziehung nach § 54 Abs. 1.',
+      owi: 'Keine (Vorrang der Straftat).'
+    },
+
+    // ==================== 3. VERBOTENE SCHUSSWAFFEN ====================
+    {
+      id: 'ehem_kriegswaffen',
+      category: 'verbotene_sw',
+      name: 'Ehemalige Kriegswaffen',
+      shortRef: 'Anl. 2 Abschn. 1 Nr. 1.1',
+      status: 'verboten',
+      badge: 'Verboten (§ 52 Abs. 1)',
+      definition: 'Waffen (§ 1 Abs. 2) aus der Kriegswaffenliste (außer halbautomatische tragbare Schusswaffen) nach Verlust der Kriegswaffeneigenschaft (solange Kriegswaffe: KrWaffKontrG nach § 57 WaffG).',
+      besitz: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Umgang mit Ausnahme der Unbrauchbarmachung verboten.' },
+      fuehren: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Ausnahmslos verboten.' },
+      schiessen: { level: 'verboten', label: 'Verboten', detail: 'Ausnahmslos verboten.' },
+      straftat: '§ 52 Abs. 1 Nr. 1 WaffG (FS 6 Monate bis 5 Jahre; besonders schwerer Fall Abs. 5: 1–10 Jahre; Versuch strafbar Abs. 2; fahrlässig Abs. 4: bis 2 Jahre). Zwingende Einziehung § 54 Abs. 1.',
+      owi: 'Keine (Vorrang der Straftat).'
+    },
+    {
+      id: 'vollautomat',
+      category: 'verbotene_sw',
+      name: 'Vollautomatische Schusswaffen',
+      shortRef: 'Anl. 2 Abschn. 1 Nr. 1.2.1.1',
+      status: 'verboten',
+      badge: 'Verbrechen (§ 51)',
+      definition: 'Schusswaffen, bei denen durch einmalige Betätigung des Abzugs mehrere Schüsse aus demselben Lauf abgegeben werden können (auch leicht rückbaubare Halbautomaten; Anl. 1 UA 1 Nr. 2.2).',
+      besitz: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Jeglicher Umgang ist streng verboten (sofern Kriegswaffe: vorrangig KrWaffKontrG).' },
+      fuehren: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Ausnahmslos verboten.' },
+      schiessen: { level: 'verboten', label: 'Verboten', detail: 'Ausnahmslos verboten.' },
+      straftat: '§ 51 Abs. 1 WaffG (VERBRECHEN bei Patronenmunition: Freiheitsstrafe 1 bis 5 Jahre; besonders schwerer Fall Abs. 2: 1–10 Jahre; minder schwer Abs. 3; fahrlässig Abs. 4: bis 2 Jahre). Zwingende Einziehung § 54 Abs. 1.',
+      owi: 'Keine (Vorrang des Verbrechenstatbestands).'
+    },
+    {
+      id: 'pumpgun',
+      category: 'verbotene_sw',
+      name: 'Verbotene Vorderschaftrepetierflinten',
+      shortRef: 'Anl. 2 Abschn. 1 Nr. 1.2.1.2',
+      status: 'verboten',
+      badge: 'Verbrechen (§ 51)',
+      definition: 'Vorderschaftrepetierflinten (Pumpguns), bei denen statt des Hinterschafts ein Kurzwaffengriff vorhanden ist ODER die Gesamtlänge < 95 cm ODER die Lauflänge < 45 cm beträgt.',
+      besitz: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Jeglicher Umgang ist verboten (reguläre Vorderschaftrepetierflinten mit Hinterschaft, ≥ 95 cm Gesamt- und ≥ 45 cm Lauflänge sind WBK-pflichtig).' },
+      fuehren: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Ausnahmslos verboten.' },
+      schiessen: { level: 'verboten', label: 'Verboten', detail: 'Ausnahmslos verboten.' },
+      straftat: '§ 51 Abs. 1 WaffG (VERBRECHEN bei Patronenmunition: Freiheitsstrafe 1 bis 5 Jahre; besonders schwerer Fall Abs. 2: 1–10 Jahre; fahrlässig Abs. 4). Zwingende Einziehung § 54 Abs. 1.',
+      owi: 'Keine (Vorrang des Verbrechenstatbestands).'
+    },
+    {
+      id: 'getarnte_sw',
+      category: 'verbotene_sw',
+      name: 'Getarnte Schusswaffen',
+      shortRef: 'Anl. 2 Abschn. 1 Nr. 1.2.2',
+      status: 'verboten',
+      badge: 'Verboten',
+      definition: 'Schusswaffen, die ihrer Form nach geeignet sind, einen anderen Gegenstand vorzutäuschen oder mit Gegenständen des täglichen Gebrauchs verkleidet sind (z. B. Schießkugelschreiber, Stockgewehre, Koppelschloss- oder Taschenlampenpistolen).',
+      besitz: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Jeglicher Umgang ist verboten.' },
+      fuehren: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Ausnahmslos verboten.' },
+      schiessen: { level: 'verboten', label: 'Verboten', detail: 'Ausnahmslos verboten.' },
+      straftat: '§ 52 Abs. 3 Nr. 1 WaffG (Freiheitsstrafe bis 3 Jahre oder Geldstrafe; fahrlässig Abs. 4). Zwingende Einziehung § 54 Abs. 1.',
+      owi: 'Keine (Vorrang der Straftat).'
+    },
+    {
+      id: 'wildererwaffe',
+      category: 'verbotene_sw',
+      name: 'Übermäßig verkürzbare / zerlegbare Schusswaffen',
+      shortRef: 'Anl. 2 Abschn. 1 Nr. 1.2.3',
+      status: 'verboten',
+      badge: 'Verboten',
+      definition: 'Schusswaffen, die über den für Jagd- und Sportzwecke allgemein üblichen Umfang hinaus zusammengeklappt, zusammengeschoben, verkürzt oder schnell zerlegt werden können.',
+      besitz: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Jeglicher Umgang ist verboten.' },
+      fuehren: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Ausnahmslos verboten.' },
+      schiessen: { level: 'verboten', label: 'Verboten', detail: 'Ausnahmslos verboten.' },
+      straftat: '§ 52 Abs. 3 Nr. 1 WaffG (Freiheitsstrafe bis 3 Jahre oder Geldstrafe; fahrlässig Abs. 4). Zwingende Einziehung § 54 Abs. 1.',
+      owi: 'Keine (Vorrang der Straftat).'
+    },
+    {
+      id: 'kurzwaffe_63',
+      category: 'verbotene_sw',
+      name: 'Mehrschüssige Kurzwaffen < 6,3 mm (ab BJ 1970)',
+      shortRef: 'Anl. 2 Abschn. 1 Nr. 1.2.5',
+      status: 'verboten',
+      badge: 'Verboten',
+      definition: 'Mehrschüssige Kurzwaffen mit Baujahr nach dem 01.01.1970 für Zentralfeuermunition in Kalibern unter 6,3 mm, sofern der Geschossantrieb nicht ausschließlich durch den Zündsatz erfolgt.',
+      besitz: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Jeglicher Umgang ist verboten.' },
+      fuehren: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Ausnahmslos verboten.' },
+      schiessen: { level: 'verboten', label: 'Verboten', detail: 'Ausnahmslos verboten.' },
+      straftat: '§ 52 Abs. 3 Nr. 1 WaffG (Freiheitsstrafe bis 3 Jahre oder Geldstrafe; fahrlässig Abs. 4). Zwingende Einziehung § 54 Abs. 1.',
+      owi: 'Keine (Vorrang der Straftat).'
+    },
+    {
+      id: 'halbautomat_mag',
+      category: 'verbotene_sw',
+      name: 'Halbautomaten mit großem eingebautem Magazin',
+      shortRef: 'Anl. 2 Abschn. 1 Nr. 1.2.6 / 1.2.7',
+      status: 'verboten',
+      badge: 'Verboten',
+      definition: 'Halbautomatische Zentralfeuerwaffen mit fest eingebautem Magazin über 20 Patronen bei Kurzwaffen (Nr. 1.2.6) bzw. über 10 Patronen bei Langwaffen (Nr. 1.2.7).',
+      besitz: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Umgang verboten (Altbesitz vor 13.06.2017 mit WBK nach § 58 Abs. 18 oder BKA-Ausnahme nach § 40 Abs. 4).' },
+      fuehren: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Ohne Ausnahme nach § 40 Abs. 4 verboten.' },
+      schiessen: { level: 'verboten', label: 'Verboten', detail: 'Ohne Ausnahme verboten.' },
+      straftat: 'Bei unerlaubtem Besitz/Führen der Waffe ohne WBK/Waffenschein: § 52 Abs. 1 Nr. 2b (KW) bzw. § 52 Abs. 3 Nr. 2a (LW). Zudem Sicherstellung/Einziehung nach § 46 Abs. 3, 4 und 7 WaffG.',
+      owi: '§ 53 Abs. 1 Nr. 4 (Zuwiderhandlung gegen vollziehbare Anordnung nach § 46 Abs. 3 Satz 1) – bis 10.000 €.'
+    },
+    {
+      id: 'verbotene_salut',
+      category: 'verbotene_sw',
+      name: 'Salutwaffen aus verbotenen Schusswaffen',
+      shortRef: 'Anl. 2 Abschn. 1 Nr. 1.2.8',
+      status: 'verboten',
+      badge: 'Verboten',
+      definition: 'Nach Anlage 2 Abschnitt 1 verbotene Schusswaffen (z. B. Vollautomaten), die zu Salutwaffen nach Anlage 1 Abschnitt 1 UA 1 Nr. 1.5 umgebaut wurden.',
+      besitz: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Umgang verboten (ohne BKA-Ausnahme nach § 40 Abs. 4; Altbesitzregelung § 58 Abs. 16).' },
+      fuehren: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Ausnahmslos verboten.' },
+      schiessen: { level: 'verboten', label: 'Verboten', detail: 'Ausnahmslos verboten.' },
+      straftat: 'Sicherstellung/Einziehung nach § 46 Abs. 3, 4 und 7 WaffG; bei fehlender Erlaubnis für Salutwaffen zudem § 52 Abs. 3 Nr. 2a WaffG prüfen.',
+      owi: '§ 53 Abs. 1 Nr. 4 (Zuwiderhandlung gegen vollziehbare Anordnung nach § 46 Abs. 3 Satz 1) – bis 10.000 €.'
+    },
+
+    // ==================== 4. ERLAUBNISPFLICHTIGE SCHUSSWAFFEN ====================
+    {
+      id: 'pistole_ha',
+      category: 'erlaubnis_sw',
+      name: 'Halbautomatische Kurzwaffen (Pistolen)',
+      shortRef: 'Anl. 2 Abschn. 2 UA 1',
+      status: 'erlaubnis',
+      badge: 'WBK / Waffenschein',
+      definition: 'Selbstladende Kurzwaffen (Lauf + Verschluss ≤ 30 cm oder Gesamtlänge ≤ 60 cm), bei denen pro Abzugsbetätigung ein Schuss abgegeben wird (Anl. 1 UA 1 Nr. 2.2, 2.5).',
+      besitz: { level: 'erlaubnis', label: 'WBK erforderlich (§ 10 Abs. 1)', detail: 'Erwerb und Besitz nur mit Waffenbesitzkarte (WBK) und Bedürfnis (§ 4, §§ 13 ff.).' },
+      fuehren: { level: 'erlaubnis', label: 'Waffenschein erforderlich (§ 10 Abs. 4)', detail: 'Ausnahmen: nicht schuss- und nicht zugriffsbereiter Transport im verschlossenen Behältnis zu bedürfnisumfasstem Zweck (§ 12 Abs. 3 Nr. 2), befugte Jagdausübung (§ 13 Abs. 6).' },
+      schiessen: { level: 'erlaubnis', label: 'Schießerlaubnis erforderlich (§ 10 Abs. 5)', detail: 'Erlaubnisfrei auf zugelassenen Schießstätten (§ 12 Abs. 4) sowie zur befugten Jagd (§ 13 Abs. 6).' },
+      straftat: '§ 52 Abs. 1 Nr. 2b WaffG (erhöhter Strafrahmen bei Patronenmunition: Freiheitsstrafe 6 Monate bis 5 Jahre; fahrlässig Abs. 4: bis 2 Jahre). § 52 Abs. 3 Nr. 9 (öff. Veranstaltung). Einziehung § 54 Abs. 1.',
+      owi: '§ 53 Abs. 1 Nr. 3 (Schießen ohne Erlaubnis), Nr. 20 (Ausweis-/WBK-Mitführpflicht § 38) – bis 10.000 €.'
+    },
+    {
+      id: 'revolver_langwaffe',
+      category: 'erlaubnis_sw',
+      name: 'Revolver, Repetier-, Einzellader- & HA-Langwaffen',
+      shortRef: 'Anl. 2 Abschn. 2 UA 1',
+      status: 'erlaubnis',
+      badge: 'WBK / Waffenschein',
+      definition: 'Double-Action-/Single-Action-Revolver (keine Halbautomaten nach Anl. 1 UA 1 Nr. 2.2), Repetierwaffen, Einzellader sowie erlaubte halbautomatische Langwaffen.',
+      besitz: { level: 'erlaubnis', label: 'WBK erforderlich (§ 10 Abs. 1)', detail: 'Erwerb und Besitz nur mit WBK (Jäger dürfen Langwaffen auf Jahresjagdschein erwerben und müssen binnen 2 Wochen WBK beantragen, § 13 Abs. 3).' },
+      fuehren: { level: 'erlaubnis', label: 'Waffenschein erforderlich (§ 10 Abs. 4)', detail: 'Ausnahmen: Transport nicht schuss-/zugriffsbereit zu bedürfnisumfasstem Zweck (§ 12 Abs. 3 Nr. 2), befugte Jagdausübung (§ 13 Abs. 6), Sportwettkämpfe (§ 12 Abs. 3 Nr. 3).' },
+      schiessen: { level: 'erlaubnis', label: 'Schießerlaubnis erforderlich (§ 10 Abs. 5)', detail: 'Erlaubnisfrei auf Schießstätten (§ 12 Abs. 4) und zur befugten Jagd (§ 13 Abs. 6).' },
+      straftat: '§ 52 Abs. 3 Nr. 2a WaffG (Freiheitsstrafe bis 3 Jahre oder Geldstrafe; fahrlässig Abs. 4). § 52 Abs. 3 Nr. 9 (öff. Veranstaltung). Einziehung § 54 Abs. 1.',
+      owi: '§ 53 Abs. 1 Nr. 3 (Schießen ohne Erlaubnis), Nr. 7 (WBK-Frist § 13 Abs. 3), Nr. 20 (Ausweispflicht § 38) – bis 10.000 €.'
+    },
+    {
+      id: 'feuerwaffe_75j',
+      category: 'erlaubnis_sw',
+      name: 'Feuerwaffen ≤ 7,5 J mit „F“-Zeichen',
+      shortRef: 'Anl. 2 Abschn. 2 UA 3 Nr. 1.1',
+      status: 'erlaubnis',
+      badge: 'WBK (ohne Bedürfnis)',
+      definition: 'Feuerwaffen (Antrieb durch heiße Gase, z. B. Kal. 4 mm M20 / 4 mm Randzünder), deren Geschossen max. 7,5 Joule erteilt werden und die das F-im-Fünfeck tragen.',
+      besitz: { level: 'erlaubnis', label: 'WBK erforderlich (ohne Bedürfnisnachweis)', detail: 'Erleichterte Erlaubnis nach Anl. 2 Abschn. 2 UA 3 Nr. 1.1: Bedürfnis (§ 4 Abs. 1 Nr. 4) entfällt, aber Alter, Zuverlässigkeit, Eignung und Sachkunde sind erforderlich.' },
+      fuehren: { level: 'erlaubnis', label: 'Waffenschein erforderlich (§ 10 Abs. 4)', detail: 'Ausnahme: Transport nicht schuss- und nicht zugriffsbereit (§ 12 Abs. 3 Nr. 2).' },
+      schiessen: { level: 'erlaubnis', label: 'Schießerlaubnis erforderlich (§ 10 Abs. 5)', detail: 'Erlaubnisfrei auf Schießstätten sowie im befriedeten Besitztum, sofern Geschosse das Grundstück nicht verlassen können (§ 12 Abs. 4 Nr. 1a).' },
+      straftat: '§ 52 Abs. 3 Nr. 2a WaffG (Erwerb, Besitz oder Führen ohne Erlaubnis – FS bis 3 J. oder Geldstrafe).',
+      owi: '§ 53 Abs. 1 Nr. 3 (Schießen außerhalb der Ausnahmen), Nr. 20 (Ausweispflicht § 38) – bis 10.000 €.'
+    },
+    {
+      id: 'druckluft_erlaubnis',
+      category: 'erlaubnis_sw',
+      name: 'Druckluft- / CO₂-Waffen > 7,5 J oder ohne „F“',
+      shortRef: 'Anl. 2 Abschn. 2 UA 1 & UA 2 Nr. 1.1',
+      status: 'erlaubnis',
+      badge: 'WBK / Waffenschein',
+      definition: 'Druckluft-, Federdruck- und Kaltgaswaffen mit > 7,5 Joule, ohne F-Zeichen (ohne Altbestand vor 1970 / DDR vor 02.04.1991) ODER mehrschüssig für Geschosse über 30 mm Länge (Nr. 1.1a).',
+      besitz: { level: 'erlaubnis', label: 'WBK erforderlich (§ 10 Abs. 1)', detail: 'Erlaubnispflichtig wie scharfe Schusswaffen (vollständige Voraussetzungen des § 4 WaffG).' },
+      fuehren: { level: 'erlaubnis', label: 'Waffenschein erforderlich (§ 10 Abs. 4)', detail: 'Ausnahme: Transport nicht schuss- und nicht zugriffsbereit (§ 12 Abs. 3 Nr. 2).' },
+      schiessen: { level: 'erlaubnis', label: 'Schießerlaubnis erforderlich (§ 10 Abs. 5)', detail: 'Erlaubnisfrei nur auf zugelassenen Schießstätten (§ 12 Abs. 4).' },
+      straftat: '§ 52 Abs. 3 Nr. 2a WaffG (Freiheitsstrafe bis 3 Jahre oder Geldstrafe; fahrlässig Abs. 4). Einziehung § 54 Abs. 1.',
+      owi: '§ 53 Abs. 1 Nr. 3 (Schießen ohne Erlaubnis), Nr. 20 (Ausweispflicht) – bis 10.000 €.'
+    },
+    {
+      id: 'pfeilabschuss',
+      category: 'erlaubnis_sw',
+      name: 'Pfeilabschussgeräte',
+      shortRef: 'Anl. 1 UA 1 Nr. 1.2.3 / Anl. 2 UA 1',
+      status: 'erlaubnis',
+      badge: 'WBK / Waffenschein',
+      definition: 'Den Schusswaffen gleichgestellte tragbare Gegenstände (keine Armbrüste), die feste Körper (Pfeile) gezielt verschießen, wobei die Antriebsenergie gespeichert/gehalten werden kann (z. B. Pressluft-Pfeilabschussgeräte).',
+      besitz: { level: 'erlaubnis', label: 'WBK erforderlich (§ 10 Abs. 1)', detail: 'Nicht von der Erlaubnispflicht freigestellt (anders als Armbrüste!). Erwerb und Besitz erfordern eine WBK.' },
+      fuehren: { level: 'erlaubnis', label: 'Waffenschein erforderlich (§ 10 Abs. 4)', detail: 'Transport nur nicht schuss- und nicht zugriffsbereit (§ 12 Abs. 3 Nr. 2).' },
+      schiessen: { level: 'erlaubnis', label: 'Schießerlaubnis erforderlich (§ 10 Abs. 5)', detail: 'Erlaubnisfrei nur auf Schießstätten (§ 12 Abs. 4).' },
+      straftat: '§ 52 Abs. 3 Nr. 2a WaffG (Freiheitsstrafe bis 3 Jahre oder Geldstrafe; fahrlässig Abs. 4). Einziehung § 54 Abs. 1.',
+      owi: '§ 53 Abs. 1 Nr. 3 (Schießen ohne Erlaubnis), Nr. 20 (Ausweispflicht) – bis 10.000 €.'
+    },
+    {
+      id: 'salutwaffe',
+      category: 'erlaubnis_sw',
+      name: 'Salutwaffen (umgebaute Langwaffen)',
+      shortRef: 'Anl. 1 UA 1 Nr. 1.5 / § 39b',
+      status: 'erlaubnis',
+      badge: 'WBK (§ 39b)',
+      definition: 'Dauerhaft für Kartuschenmunition abgeänderte Langwaffen (mit Prüfzeichen nach BeschV), sofern Ursprungswaffe nicht nach Anlage 2 Abschn. 1 verboten war.',
+      besitz: { level: 'erlaubnis', label: 'WBK erforderlich (§ 39b WaffG)', detail: 'Bedürfnis insbesondere für Theater, Film/TV, Kultur oder Brauchtum (§ 39b Abs. 1). Kein Sachkundenachweis erforderlich (§ 39b Abs. 2).' },
+      fuehren: { level: 'erlaubnis', label: 'Waffenschein erforderlich (§ 10 Abs. 4)', detail: 'Ausnahmen für Theateraufführungen (§ 42 Abs. 4 Nr. 1), Brauchtumsschützen (§ 16 Abs. 2, 4) und Transport (§ 12 Abs. 3 Nr. 2).' },
+      schiessen: { level: 'erlaubnis', label: 'Schießerlaubnis erforderlich (§ 10 Abs. 5)', detail: 'Erlaubnisfrei im befriedeten Besitztum mit Zustimmung des Hausrechtsinhabers (§ 12 Abs. 4 Nr. 1b) oder bei Theateraufführungen (§ 12 Abs. 4 Nr. 3a).' },
+      straftat: '§ 52 Abs. 3 Nr. 2a WaffG (Freiheitsstrafe bis 3 Jahre oder Geldstrafe; fahrlässig Abs. 4). Einziehung § 54 Abs. 1.',
+      owi: '§ 53 Abs. 1 Nr. 3 (Schießen), Nr. 20 (Ausweispflicht) – bis 10.000 €.'
+    },
+    {
+      id: 'wesentliche_teile',
+      category: 'erlaubnis_sw',
+      name: 'Wesentliche Teile & Schalldämpfer',
+      shortRef: 'Anl. 1 UA 1 Nr. 1.3',
+      status: 'erlaubnis',
+      badge: 'Wie Hauptwaffe',
+      definition: 'Lauf/Gaslauf, Verschluss, Patronen-/Kartuschenlager, Gehäuse/Griffstück (Ober- & Unterteil), Verbrennungskammer, vorgearbeitete Teile sowie Schalldämpfer stehen der jeweiligen Schusswaffe gleich.',
+      besitz: { level: 'erlaubnis', label: 'Erlaubnispflicht wie zugehörige Waffe', detail: 'Für erlaubnispflichtige Waffen ist WBK erforderlich. Ausnahmen für WBK-Inhaber: Wechselsysteme gleichen/kleineren Kalibers & Einsteckläufe (Anl. 2 Abschn. 2 UA 2 Nr. 2, 2a; Anzeige § 37a). Jäger: Schalldämpfer für Zentralfeuer-Langwaffen (§ 13 Abs. 9).' },
+      fuehren: { level: 'erlaubnis', label: 'Wie zugehörige Waffe', detail: 'Ausnahme nach § 12 Abs. 3 Nr. 6 bei vorübergehender Aufbewahrung außerhalb der Wohnung (Entnahme eines wesentlichen Teils, sofern nicht schussfähig zusammenfügbar).' },
+      straftat: 'Wie Hauptwaffe: § 51 Abs. 1 (Teile verbotener Vollautomaten/Pumpguns), § 52 Abs. 1 Nr. 2b (Teile halbautomatischer Kurzwaffen), § 52 Abs. 3 Nr. 1 oder Nr. 2a.',
+      owi: '§ 53 Abs. 1 Nr. 8 (fehlende Anzeige nach § 37a) – bis 10.000 €.'
+    },
+    {
+      id: 'srs_ohne_ptb',
+      category: 'erlaubnis_sw',
+      name: 'SRS-Waffen OHNE PTB-/EU-Zeichen',
+      shortRef: 'Anl. 2 Abschn. 2 UA 1',
+      status: 'erlaubnis',
+      badge: 'WBK / Großer WS',
+      definition: 'Schreckschuss-, Reizstoff- und Signalwaffen, die weder das deutsche PTB-Zulassungszeichen noch eine notifizierte EU-Konformität nach RL (EU) 2019/69 besitzen.',
+      besitz: { level: 'erlaubnis', label: 'WBK erforderlich (§ 10 Abs. 1)', detail: 'Ohne Prüfzeichen entfällt die Erlaubnisfreiheit nach Anl. 2 Abschn. 2 UA 2 Nr. 1.3 vollständig.' },
+      fuehren: { level: 'erlaubnis', label: 'Großer Waffenschein erforderlich (§ 10 Abs. 4)', detail: 'Der Kleine Waffenschein gilt hier NICHT!' },
+      schiessen: { level: 'erlaubnis', label: 'Schießerlaubnis erforderlich (§ 10 Abs. 5)', detail: 'Nur mit Schießerlaubnis oder auf Schießstätten (§ 12 Abs. 4).' },
+      straftat: '§ 52 Abs. 3 Nr. 2a WaffG (Freiheitsstrafe bis 3 Jahre oder Geldstrafe; fahrlässig Abs. 4). Einziehung § 54 Abs. 1.',
+      owi: '§ 53 Abs. 1 Nr. 3 (Schießen ohne Erlaubnis) – bis 10.000 €.'
+    },
+    {
+      id: 'schussgeraet_ohne_ptb',
+      category: 'erlaubnis_sw',
+      name: 'Schussgeräte ohne BeschG-Zulassung',
+      shortRef: 'Anl. 1 UA 1 Nr. 1.2.2',
+      status: 'erlaubnis',
+      badge: 'WBK / Waffenschein',
+      definition: 'Tragbare Befestigungsgeräte mit Treibladung, Bolzensetz- oder Schlachtgeräte ohne Bauartzulassung (§ 7 BeschG / PTB) und ohne EG-Maschinenrichtlinien-Nachweis.',
+      besitz: { level: 'erlaubnis', label: 'WBK erforderlich (§ 10 Abs. 1)', detail: 'Den Schusswaffen gleichgestellt und erlaubnispflichtig (mit PTB-/EG-Nachweis vom WaffG ausgenommen).' },
+      fuehren: { level: 'erlaubnis', label: 'Waffenschein erforderlich (§ 10 Abs. 4)', detail: 'Führen außerhalb befriedeten Besitztums nur mit Erlaubnis.' },
+      schiessen: { level: 'erlaubnis', label: 'Schießerlaubnis erforderlich (§ 10 Abs. 5)', detail: 'Ausnahme nur im Rahmen § 12 Abs. 4.' },
+      straftat: '§ 52 Abs. 3 Nr. 2a WaffG (Freiheitsstrafe bis 3 Jahre oder Geldstrafe; fahrlässig Abs. 4).',
+      owi: '§ 53 Abs. 1 Nr. 3 (Schießen ohne Erlaubnis) – bis 10.000 €.'
+    },
+
+    // ==================== 5. FREIE SCHUSSWAFFEN & SONSTIGE ====================
+    {
+      id: 'srs_ptb',
+      category: 'freie_sw',
+      name: 'Schreckschuss-, Reizstoff- & Signalwaffen (PTB)',
+      shortRef: 'Anl. 2 UA 2 Nr. 1.3 / UA 3 Nr. 2.1',
+      status: 'erlaubnis',
+      badge: 'Frei ab 18 / KWS',
+      definition: 'Schreckschuss-, Reizstoff- und Signalwaffen mit PTB-Zeichen im Kreis oder notifizierter EU-Zulassung nach RL (EU) 2019/69 (Anl. 1 UA 1 Nr. 2.6–2.8).',
+      besitz: { level: 'frei', label: 'Erlaubnisfrei ab 18 Jahren (§ 2 Abs. 1)', detail: 'Erwerb, Besitz sowie Verbringen/Mitnahme nach DE sind ab 18 Jahren erlaubnisfrei.' },
+      fuehren: { level: 'erlaubnis', label: 'Kleiner Waffenschein (KWS) erforderlich', detail: 'Führen nur mit KWS (§ 10 Abs. 4 Satz 4) + Personalausweis/Pass (§ 38). Transport ohne KWS nur nicht schuss- und nicht zugriffsbereit (§ 12 Abs. 3 Nr. 2). VERBOTEN bei öff. Veranstaltungen (§ 42 Abs. 1), im Fernverkehr (§ 42b) und in Verbotszonen (§ 42 Abs. 5 – KWS ist dort keine Ausnahme!).' },
+      schiessen: { level: 'erlaubnis', label: 'Schießerlaubnis erforderlich (§ 10 Abs. 5)', detail: 'Ohne Erlaubnis zulässig nur im eigenen befriedeten Besitztum mit Zustimmung des Hausrechtsinhabers (§ 12 Abs. 4 Nr. 1b), auf Schießstätten, zur Vogelabwehr in der Landwirtschaft, im Theater oder als Startzeichen (§ 12 Abs. 4 Nr. 3–5) sowie bei Notwehr.' },
+      straftat: '§ 52 Abs. 3 Nr. 2a WaffG (Führen ohne Kleinen Waffenschein! FS bis 3 J. oder Geldstrafe); § 52 Abs. 3 Nr. 9 (Führen bei öff. Veranstaltung § 42 Abs. 1). Einziehung § 54 Abs. 1.',
+      owi: '§ 53 Abs. 1 Nr. 1 (< 18 J.), Nr. 3 (Schießen ohne Erlaubnis), Nr. 20 (KWS/Ausweis nicht mitgeführt), Nr. 21c (Fernverkehr § 42b), Nr. 23 (Verbotszone § 42 Abs. 5) – bis 10.000 €.'
+    },
+    {
+      id: 'druckluft_frei',
+      category: 'freie_sw',
+      name: 'Druckluft- / CO₂-Waffen ≤ 7,5 J („F“-Zeichen)',
+      shortRef: 'Anl. 2 Abschn. 2 UA 2 Nr. 1.1 / 1.2',
+      status: 'erlaubnis',
+      badge: 'Frei ab 18 / Führen WS',
+      definition: 'Druckluft-, Federdruck- und Kaltgaswaffen (inkl. Paintball/Softair > 0,5 J bis 7,5 J) mit F-im-Fünfeck (nicht mehrschüssig > 30 mm Geschosslänge) sowie Altbestand vor 01.01.1970 (DDR: vor 02.04.1991).',
+      besitz: { level: 'frei', label: 'Erlaubnisfrei ab 18 Jahren (§ 2 Abs. 1)', detail: 'Erwerb, Besitz und Verbringen sind ab 18 Jahren erlaubnisfrei.' },
+      fuehren: { level: 'erlaubnis', label: 'Waffenschein erforderlich (§ 10 Abs. 4)', detail: 'Kein Führen ohne Waffenschein (auch nicht mit KWS!). Transport nur nicht schuss- und nicht zugriffsbereit im verschlossenen Behältnis (§ 12 Abs. 3 Nr. 2). Häufig zudem Anscheinswaffe (§ 42a).' },
+      schiessen: { level: 'erlaubnis', label: 'Schießerlaubnis erforderlich (§ 10 Abs. 5)', detail: 'Erlaubnisfrei auf Schießstätten oder im befriedeten Besitztum, sofern Geschosse das Grundstück nicht verlassen können (§ 12 Abs. 4 Nr. 1a).' },
+      straftat: '§ 52 Abs. 3 Nr. 2a WaffG (Führen ohne Waffenschein – FS bis 3 J. oder Geldstrafe); § 52 Abs. 3 Nr. 9 (öff. Veranstaltung § 42 Abs. 1).',
+      owi: '§ 53 Abs. 1 Nr. 1 (< 18 J.), Nr. 3 (Schießen außerhalb der Ausnahmen), Nr. 21b (Anscheinswaffe § 42a), Nr. 21c (§ 42b) – bis 10.000 €.'
+    },
+    {
+      id: 'armbrust',
+      category: 'freie_sw',
+      name: 'Armbrüste',
+      shortRef: 'Anl. 2 Abschn. 2 UA 2 Nr. 1.8 / 3.2',
+      status: 'frei',
+      badge: 'Frei ab 18',
+      definition: 'Den Schusswaffen gleichgestellte tragbare Gegenstände, bei denen Muskelkraft durch eine Sperrvorrichtung gespeichert wird (Anl. 1 Abschn. 1 UA 1 Nr. 1.2.3).',
+      besitz: { level: 'frei', label: 'Erlaubnisfrei ab 18 Jahren (§ 2 Abs. 1)', detail: 'Erwerb, Besitz, Herstellung, Handel und Verbringen sind ab 18 Jahren erlaubnisfrei (Nr. 1.8, 4.2, 7.7).' },
+      fuehren: { level: 'frei', label: 'Erlaubnisfrei ab 18 Jahren (Nr. 3.2)', detail: 'Führen ist erlaubnisfrei, aber VERBOTEN bei öffentlichen Veranstaltungen (§ 42 Abs. 1), im Personenfernverkehr (§ 42b) und in Waffenverbotszonen (§ 42 Abs. 5).' },
+      schiessen: { level: 'frei', label: 'Kein Schießen i.S.d. WaffG', detail: 'Keine waffenrechtliche Schießerlaubnis erforderlich (kein Lauf, keine Munition nach Anl. 1 Abschn. 2 Nr. 7).' },
+      straftat: '§ 52 Abs. 3 Nr. 9 WaffG (Führen bei öffentlicher Veranstaltung § 42 Abs. 1 – FS bis 3 J. oder Geldstrafe).',
+      owi: '§ 53 Abs. 1 Nr. 1 (< 18 J.), Nr. 16 (Überlassen an Minderjährige), Nr. 21c (Fernverkehr § 42b), Nr. 23 (Verbotszone § 42 Abs. 5) – bis 10.000 €.'
+    },
+    {
+      id: 'lunte_funken',
+      category: 'freie_sw',
+      name: 'Vorderlader: Lunten- & Funkenzündung (< 1871)',
+      shortRef: 'Anl. 2 Abschn. 2 UA 2 Nr. 1.6 / 3.1',
+      status: 'frei',
+      badge: 'Frei ab 18',
+      definition: 'Schusswaffen mit Lunten- oder Funkenzündung (z. B. Steinschlosspistole/-gewehr), deren historisches Modell vor dem 01.01.1871 entwickelt worden ist.',
+      besitz: { level: 'frei', label: 'Erlaubnisfrei ab 18 Jahren (§ 2 Abs. 1)', detail: 'Erwerb, Besitz, Herstellung und Handel sind ab 18 Jahren erlaubnisfrei (Nr. 1.6, 4.1).' },
+      fuehren: { level: 'frei', label: 'Erlaubnisfrei ab 18 Jahren (Nr. 3.1)', detail: 'Führen erlaubnisfrei, aber VERBOTEN bei öffentlichen Veranstaltungen (§ 42 Abs. 1), im Fernverkehr (§ 42b) und in Verbotszonen (§ 42 Abs. 5).' },
+      schiessen: { level: 'erlaubnis', label: 'Schießerlaubnis + SprengG erforderlich', detail: 'Schießen nur auf Schießstätten (§ 12 Abs. 4) oder mit Schießerlaubnis (§ 10 Abs. 5); für Schwarzpulver ist eine sprengstoffrechtliche Erlaubnis (§ 27 SprengG) nötig.' },
+      straftat: '§ 52 Abs. 3 Nr. 9 WaffG (Führen bei öff. Veranstaltung § 42 Abs. 1); ggf. § 40 SprengG bei unerlaubtem Schwarzpulverbesitz.',
+      owi: '§ 53 Abs. 1 Nr. 1 (< 18 J.), Nr. 3 (Schießen ohne Erlaubnis), Nr. 21c (§ 42b), Nr. 23 (Verbotszone) – bis 10.000 €.'
+    },
+    {
+      id: 'perkussion',
+      category: 'freie_sw',
+      name: 'Vorderlader: Perkussion & Zündnadel (< 1871)',
+      shortRef: 'Anl. 2 Abschn. 2 UA 2 Nr. 1.5 / 1.7',
+      status: 'erlaubnis',
+      badge: 'Frei ab 18 / Führen WS',
+      definition: 'Einläufige Einzelladerwaffen mit Zündhütchenzündung (Perkussionswaffen, Nr. 1.5) sowie Schusswaffen mit Zündnadelzündung (Nr. 1.7), deren Modell vor dem 01.01.1871 entwickelt wurde.',
+      besitz: { level: 'frei', label: 'Erlaubnisfrei ab 18 Jahren (§ 2 Abs. 1)', detail: 'Erwerb, Besitz und Handel sind ab 18 Jahren erlaubnisfrei (mehrschüssige Perkussionsrevolver sind hingegen WBK-pflichtig!).' },
+      fuehren: { level: 'erlaubnis', label: 'Waffenschein erforderlich (§ 10 Abs. 4)', detail: 'Im Gegensatz zu Funkenzündung ist das Führen NICHT erlaubnisfrei! Transport nur nicht schuss- und nicht zugriffsbereit (§ 12 Abs. 3 Nr. 2).' },
+      schiessen: { level: 'erlaubnis', label: 'Schießerlaubnis + SprengG erforderlich', detail: 'Schießen nur auf Schießstätten (§ 12 Abs. 4) oder mit Schießerlaubnis (§ 10 Abs. 5) + § 27 SprengG für Schwarzpulver.' },
+      straftat: '§ 52 Abs. 3 Nr. 2a WaffG (Führen ohne Waffenschein – FS bis 3 J. oder Geldstrafe); § 52 Abs. 3 Nr. 9 (öff. Veranstaltung).',
+      owi: '§ 53 Abs. 1 Nr. 1 (< 18 J.), Nr. 3 (Schießen ohne Erlaubnis) – bis 10.000 €.'
+    },
+    {
+      id: 'dekowaffe',
+      category: 'freie_sw',
+      name: 'Dekorationswaffen (unbrauchbar gemacht)',
+      shortRef: 'Anl. 1 UA 1 Nr. 1.4 / § 37d',
+      status: 'fuehrverbot',
+      badge: 'Anzeige § 37d / § 42a',
+      definition: 'Nach Durchführungsverordnung (EU) 2015/2403 dauerhaft unbrauchbar gemachte Schusswaffen mit EU-Deaktivierungsbescheinigung und amtlicher Kennzeichnung.',
+      besitz: { level: 'frei', label: 'Erlaubnisfrei ab 18 J., aber anzeigepflichtig', detail: 'Erwerb, Besitz und Überlassen sind erlaubnisfrei (Anl. 2 UA 2 Nr. 2b), aber binnen 2 Wochen der Waffenbehörde anzuzeigen (§ 37d Abs. 1, 3).' },
+      fuehren: { level: 'verboten', label: 'Führverbot als Anscheinswaffe (§ 42a)', detail: 'Zwar nach Anl. 2 UA 2 Nr. 3.3 vom Waffenschein befreit, aber als Anscheinswaffe nach Anl. 1 UA 1 Nr. 1.6.3 gilt das Führverbot des § 42a Abs. 1 Nr. 1 (Transport nur verschlossen).' },
+      schiessen: { level: 'verboten', label: 'Technisch ausgeschlossen', detail: 'Dauerhaft unbrauchbar gemacht.' },
+      straftat: 'Keine (bei ordnungsgemäßer EU-Deaktivierung; fehlt diese, gilt sie waffenrechtlich als scharfe Schusswaffe → § 51 / § 52 WaffG).',
+      owi: '§ 53 Abs. 1 Nr. 8 (unterlassene Anzeige nach § 37d), Nr. 21b (Führen als Anscheinswaffe § 42a) – bis 10.000 €.'
+    },
+    {
+      id: 'anscheinswaffe',
+      category: 'freie_sw',
+      name: 'Anscheinswaffen, Nachbildungen & Softair ≤ 0,5 J',
+      shortRef: 'Anl. 1 Nr. 1.6 & 6 / Anl. 2 Abschn. 3 UA 2',
+      status: 'fuehrverbot',
+      badge: 'Führverbot § 42a',
+      definition: 'Spielzeug-Schusswaffen ≤ 0,5 J (Anl. 2 Abschn. 3 UA 2 Nr. 1) und Nachbildungen (Nr. 4), die wie echte Feuerwaffen aussehen (ausgenommen erkennbares Spielzeug wie Neonfarben oder ±50 % Größe).',
+      besitz: { level: 'frei', label: 'Vom WaffG ausgenommen (außer § 42a)', detail: 'Erwerb und Besitz sind frei (kein gesetzliches Mindestalter nach WaffG).' },
+      fuehren: { level: 'verboten', label: 'Führverbot (§ 42a Abs. 1 Nr. 1)', detail: 'Führen in der Öffentlichkeit verboten. Ausnahmen nur für Film-/Theateraufnahmen oder Transport im verschlossenen Behältnis (§ 42a Abs. 2 Nr. 1, 2).' },
+      schiessen: { level: 'frei', label: 'Vom WaffG ausgenommen (≤ 0,5 J)', detail: 'Kein waffenrechtliches Schießverbot.' },
+      straftat: 'Keine nach dem WaffG.',
+      owi: '§ 53 Abs. 1 Nr. 21b WaffG (Führen entgegen § 42a Abs. 1 Nr. 1) – Geldbuße bis 10.000 €. Einziehung möglich (§ 54 Abs. 2).'
+    },
+    {
+      id: 'blasrohr_harpune',
+      category: 'freie_sw',
+      name: 'Harpunen, Blasrohre & Amorces-Spielzeug',
+      shortRef: 'Anl. 2 Abschn. 3 UA 1 & UA 2 Nr. 2, 3',
+      status: 'frei',
+      badge: 'Frei (Harpune ab 18)',
+      definition: 'Unterwassersportgeräte/Harpunen ohne Munitionsantrieb (Abschn. 3 UA 1), Blasrohre ohne Energiespeicherung (UA 2 Nr. 2) sowie Spielzeug für Zündblättchen/Amorces/Knallkorken (UA 2 Nr. 3).',
+      besitz: { level: 'frei', label: 'Frei (Harpunengeräte erst ab 18 J.)', detail: 'Blasrohre und Amorces sind vom WaffG ausgenommen (außer § 42a). Für Harpunengeräte gelten § 2 Abs. 1 (ab 18 J.) und § 41 (Einzelfallverbot).' },
+      fuehren: { level: 'frei', label: 'Erlaubnisfrei (außer Anscheinswaffe § 42a)', detail: 'Sofern eine Amorces-Spielzeugwaffe wie eine echte Feuerwaffe aussieht, greift das Führverbot des § 42a Abs. 1 Nr. 1.' },
+      schiessen: { level: 'frei', label: 'Vom WaffG ausgenommen', detail: 'Keine waffenrechtliche Schießerlaubnis erforderlich.' },
+      straftat: 'Keine nach dem WaffG.',
+      owi: '§ 53 Abs. 1 Nr. 1 (Harpunen unter 18 J.), Nr. 21b (falls Anscheinswaffe nach § 42a) – bis 10.000 €.'
+    },
+
+    // ==================== 6. REIZSTOFF, ELEKTRO & BRAND ====================
+    {
+      id: 'reizstoff_ptb',
+      category: 'reiz_elektro',
+      name: 'Reizstoffsprühgerät MIT Prüfzeichen (CS)',
+      shortRef: 'Anl. 2 Abschn. 1 Nr. 1.3.5 / § 3 Abs. 2',
+      status: 'frei',
+      badge: 'Frei ab 14 J.',
+      definition: 'Reizstoffsprühgeräte mit Reichweite bis 2 m (Anl. 1 UA 2 Nr. 1.2.2), die amtlich als gesundheitlich unbedenklich zugelassen sind und das PTB-Prüfzeichen tragen.',
+      besitz: { level: 'frei', label: 'Erlaubnisfrei ab 14 Jahren (§ 3 Abs. 2)', detail: 'Jugendliche ab 14 Jahren dürfen abweichend von § 2 Abs. 1 mit geprüften Reizstoffsprühgeräten umgehen.' },
+      fuehren: { level: 'frei', label: 'Erlaubnisfrei ab 14 J. (Verbotszonen!)', detail: 'Führen ist erlaubnisfrei, aber als Waffe (§ 1 Abs. 2 Nr. 2a) VERBOTEN bei öffentlichen Veranstaltungen (§ 42 Abs. 1), im Personenfernverkehr (§ 42b) und in Waffenverbotszonen (§ 42 Abs. 5).' },
+      straftat: '§ 52 Abs. 3 Nr. 9 WaffG (Führen bei öffentlicher Veranstaltung § 42 Abs. 1 – FS bis 3 J. oder Geldstrafe).',
+      owi: '§ 53 Abs. 1 Nr. 1 (unter 14 Jahren), Nr. 16 (Überlassen an Kinder < 14 J.), Nr. 21c (Fernverkehr § 42b), Nr. 23 (Verbotszone § 42 Abs. 5) – bis 10.000 €.'
+    },
+    {
+      id: 'tierabwehrspray',
+      category: 'reiz_elektro',
+      name: 'Tierabwehrspray (Pfefferspray)',
+      shortRef: 'Nicht vom WaffG erfasst',
+      status: 'frei',
+      badge: 'Frei (kein WaffG)',
+      definition: 'Pfefferspray (OC), das vom Hersteller eindeutig und ausschließlich zur Tierabwehr bestimmt und entsprechend gekennzeichnet ist (keine Waffe nach § 1 Abs. 2 WaffG).',
+      besitz: { level: 'frei', label: 'Frei (kein WaffG)', detail: 'Kein gesetzliches Mindestalter und keine Erlaubnispflicht nach dem WaffG.' },
+      fuehren: { level: 'frei', label: 'Frei nach WaffG', detail: 'Waffenrechtlich nicht erfasst (Versammlungsrecht / Hausrecht bleiben unberührt; fehlt die Tierabwehr-Kennzeichnung, handelt es sich um eine verbotene Waffe nach Nr. 1.3.5!).' },
+      straftat: 'Keine nach dem WaffG (bei unberechtigtem Einsatz gegen Menschen: § 224 StGB).',
+      owi: 'Keine nach dem WaffG.'
+    },
+    {
+      id: 'reizstoff_verboten',
+      category: 'reiz_elektro',
+      name: 'Reizstoffgeräte OHNE Prüfzeichen / > 2 m',
+      shortRef: 'Anl. 2 Abschn. 1 Nr. 1.3.5',
+      status: 'verboten',
+      badge: 'Verboten',
+      definition: 'Gegenstände mit Reiz- oder anderen Wirkstoffen gegen Menschen ohne amtliches PTB-Prüfzeichen oder ohne Reichweiten-/Sprühdauerbegrenzung (Anl. 1 UA 2 Nr. 1.2.2, 1.2.3a).',
+      besitz: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Jeglicher Umgang ist verboten (gilt auch für Pfefferspray ohne eindeutige Tierabwehr-Kennzeichnung).' },
+      fuehren: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Ausnahmslos verboten.' },
+      straftat: '§ 52 Abs. 3 Nr. 1 WaffG (Freiheitsstrafe bis 3 Jahre oder Geldstrafe; fahrlässig Abs. 4). Zwingende Einziehung § 54 Abs. 1.',
+      owi: 'Keine (Vorrang der Straftat).'
+    },
+    {
+      id: 'elektro_ptb',
+      category: 'reiz_elektro',
+      name: 'Elektroimpulsgeräte MIT PTB-Prüfzeichen',
+      shortRef: 'Anl. 2 Abschn. 1 Nr. 1.3.6',
+      status: 'frei',
+      badge: 'Frei ab 18 J.',
+      definition: 'Tragbare Kontakt-Elektroimpulsgeräte (Elektroschocker), die als gesundheitlich unbedenklich amtlich zugelassen sind und das PTB-Prüfzeichen tragen (Anl. 1 UA 2 Nr. 1.2.1).',
+      besitz: { level: 'frei', label: 'Erlaubnisfrei ab 18 Jahren (§ 2 Abs. 1)', detail: 'Erwerb und Besitz sind für Volljährige ohne Erlaubnis zulässig.' },
+      fuehren: { level: 'frei', label: 'Erlaubnisfrei ab 18 J. (Verbotszonen!)', detail: 'Führen erlaubnisfrei, aber als Waffe VERBOTEN bei öffentlichen Veranstaltungen (§ 42 Abs. 1), im Personenfernverkehr (§ 42b) und in Waffenverbotszonen (§ 42 Abs. 5).' },
+      straftat: '§ 52 Abs. 3 Nr. 9 WaffG (Führen bei öffentlicher Veranstaltung § 42 Abs. 1 – FS bis 3 J. oder Geldstrafe).',
+      owi: '§ 53 Abs. 1 Nr. 1 (< 18 J.), Nr. 16 (Überlassen an Minderjährige), Nr. 21c (Fernverkehr § 42b), Nr. 23 (Verbotszone § 42 Abs. 5) – bis 10.000 €.'
+    },
+    {
+      id: 'elektro_verboten',
+      category: 'reiz_elektro',
+      name: 'Elektroschocker OHNE PTB & Distanz-Taser',
+      shortRef: 'Anl. 2 Abschn. 1 Nr. 1.3.6 / 1.4.4',
+      status: 'verboten',
+      badge: 'Verboten',
+      definition: 'Elektroimpulsgeräte ohne PTB-Prüfzeichen (auch getarnt als Taschenlampe/Handy), Distanz-Elektroimpulsgeräte (Taser mit Draht-Elektroden oder Flüssigkeitsstrahl) sowie ungeprüfte Tier-Elektroimpulsgeräte außerhalb der Tierhaltung (Nr. 1.4.4).',
+      besitz: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Jeglicher Umgang ist verboten.' },
+      fuehren: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Ausnahmslos verboten.' },
+      straftat: '§ 52 Abs. 3 Nr. 1 WaffG (Freiheitsstrafe bis 3 Jahre oder Geldstrafe; fahrlässig Abs. 4). Zwingende Einziehung § 54 Abs. 1.',
+      owi: 'Keine (Vorrang der Straftat).'
+    },
+    {
+      id: 'brand_flamme',
+      category: 'reiz_elektro',
+      name: 'Brand-/Explosionsgegenstände & Flammen > 20 cm',
+      shortRef: 'Anl. 2 Abschn. 1 Nr. 1.3.4 / Anl. 1 Nr. 1.2.4',
+      status: 'verboten',
+      badge: 'Verboten (§ 52 Abs. 1)',
+      definition: 'Nr. 1.3.4: Gegenstände mit leicht entflammbaren Stoffen für schlagartige Brände oder explosionsfähigen Stoffen (Anl. 1 UA 2 Nr. 1.2.5). Nr. 1.2.4: Gegenstände mit gezielter Flamme > 20 cm Länge (Waffe ab 18 J.).',
+      besitz: { level: 'verboten', label: 'Nr. 1.3.4: Verboten (§ 2 Abs. 3)', detail: 'Umgang sowie Anleitung/Aufforderung zur Herstellung (§ 40 Abs. 1) sind verboten (Ausnahme § 40 Abs. 3 für SprengG-Inhaber). Geräte nach Anl. 1 Nr. 1.2.4 (> 20 cm Flamme) sind Waffen ab 18 J.' },
+      fuehren: { level: 'verboten', label: 'Verboten', detail: 'Bei Nr. 1.3.4 ausnahmslos verboten; bei Nr. 1.2.4 verboten u. a. nach §§ 42 Abs. 1, 42b.' },
+      straftat: 'Nr. 1.3.4: § 52 Abs. 1 Nr. 1 (FS 6 Monate bis 5 Jahre; bes. schwerer Fall Abs. 5: 1–10 J.; Versuch strafbar) sowie § 52 Abs. 1 Nr. 4 (Anleitung entgegen § 40 Abs. 1). Nr. 1.2.4: § 52 Abs. 3 Nr. 9 (§ 42 Abs. 1).',
+      owi: 'Bei Nr. 1.2.4: § 53 Abs. 1 Nr. 1 (< 18 J.), Nr. 21c (§ 42b), Nr. 23 (Verbotszone) – bis 10.000 €.'
+    },
+
+    // ==================== 7. ZUBEHÖR, MAGAZINE & MUNITION ====================
+    {
+      id: 'zielscheinwerfer_laser',
+      category: 'zubehoer_mun',
+      name: 'Zielscheinwerfer & Ziellaser für Schusswaffen',
+      shortRef: 'Anl. 2 Abschn. 1 Nr. 1.2.4.1',
+      status: 'verboten',
+      badge: 'Verboten',
+      definition: 'Für Schusswaffen bestimmte Vorrichtungen, die das Ziel beleuchten (sichtbar oder infrarot; Anl. 1 UA 1 Nr. 4.1) oder mittels Zielpunkt markieren (Laser/Zielpunktprojektoren; Nr. 4.2).',
+      besitz: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Bereits der Besitz der für Schusswaffen bestimmten Vorrichtung allein ist verboten.' },
+      fuehren: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Ausnahmslos verboten.' },
+      straftat: '§ 52 Abs. 3 Nr. 1 WaffG (Freiheitsstrafe bis 3 Jahre oder Geldstrafe; fahrlässig Abs. 4). Zwingende Einziehung § 54 Abs. 1.',
+      owi: 'Keine (Vorrang der Straftat).'
+    },
+    {
+      id: 'nachtsicht_montage',
+      category: 'zubehoer_mun',
+      name: 'Nachtsicht- / Nachtzielgeräte (Waffenmontage)',
+      shortRef: 'Anl. 2 Abschn. 1 Nr. 1.2.4.2',
+      status: 'verboten',
+      badge: 'Verboten (Ausn. Jäger)',
+      definition: 'Nachtsicht-/Nachtzielgeräte mit Montagevorrichtung für Schusswaffen sowie Nachtsichtvorsätze/-aufsätze für Zielfernrohre mit elektronischer Verstärkung oder Bildwandler (Anl. 1 UA 1 Nr. 4.3).',
+      besitz: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Ausnahme nach § 40 Abs. 3 Satz 4 WaffG: Inhaber eines gültigen Jagdscheins (und Händler § 21) dürfen Umgang mit Nachtsichtvorsätzen und -aufsätzen zu jagdlichen Zwecken haben (nicht Komplett-Nachtzielgeräte!).' },
+      fuehren: { level: 'verboten', label: 'Verboten (außer Jagd-Ausnahme)', detail: 'Nur für Vorsätze/Aufsätze im Rahmen der Ausnahme des § 40 Abs. 3 Satz 4 zulässig.' },
+      straftat: '§ 52 Abs. 3 Nr. 1 WaffG (Freiheitsstrafe bis 3 Jahre oder Geldstrafe; fahrlässig Abs. 4). Zwingende Einziehung § 54 Abs. 1.',
+      owi: 'Keine (jagdrechtliche Beschränkungen bleiben unberührt).'
+    },
+    {
+      id: 'verbotene_magazine',
+      category: 'zubehoer_mun',
+      name: 'Verbotene Wechselmagazine & Magazingehäuse',
+      shortRef: 'Anl. 2 Abschn. 1 Nr. 1.2.4.3–1.2.4.5',
+      status: 'verboten',
+      badge: 'Verboten (Altbesitz)',
+      definition: 'Wechselmagazine (und Magazingehäuse) für Zentralfeuermunition mit Kapazität > 20 Patronen für Kurzwaffen (Nr. 1.2.4.3) oder > 10 Patronen für Langwaffen (Nr. 1.2.4.4 / 1.2.4.5).',
+      besitz: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Umgang verboten (Ausnahmen: fristgerecht angezeigter Altbesitz vor 13.06.2017 nach § 58 Abs. 17 oder BKA-Ausnahmegenehmigung nach § 40 Abs. 4).' },
+      fuehren: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Ohne Altbesitzanzeige / BKA-Ausnahme verboten.' },
+      straftat: 'Nr. 1.2.4.3–1.2.4.5 sind in § 52 Abs. 3 Nr. 1 nicht strafbewehrt; es drohen jedoch Sicherstellung/Einziehung (§ 46 Abs. 3, 4, 7) sowie Wegfall der waffenrechtlichen Zuverlässigkeit (§ 5).',
+      owi: '§ 53 Abs. 1 Nr. 4 (Zuwiderhandlung gegen vollziehbare Anordnung nach § 46 Abs. 3 Satz 1) – bis 10.000 €.'
+    },
+    {
+      id: 'munition_erlaubnis',
+      category: 'zubehoer_mun',
+      name: 'Patronen- & Pyrotechnische Munition (PM II)',
+      shortRef: 'Anl. 1 UA 3 / Anl. 2 Abschn. 2 UA 1',
+      status: 'erlaubnis',
+      badge: 'MES / WBK-Eintrag',
+      definition: 'Patronenmunition (Hülse, Ladung, Geschoss), hülsenlose Munition und erlaubnispflichtige pyrotechnische Munition (Klasse PM II, z. B. Vogelschreck).',
+      besitz: { level: 'erlaubnis', label: 'Erlaubnispflichtig (§ 10 Abs. 3)', detail: 'Erwerb und Besitz nur mit Eintrag in der WBK oder Munitionserwerbsschein (MES); Jäger: Langwaffenmunition mit gültigem Jagdschein (§ 13 Abs. 5).' },
+      fuehren: { level: 'erlaubnis', label: 'Nur für Berechtigte', detail: 'Mitführen im Rahmen der Besitzberechtigung; getrennt/sicher zu verwahren (§ 36).' },
+      schiessen: { level: 'erlaubnis', label: 'Wie zugehörige Schusswaffe', detail: 'Verschießen nur im Rahmen des § 10 Abs. 5 bzw. § 12 Abs. 4 / § 13 Abs. 6.' },
+      straftat: '§ 52 Abs. 3 Nr. 2b WaffG (unerlaubter Erwerb oder Besitz von Munition – FS bis 3 J. oder Geldstrafe; fahrlässig Abs. 4); § 52 Abs. 3 Nr. 7 (Überlassen an Nichtberechtigte). Einziehung § 54 Abs. 1.',
+      owi: '§ 53 Abs. 1 Nr. 3 (Schießen ohne Erlaubnis), Nr. 20 (Ausweispflicht § 38) – bis 10.000 €.'
+    },
+    {
+      id: 'munition_frei',
+      category: 'zubehoer_mun',
+      name: 'Kartuschenmunition (PTB) & Pyrotechnik PM I',
+      shortRef: 'Anl. 2 Abschn. 2 UA 2 Nr. 1.4, 1.9, 1.10',
+      status: 'frei',
+      badge: 'Frei ab 18 J.',
+      definition: 'Kartuschenmunition (Platz-/Reizstoffkartuschen mit Prüfzeichen) für PTB-SRS, Salutwaffen und BeschG-Schussapparate sowie pyrotechnische Signalmunition der Klasse PM I.',
+      besitz: { level: 'frei', label: 'Erlaubnisfrei ab 18 Jahren (§ 2 Abs. 1)', detail: 'Erwerb, Besitz und Verbringen sind ab 18 Jahren erlaubnisfrei.' },
+      fuehren: { level: 'frei', label: 'Erlaubnisfrei ab 18 J.', detail: 'Für die Munition allein kein KWS erforderlich (für die geladene oder ungeladene SRS-Waffe hingegen zwingend KWS!).' },
+      schiessen: { level: 'erlaubnis', label: 'Nur nach § 12 Abs. 4 WaffG', detail: 'Abschießen nur im befriedeten Besitztum mit Zustimmung des Hausrechtsinhabers (PM I-Geschosse dürfen Grundstück nicht verlassen) oder mit Schießerlaubnis.' },
+      straftat: 'Keine für Erwerb/Besitz der Munition.',
+      owi: '§ 53 Abs. 1 Nr. 1 (< 18 J.), Nr. 3 (unerlaubtes Schießen z. B. auf öffentlicher Straße), Nr. 16 (Überlassen an Minderjährige) – bis 10.000 €.'
+    },
+    {
+      id: 'munition_verboten_strafbar',
+      category: 'zubehoer_mun',
+      name: 'Verbotene Munition (Hartkern, Treibspiegel, Kleinschrot)',
+      shortRef: 'Anl. 2 Abschn. 1 Nr. 1.5.3–1.5.7',
+      status: 'verboten',
+      badge: 'Verboten',
+      definition: 'Treibspiegelmunition (1.5.3), Hartkern-/panzerbrechende/Spreng-/Brand-/Leuchtspurmunition & -geschosse (1.5.4), verletzende Knall-/Reizkartuschen > 1,5 m (1.5.5), Kleinschrot bis 12,5 mm (1.5.6), Kriegswaffen-/Behördenmunition (1.5.7).',
+      besitz: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Jeglicher Umgang ist verboten.' },
+      fuehren: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Ausnahmslos verboten.' },
+      schiessen: { level: 'verboten', label: 'Verboten', detail: 'Ausnahmslos verboten.' },
+      straftat: '§ 52 Abs. 3 Nr. 1 WaffG (Freiheitsstrafe bis 3 Jahre oder Geldstrafe; fahrlässig Abs. 4). Zwingende Einziehung § 54 Abs. 1.',
+      owi: 'Keine (Vorrang der Straftat).'
+    },
+    {
+      id: 'munition_betaeubung_reiz',
+      category: 'zubehoer_mun',
+      name: 'Betäubungsgeschosse & ungeprüfte Reizstoffmunition',
+      shortRef: 'Anl. 2 Abschn. 1 Nr. 1.5.1 / 1.5.2',
+      status: 'verboten',
+      badge: 'Verboten',
+      definition: 'Geschosse mit Betäubungsstoffen zu Angriffs-/Verteidigungszwecken (Nr. 1.5.1) sowie Geschosse oder Kartuschenmunition mit Reizstoffen ohne amtliches Prüfzeichen (Nr. 1.5.2).',
+      besitz: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Jeglicher Umgang ist verboten.' },
+      fuehren: { level: 'verboten', label: 'Verboten (§ 2 Abs. 3)', detail: 'Ausnahmslos verboten.' },
+      schiessen: { level: 'verboten', label: 'Verboten', detail: 'Ausnahmslos verboten.' },
+      straftat: 'Sicherstellung/Einziehung nach § 46 Abs. 3, 4, 7 WaffG; bei erlaubnispflichtiger Munition ohne Erlaubnis zusätzlich § 52 Abs. 3 Nr. 2b WaffG (Nr. 1.5.1/1.5.2 selbst sind nicht in § 52 Abs. 3 Nr. 1 genannt).',
+      owi: '§ 53 Abs. 1 Nr. 4 (Zuwiderhandlung gegen vollziehbare Anordnung nach § 46 Abs. 3 Satz 1) – bis 10.000 €.'
+    }
+  ];
+
+  // Maßgeschneiderte SVG-Grafiken für alle Waffen & Gegenstände aus dem WaffG
+  const WeaponSvg = ({ id, className = 'w-full h-16' }) => {
+    switch (id) {
+      case 'springmesser':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <rect x="10" y="21" width="44" height="14" rx="4" fill="#334155" stroke="#0f172a" strokeWidth="2" />
+            <circle cx="42" cy="28" r="3.2" fill="#ef4444" stroke="#fff" strokeWidth="1" />
+            <path d="M54 22 L106 22 L112 28 L96 34 L54 34 Z" fill="#cbd5e1" stroke="#334155" strokeWidth="2" strokeLinejoin="round" />
+            <path d="M58 14 C64 8, 72 8, 78 14" stroke="#ef4444" strokeWidth="2" strokeDasharray="2 2" strokeLinecap="round" />
+            <path d="M75 10 L79 14 L74 16" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        );
+      case 'fallmesser':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <rect x="12" y="20" width="46" height="16" rx="3" fill="#334155" stroke="#0f172a" strokeWidth="2" />
+            <rect x="44" y="16" width="8" height="4" rx="1" fill="#ef4444" />
+            <path d="M58 23 L102 23 L110 28 L102 33 L58 33 Z" fill="#cbd5e1" stroke="#334155" strokeWidth="2" />
+            <path d="M68 43 L92 43 M87 39 L92 43 L87 47" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        );
+      case 'faustmesser':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <rect x="26" y="10" width="12" height="36" rx="5" fill="#334155" stroke="#0f172a" strokeWidth="2" />
+            <rect x="38" y="24" width="14" height="8" fill="#475569" />
+            <path d="M52 18 L102 28 L52 38 Z" fill="#cbd5e1" stroke="#334155" strokeWidth="2" strokeLinejoin="round" />
+            <line x1="52" y1="28" x2="96" y2="28" stroke="#64748b" strokeWidth="1.2" />
+          </svg>
+        );
+      case 'butterfly':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <rect x="12" y="10" width="42" height="9" rx="3" transform="rotate(-14 54 24)" fill="#334155" stroke="#0f172a" strokeWidth="1.8" />
+            <rect x="12" y="37" width="42" height="9" rx="3" transform="rotate(14 54 32)" fill="#475569" stroke="#0f172a" strokeWidth="1.8" />
+            <circle cx="52" cy="24" r="2.2" fill="#ef4444" />
+            <circle cx="52" cy="32" r="2.2" fill="#ef4444" />
+            <path d="M54 22 L106 23 L112 28 L96 34 L54 34 Z" fill="#cbd5e1" stroke="#334155" strokeWidth="2" strokeLinejoin="round" />
+          </svg>
+        );
+      case 'einhandmesser':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <path d="M12 24 C12 20 16 19 22 19 L54 21 L54 35 L18 36 C13 36 12 32 12 24 Z" fill="#475569" stroke="#0f172a" strokeWidth="2" />
+            <path d="M54 22 L98 20 C105 20 110 24 111 28 L96 34 L54 34 Z" fill="#e2e8f0" stroke="#334155" strokeWidth="2" strokeLinejoin="round" />
+            <circle cx="64" cy="24" r="3" fill="#f59e0b" stroke="#92400e" strokeWidth="1.5" />
+            <circle cx="52" cy="28" r="2" fill="#cbd5e1" />
+          </svg>
+        );
+      case 'feststehend12':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <rect x="8" y="19" width="32" height="12" rx="3" fill="#78350f" stroke="#451a03" strokeWidth="2" />
+            <rect x="40" y="14" width="5" height="22" rx="1.5" fill="#94a3b8" stroke="#334155" strokeWidth="1.5" />
+            <path d="M45 19 L104 19 L112 25 L98 31 L45 31 Z" fill="#e2e8f0" stroke="#334155" strokeWidth="2" strokeLinejoin="round" />
+            <line x1="45" y1="44" x2="112" y2="44" stroke="#f59e0b" strokeWidth="2" />
+            <line x1="45" y1="40" x2="45" y2="48" stroke="#f59e0b" strokeWidth="2" />
+            <line x1="112" y1="40" x2="112" y2="48" stroke="#f59e0b" strokeWidth="2" />
+            <text x="78" y="53" textAnchor="middle" fontSize="8" fontWeight="900" fill="#b45309">&gt; 12 cm</text>
+          </svg>
+        );
+      case 'alltagsmesser':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <rect x="14" y="21" width="44" height="14" rx="6" fill="#dc2626" stroke="#7f1d1d" strokeWidth="2" />
+            <path d="M26 28 H34 M30 24 V32" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
+            <path d="M58 23 L96 23 C102 23 105 27 104 31 L92 33 L58 33 Z" fill="#e2e8f0" stroke="#334155" strokeWidth="2" />
+            <path d="M74 26 H84" stroke="#64748b" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+        );
+      case 'hieb_stoss':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <rect x="10" y="23" width="28" height="10" rx="2" fill="#334155" stroke="#0f172a" strokeWidth="2" />
+            <rect x="38" y="14" width="6" height="28" rx="2" fill="#64748b" stroke="#0f172a" strokeWidth="1.8" />
+            <path d="M44 21 L110 28 L44 35 Z" fill="#cbd5e1" stroke="#334155" strokeWidth="2" strokeLinejoin="round" />
+            <line x1="44" y1="28" x2="104" y2="28" stroke="#64748b" strokeWidth="1.2" />
+          </svg>
+        );
+      case 'getarnte_hieb':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <path d="M14 28 C14 17 24 14 30 20" stroke="#78350f" strokeWidth="5" strokeLinecap="round" />
+            <line x1="14" y1="28" x2="54" y2="28" stroke="#78350f" strokeWidth="6" strokeLinecap="round" />
+            <path d="M54 25 L108 28 L54 31 Z" fill="#cbd5e1" stroke="#ef4444" strokeWidth="1.8" strokeLinejoin="round" />
+            <rect x="52" y="23" width="4" height="10" fill="#f59e0b" />
+          </svg>
+        );
+      case 'schlagring':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <path d="M24 38 C24 44 96 44 96 38 L92 32 H28 Z" fill="#475569" stroke="#0f172a" strokeWidth="2" />
+            {[32, 50, 68, 86].map((cx) => (
+              <circle key={cx} cx={cx} cy="22" r="8" fill="#ffffff" stroke="#0f172a" strokeWidth="3.5" />
+            ))}
+          </svg>
+        );
+      case 'stahlrute':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <rect x="10" y="23" width="32" height="10" rx="3" fill="#1e293b" stroke="#0f172a" strokeWidth="2" />
+            <path d="M42 28 Q54 20 66 28 T90 28" stroke="#475569" strokeWidth="4" strokeLinecap="round" />
+            <circle cx="98" cy="28" r="8" fill="#334155" stroke="#ef4444" strokeWidth="2" />
+          </svg>
+        );
+      case 'wurfstern':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <path d="M60 4 L68 20 L86 28 L68 36 L60 52 L52 36 L34 28 L52 20 Z" fill="#94a3b8" stroke="#0f172a" strokeWidth="2" strokeLinejoin="round" />
+            <circle cx="60" cy="28" r="5" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+          </svg>
+        );
+      case 'nunchaku':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <rect x="16" y="14" width="11" height="34" rx="3" transform="rotate(-18 22 30)" fill="#334155" stroke="#0f172a" strokeWidth="2" />
+            <rect x="93" y="14" width="11" height="34" rx="3" transform="rotate(18 98 30)" fill="#334155" stroke="#0f172a" strokeWidth="2" />
+            <path d="M30 16 Q60 6 90 16" stroke="#94a3b8" strokeWidth="3" strokeDasharray="4 3" strokeLinecap="round" />
+          </svg>
+        );
+      case 'praezisionsschleuder':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <path d="M56 46 V28 L42 12 M56 28 L70 12" stroke="#334155" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M42 12 L24 24 L70 12" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" />
+            <path d="M56 40 H86 C94 40 96 32 90 28 H76" stroke="#ef4444" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        );
+      case 'ehem_kriegswaffen':
+      case 'vollautomat':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <path d="M10 22 L28 20 V30 L10 34 Z" fill="#334155" stroke="#0f172a" strokeWidth="1.8" />
+            <rect x="28" y="19" width="44" height="11" rx="1.5" fill="#1e293b" stroke="#0f172a" strokeWidth="1.8" />
+            <line x1="72" y1="23" x2="108" y2="23" stroke="#0f172a" strokeWidth="3.5" strokeLinecap="round" />
+            <path d="M40 30 L35 44 H43 L47 30 Z" fill="#334155" />
+            <path d="M54 30 L59 47 L67 45 L62 30 Z" fill="#475569" stroke="#0f172a" strokeWidth="1.5" />
+            <path d="M98 12 L106 12 M100 16 L110 16 M98 20 L106 20" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+        );
+      case 'pumpgun':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <path d="M22 25 L14 42 H24 L32 29 Z" fill="#78350f" stroke="#451a03" strokeWidth="2" />
+            <rect x="28" y="19" width="32" height="10" rx="1.5" fill="#1e293b" />
+            <line x1="60" y1="21" x2="104" y2="21" stroke="#0f172a" strokeWidth="3.5" strokeLinecap="round" />
+            <line x1="60" y1="26" x2="96" y2="26" stroke="#475569" strokeWidth="2.5" strokeLinecap="round" />
+            <rect x="68" y="24" width="18" height="6" rx="1.5" fill="#78350f" />
+            <text x="64" y="47" textAnchor="middle" fontSize="8" fontWeight="900" fill="#dc2626">&lt;95cm / Griff</text>
+          </svg>
+        );
+      case 'getarnte_sw':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <rect x="16" y="22" width="76" height="12" rx="3" fill="#334155" stroke="#0f172a" strokeWidth="2" />
+            <path d="M92 22 L108 28 L92 34 Z" fill="#94a3b8" stroke="#0f172a" strokeWidth="1.8" />
+            <path d="M26 22 V17 H56 V22" stroke="#f59e0b" strokeWidth="2" />
+            <circle cx="111" cy="28" r="3" fill="#ef4444" />
+          </svg>
+        );
+      case 'wildererwaffe':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <rect x="14" y="21" width="36" height="10" rx="2" fill="#334155" />
+            <rect x="64" y="22" width="44" height="6" rx="1.5" fill="#1e293b" />
+            <line x1="57" y1="12" x2="57" y2="44" stroke="#ef4444" strokeWidth="2" strokeDasharray="3 2" />
+            <path d="M46 14 C52 8, 62 8, 68 14" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+        );
+      case 'kurzwaffe_63':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <path d="M28 16 H78 V27 H50 L44 43 H31 L36 27 H28 Z" fill="#334155" stroke="#0f172a" strokeWidth="2" strokeLinejoin="round" />
+            <rect x="74" y="34" width="38" height="14" rx="3" fill="#fee2e2" stroke="#ef4444" strokeWidth="1.5" />
+            <text x="93" y="44" textAnchor="middle" fontSize="8" fontWeight="900" fill="#dc2626">&lt;6,3mm</text>
+          </svg>
+        );
+      case 'halbautomat_mag':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <path d="M12 18 H78 V27 H52 L48 39 H38 L42 27 H12 Z" fill="#1e293b" />
+            <line x1="78" y1="21" x2="108" y2="21" stroke="#0f172a" strokeWidth="3" />
+            <path d="M56 27 L64 51 L73 48 L65 27 Z" fill="#ef4444" stroke="#991b1b" strokeWidth="1.5" />
+            <text x="92" y="45" textAnchor="middle" fontSize="8" fontWeight="900" fill="#dc2626">&gt;10/&gt;20</text>
+          </svg>
+        );
+      case 'verbotene_salut':
+      case 'salutwaffe':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <path d="M10 24 L30 22 V32 L10 37 Z" fill="#78350f" stroke="#451a03" strokeWidth="1.8" />
+            <rect x="30" y="21" width="32" height="9" fill="#334155" />
+            <rect x="62" y="22" width="46" height="5" fill="#1e293b" />
+            {[68, 74, 80, 86].map((cx) => (
+              <circle key={cx} cx={cx} cy="24.5" r="1.4" fill="#f59e0b" />
+            ))}
+            <text x="86" y="44" textAnchor="middle" fontSize="8" fontWeight="900" fill={id === 'verbotene_salut' ? '#dc2626' : '#475569'}>
+              {id === 'verbotene_salut' ? 'SALUT VERB.' : 'SALUT'}
+            </text>
+          </svg>
+        );
+      case 'pistole_ha':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <path d="M22 14 H94 V26 H54 L46 46 H31 L37 26 H22 Z" fill="#1e293b" stroke="#0f172a" strokeWidth="2" strokeLinejoin="round" />
+            <path d="M54 26 V33 H64 V26" stroke="#334155" strokeWidth="2" />
+            <line x1="28" y1="18" x2="88" y2="18" stroke="#64748b" strokeWidth="1.5" />
+          </svg>
+        );
+      case 'revolver_langwaffe':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <path d="M26 28 C20 35 18 42 22 47 H34 L42 30 Z" fill="#78350f" stroke="#451a03" strokeWidth="1.8" />
+            <rect x="42" y="16" width="22" height="14" rx="2" fill="#64748b" stroke="#1e293b" strokeWidth="2" />
+            <rect x="64" y="17" width="36" height="7" rx="1" fill="#334155" stroke="#0f172a" strokeWidth="1.8" />
+            <path d="M46 30 V37 H58 V30" stroke="#334155" strokeWidth="2" />
+          </svg>
+        );
+      case 'feuerwaffe_75j':
+      case 'druckluft_frei':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <path d="M8 26 L30 22 V32 L10 38 Z" fill="#78350f" stroke="#451a03" strokeWidth="1.8" />
+            <rect x="30" y="21" width="36" height="8" rx="1.5" fill="#334155" />
+            <line x1="66" y1="24" x2="108" y2="24" stroke="#0f172a" strokeWidth="3.2" strokeLinecap="round" />
+            <polygon points="88,33 98,39 94,50 82,50 78,39" fill="#ecfdf5" stroke="#059669" strokeWidth="1.8" />
+            <text x="88" y="46" textAnchor="middle" fontSize="9" fontWeight="900" fill="#059669">F</text>
+          </svg>
+        );
+      case 'druckluft_erlaubnis':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <path d="M8 26 L30 22 V32 L10 38 Z" fill="#475569" stroke="#0f172a" strokeWidth="1.8" />
+            <rect x="30" y="21" width="36" height="8" rx="1.5" fill="#1e293b" />
+            <line x1="66" y1="24" x2="108" y2="24" stroke="#0f172a" strokeWidth="3.2" strokeLinecap="round" />
+            <rect x="70" y="34" width="40" height="14" rx="3" fill="#fef3c7" stroke="#d97706" strokeWidth="1.5" />
+            <text x="90" y="44" textAnchor="middle" fontSize="8" fontWeight="900" fill="#b45309">&gt; 7,5 J</text>
+          </svg>
+        );
+      case 'pfeilabschuss':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <rect x="14" y="21" width="48" height="12" rx="3" fill="#334155" stroke="#0f172a" strokeWidth="1.8" />
+            <path d="M30 33 L24 45 H34 L39 33 Z" fill="#475569" />
+            <line x1="62" y1="27" x2="108" y2="27" stroke="#d97706" strokeWidth="3" />
+            <polygon points="112,27 102,22 102,32" fill="#d97706" />
+          </svg>
+        );
+      case 'wesentliche_teile':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <rect x="12" y="12" width="52" height="10" rx="2" fill="#475569" stroke="#0f172a" strokeWidth="1.8" />
+            <rect x="70" y="11" width="38" height="12" rx="3" fill="#1e293b" stroke="#0f172a" strokeWidth="1.8" />
+            <path d="M22 32 H60 V40 H40 L35 50 H25 L28 40 H22 Z" fill="#94a3b8" stroke="#334155" strokeWidth="1.8" />
+            <text x="88" y="44" textAnchor="middle" fontSize="7.5" fontWeight="900" fill="#475569">SD / TEIL</text>
+          </svg>
+        );
+      case 'srs_ptb':
+      case 'srs_ohne_ptb':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <path d="M18 14 H76 V25 H46 L40 43 H27 L32 25 H18 Z" fill="#334155" stroke="#0f172a" strokeWidth="2" strokeLinejoin="round" />
+            <circle cx="94" cy="36" r="13" fill={id === 'srs_ptb' ? '#ecfdf5' : '#fee2e2'} stroke={id === 'srs_ptb' ? '#059669' : '#dc2626'} strokeWidth="2" />
+            <text x="94" y="39" textAnchor="middle" fontSize="8" fontWeight="900" fill={id === 'srs_ptb' ? '#059669' : '#dc2626'}>PTB</text>
+            {id === 'srs_ohne_ptb' && <line x1="84" y1="26" x2="104" y2="46" stroke="#dc2626" strokeWidth="2.5" />}
+          </svg>
+        );
+      case 'schussgeraet_ohne_ptb':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <rect x="20" y="16" width="60" height="14" rx="3" fill="#475569" stroke="#0f172a" strokeWidth="2" />
+            <rect x="80" y="20" width="24" height="6" fill="#94a3b8" stroke="#334155" strokeWidth="1.5" />
+            <path d="M36 30 L32 45 H44 L48 30 Z" fill="#d97706" stroke="#92400e" strokeWidth="1.8" />
+          </svg>
+        );
+      case 'armbrust':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <line x1="16" y1="28" x2="100" y2="28" stroke="#78350f" strokeWidth="4.5" strokeLinecap="round" />
+            <path d="M78 8 C94 18 94 38 78 48" stroke="#1e293b" strokeWidth="3.5" strokeLinecap="round" />
+            <line x1="78" y1="8" x2="48" y2="28" stroke="#64748b" strokeWidth="1.5" />
+            <line x1="78" y1="48" x2="48" y2="28" stroke="#64748b" strokeWidth="1.5" />
+            <polygon points="108,28 98,24 98,32" fill="#0f172a" />
+          </svg>
+        );
+      case 'lunte_funken':
+      case 'perkussion':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <path d="M12 30 C12 24 22 22 32 24 L62 24 V30 L32 30 C24 33 20 40 14 40 Z" fill="#92400e" stroke="#451a03" strokeWidth="1.8" />
+            <line x1="42" y1="22" x2="108" y2="22" stroke="#475569" strokeWidth="3.5" strokeLinecap="round" />
+            <text x="86" y="44" textAnchor="middle" fontSize="8" fontWeight="900" fill="#78350f">&lt; 1871</text>
+          </svg>
+        );
+      case 'dekowaffe':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <path d="M10 24 L28 21 V30 L10 35 Z" fill="#64748b" />
+            <rect x="28" y="20" width="38" height="9" fill="#94a3b8" stroke="#475569" strokeWidth="1.5" />
+            <line x1="66" y1="23" x2="106" y2="23" stroke="#64748b" strokeWidth="3" strokeDasharray="5 2" />
+            <rect x="68" y="34" width="40" height="14" rx="3" fill="#eff6ff" stroke="#2563eb" strokeWidth="1.5" />
+            <text x="88" y="44" textAnchor="middle" fontSize="8" fontWeight="900" fill="#1d4ed8">EU DEKO</text>
+          </svg>
+        );
+      case 'anscheinswaffe':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <path d="M18 14 H76 V25 H46 L40 43 H27 L32 25 H18 Z" fill="#64748b" stroke="#334155" strokeWidth="2" strokeDasharray="4 2" />
+            <rect x="74" y="33" width="38" height="14" rx="3" fill="#fef3c7" stroke="#d97706" strokeWidth="1.5" />
+            <text x="93" y="43" textAnchor="middle" fontSize="8" fontWeight="900" fill="#b45309">§ 42a</text>
+          </svg>
+        );
+      case 'blasrohr_harpune':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <rect x="12" y="14" width="84" height="7" rx="3" fill="#0f766e" stroke="#115e59" strokeWidth="1.5" />
+            <polygon points="108,17.5 98,14 98,21" fill="#f59e0b" />
+            <line x1="16" y1="38" x2="98" y2="38" stroke="#334155" strokeWidth="3" />
+            <path d="M108 38 L94 32 L98 38 L94 44 Z" fill="#334155" />
+            <path d="M24 38 L18 48 H28 L32 38 Z" fill="#0284c7" />
+          </svg>
+        );
+      case 'reizstoff_ptb':
+      case 'tierabwehrspray':
+      case 'reizstoff_verboten':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <rect x="26" y="16" width="24" height="34" rx="4" fill={id === 'reizstoff_verboten' ? '#dc2626' : id === 'tierabwehrspray' ? '#059669' : '#2563eb'} stroke="#0f172a" strokeWidth="1.8" />
+            <rect x="31" y="9" width="14" height="7" rx="1.5" fill="#1e293b" />
+            <path d="M47 12 L74 6 V18 Z" fill="#fbbf24" fillOpacity="0.45" stroke="#f59e0b" strokeWidth="1.2" />
+            <rect x="66" y="30" width="44" height="16" rx="4" fill={id === 'reizstoff_verboten' ? '#fee2e2' : '#ecfdf5'} stroke={id === 'reizstoff_verboten' ? '#dc2626' : '#059669'} strokeWidth="1.5" />
+            <text x="88" y="41" textAnchor="middle" fontSize="8" fontWeight="900" fill={id === 'reizstoff_verboten' ? '#dc2626' : '#059669'}>
+              {id === 'reizstoff_ptb' ? 'PTB' : id === 'tierabwehrspray' ? 'TIER' : 'KEIN PTB'}
+            </text>
+          </svg>
+        );
+      case 'elektro_ptb':
+      case 'elektro_verboten':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <rect x="18" y="18" width="44" height="20" rx="5" fill="#1e293b" stroke="#0f172a" strokeWidth="2" />
+            <line x1="62" y1="22" x2="72" y2="22" stroke="#94a3b8" strokeWidth="3" />
+            <line x1="62" y1="34" x2="72" y2="34" stroke="#94a3b8" strokeWidth="3" />
+            <path d="M74 16 L68 28 H76 L70 40" stroke="#f59e0b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            <rect x="82" y="20" width="32" height="16" rx="4" fill={id === 'elektro_ptb' ? '#ecfdf5' : '#fee2e2'} stroke={id === 'elektro_ptb' ? '#059669' : '#dc2626'} strokeWidth="1.5" />
+            <text x="98" y="31" textAnchor="middle" fontSize="7.5" fontWeight="900" fill={id === 'elektro_ptb' ? '#059669' : '#dc2626'}>
+              {id === 'elektro_ptb' ? 'PTB' : 'VERB.'}
+            </text>
+          </svg>
+        );
+      case 'brand_flamme':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <polygon points="60,6 92,48 28,48" fill="#fef2f2" stroke="#dc2626" strokeWidth="2.5" strokeLinejoin="round" />
+            <path d="M60 18 C67 26 69 34 60 42 C51 34 53 26 60 18 Z" fill="#f97316" stroke="#dc2626" strokeWidth="1.5" />
+          </svg>
+        );
+      case 'zielscheinwerfer_laser':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <rect x="16" y="19" width="42" height="16" rx="3" fill="#1e293b" stroke="#0f172a" strokeWidth="2" />
+            <rect x="28" y="13" width="18" height="6" rx="1" fill="#64748b" />
+            <line x1="58" y1="27" x2="106" y2="27" stroke="#ef4444" strokeWidth="2.5" strokeDasharray="4 2" />
+            <circle cx="106" cy="27" r="4.5" fill="#ef4444" />
+          </svg>
+        );
+      case 'nachtsicht_montage':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <rect x="22" y="16" width="56" height="18" rx="4" fill="#1e293b" stroke="#0f172a" strokeWidth="2" />
+            <ellipse cx="78" cy="25" rx="6" ry="9" fill="#10b981" stroke="#065f46" strokeWidth="2" />
+            <rect x="38" y="34" width="24" height="9" rx="2" fill="#64748b" stroke="#0f172a" strokeWidth="1.5" />
+          </svg>
+        );
+      case 'verbotene_magazine':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <path d="M24 10 H44 L54 48 H34 Z" fill="#334155" stroke="#0f172a" strokeWidth="2" strokeLinejoin="round" />
+            <rect x="64" y="18" width="44" height="20" rx="4" fill="#fee2e2" stroke="#dc2626" strokeWidth="1.8" />
+            <text x="86" y="31" textAnchor="middle" fontSize="8.5" fontWeight="900" fill="#dc2626">&gt;10 / &gt;20</text>
+          </svg>
+        );
+      case 'munition_erlaubnis':
+      case 'munition_frei':
+      case 'munition_verboten_strafbar':
+      case 'munition_betaeubung_reiz':
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <rect x="20" y="20" width="44" height="16" rx="2" fill="#d97706" stroke="#78350f" strokeWidth="1.8" />
+            <rect x="16" y="18" width="5" height="20" rx="1" fill="#b45309" />
+            <path d="M64 20 L84 24 C88 26 88 30 84 32 L64 36 Z" fill={id.includes('verboten') || id.includes('betaeubung') ? '#dc2626' : id === 'munition_frei' ? '#059669' : '#94a3b8'} stroke="#0f172a" strokeWidth="1.8" />
+            <text x="102" y="31" textAnchor="middle" fontSize="8" fontWeight="900" fill={id.includes('verboten') || id.includes('betaeubung') ? '#dc2626' : id === 'munition_frei' ? '#059669' : '#b45309'}>
+              {id === 'munition_frei' ? 'PM I' : id === 'munition_erlaubnis' ? 'MES' : 'VERB.'}
+            </text>
+          </svg>
+        );
+      default:
+        return (
+          <svg viewBox="0 0 120 56" className={className} fill="none">
+            <circle cx="60" cy="28" r="18" fill="#f1f5f9" stroke="#64748b" strokeWidth="2" />
+          </svg>
+        );
+    }
+  };
+
+  function WaffgKnowledgeSection() {
+    const [activeCat, setActiveCat] = useState('messer');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedItem, setSelectedItem] = useState(null);
+
+    const statusBadgeClass = (status) => {
+      if (status === 'verboten') return 'bg-red-100 text-red-700 border-red-200';
+      if (status === 'erlaubnis') return 'bg-amber-100 text-amber-800 border-amber-200';
+      if (status === 'fuehrverbot') return 'bg-orange-100 text-orange-800 border-orange-200';
+      return 'bg-emerald-100 text-emerald-700 border-emerald-200';
+    };
+
+    const actionBoxStyle = (level) => {
+      if (level === 'verboten') return { bg: 'bg-red-50 border-red-200', title: 'text-red-800', pill: 'bg-red-600 text-white', text: 'text-red-900' };
+      if (level === 'erlaubnis') return { bg: 'bg-amber-50 border-amber-200', title: 'text-amber-900', pill: 'bg-amber-600 text-white', text: 'text-amber-950' };
+      return { bg: 'bg-emerald-50 border-emerald-200', title: 'text-emerald-900', pill: 'bg-emerald-600 text-white', text: 'text-emerald-950' };
+    };
+
+    const filteredItems = React.useMemo(() => {
+      const q = searchTerm.trim().toLowerCase();
+      if (q) {
+        return WAFFG_ITEMS.filter(
+          (item) =>
+            item.name.toLowerCase().includes(q) ||
+            item.shortRef.toLowerCase().includes(q) ||
+            item.definition.toLowerCase().includes(q) ||
+            item.straftat.toLowerCase().includes(q) ||
+            item.owi.toLowerCase().includes(q)
+        );
+      }
+      return WAFFG_ITEMS.filter((item) => item.category === activeCat);
+    }, [activeCat, searchTerm]);
+
+    return (
+      <div className="space-y-3 animate-in fade-in">
+        {/* Schnellsuche */}
+        <div className="bg-white p-3 rounded-2xl shadow-sm border border-slate-100">
+          <div className="relative">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Waffe, Gegenstand oder § suchen (z. B. Taser, 1.4.1, KWS)..."
+              className="w-full pl-9 pr-8 py-2 text-xs font-medium bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500"
+            />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Kategorien-Reiter */}
+        {!searchTerm && (
+          <div className="flex overflow-x-auto gap-1.5 pb-2 custom-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }}>
+            {WAFFG_CATEGORIES.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCat(cat.id)}
+                className={`whitespace-nowrap px-3 py-2 rounded-xl text-xs font-bold transition-all border ${
+                  activeCat === cat.id
+                    ? 'bg-red-600 text-white border-red-600 shadow-md'
+                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Reiter: Verbote & Begriffe */}
+        {!searchTerm && activeCat === 'regeln' ? (
+          <div className="space-y-3 animate-in fade-in">
+            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-3">
+              <div className="flex items-center gap-2 text-red-700 pb-2 border-b border-slate-100">
+                <ShieldAlert className="w-5 h-5" />
+                <h3 className="font-black uppercase tracking-wide text-xs">Zentrale Führverbote & Kontrollbefugnis</h3>
+              </div>
+
+              <div className="bg-red-50 border border-red-200 p-3 rounded-xl text-xs space-y-1">
+                <div className="font-black text-red-800">§ 42 Abs. 1 & 4a WaffG – Öffentliche Veranstaltungen</div>
+                <p className="text-red-900 leading-relaxed">
+                  Verbot des Führens von <strong>Waffen</strong> (Abs. 1 → <strong>Straftat § 52 Abs. 3 Nr. 9</strong>) sowie <strong>Messern</strong> jeder Art (Abs. 4a → <strong>OWi § 53 Abs. 1 Nr. 21a</strong>) bei Volksfesten, Sportveranstaltungen, Märkten, Messen, Diskotheken, Kinos, Theatern u. Ä.
+                </p>
+              </div>
+
+              <div className="bg-amber-50 border border-amber-200 p-3 rounded-xl text-xs space-y-1">
+                <div className="font-black text-amber-900">§ 42a WaffG – Anscheinswaffen, Hieb-/Stoßwaffen & bestimmte Messer</div>
+                <p className="text-amber-950 leading-relaxed">
+                  Führverbot für Anscheinswaffen (Nr. 1), Hieb-/Stoßwaffen (Nr. 2) sowie Einhandmesser und feststehende Messer über 12 cm Klingenlänge (Nr. 3). Verstoß: <strong>OWi § 53 Abs. 1 Nr. 21b</strong> (bis 10.000 €). Ausnahmen: Transport im verschlossenen Behältnis oder berechtigtes Interesse (Nr. 2 & 3).
+                </p>
+              </div>
+
+              <div className="bg-orange-50 border border-orange-200 p-3 rounded-xl text-xs space-y-1">
+                <div className="font-black text-orange-900">§ 42b WaffG – Öffentlicher Personenfernverkehr</div>
+                <p className="text-orange-950 leading-relaxed">
+                  Verbot des Führens von <strong>Waffen</strong> und <strong>Messern</strong> in Zügen/Verkehrsmitteln und seitlich umschlossenen Einrichtungen des öffentlichen Personenfernverkehrs. Verstoß: <strong>OWi § 53 Abs. 1 Nr. 21c</strong> (bis 10.000 €).
+                </p>
+              </div>
+
+              <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl text-xs space-y-1">
+                <div className="font-black text-slate-800">§ 42 Abs. 5 & § 42c WaffG – Verbotszonen & Kontrollen</div>
+                <p className="text-slate-700 leading-relaxed">
+                  Landesrechtliche Waffen- und Messerverbotszonen (§ 42 Abs. 5 → <strong>OWi § 53 Abs. 1 Nr. 23</strong>; Kleiner Waffenschein ist dort keine Ausnahme!). <strong>§ 42c WaffG</strong> ermächtigt zur anlasslosen Kontrolle (Anhalten, Befragen, Inaugenscheinnahme, Durchsuchung) im Geltungsbereich von §§ 42, 42b und Verbotszonen.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-2.5">
+              <div className="flex items-center gap-2 text-slate-700 pb-2 border-b border-slate-100">
+                <ScaleLaw className="w-5 h-5 text-red-600" />
+                <h3 className="font-black uppercase tracking-wide text-xs">Wichtige Begriffe (Anlage 1 Abschn. 2 & § 54)</h3>
+              </div>
+              <ul className="space-y-2 text-xs text-slate-700 leading-relaxed">
+                <li className="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                  <strong>Führen (Nr. 4):</strong> Ausübung der tatsächlichen Gewalt außerhalb der eigenen Wohnung, Geschäftsräume, des eigenen befriedeten Besitztums oder einer Schießstätte.
+                </li>
+                <li className="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                  <strong>Schussbereit (Nr. 12):</strong> Waffe ist geladen (Munition/Geschosse in Trommel, eingefügtem Magazin oder Patronen-/Geschosslager), auch wenn nicht gespannt.
+                </li>
+                <li className="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                  <strong>Nicht zugriffsbereit (Nr. 13):</strong> Schusswaffe im <strong>verschlossenen Behältnis</strong>; ein Messer ist nicht zugriffsbereit, wenn es nur mit <strong>mehr als drei Handgriffen</strong> erreicht werden kann.
+                </li>
+                <li className="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                  <strong>Einziehung (§ 54 WaffG):</strong> Bei Straftaten nach §§ 51, 52 Abs. 1, 2, 3 Nr. 1–3, Abs. 5 <strong>zwingend</strong> (Abs. 1); bei sonstigen Straftaten nach § 52 und OWis nach § 53 <strong>möglich</strong> (Abs. 2).
+                </li>
+              </ul>
+            </div>
+          </div>
+        ) : (
+          /* 2-Spalten-Raster der Waffen-Grafiken */
+          <div className="space-y-2">
+            {searchTerm && (
+              <div className="text-[11px] font-bold text-slate-500 px-1">
+                {filteredItems.length} Treffer für „{searchTerm}“
+              </div>
+            )}
+            {filteredItems.length === 0 ? (
+              <div className="bg-white p-6 rounded-2xl border border-slate-200 text-center text-xs text-slate-500">
+                Keine passenden Einträge im Waffengesetz gefunden.
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-2.5">
+                {filteredItems.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => setSelectedItem(item)}
+                    className="bg-white p-3 rounded-2xl shadow-sm border border-slate-200 hover:border-red-300 hover:shadow-md transition-all active:scale-[0.98] flex flex-col items-center text-center group"
+                  >
+                    <div className="w-full bg-slate-50 rounded-xl p-2 mb-2 border border-slate-100 group-hover:bg-white transition-colors">
+                      <WeaponSvg id={item.id} className="w-full h-14" />
+                    </div>
+                    <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full border mb-1.5 ${statusBadgeClass(item.status)}`}>
+                      {item.badge}
+                    </span>
+                    <div className="font-bold text-slate-800 text-xs leading-snug line-clamp-2">
+                      {item.name}
+                    </div>
+                    <div className="text-[9px] font-mono text-slate-400 mt-1">
+                      {item.shortRef}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* DETAIL-MODAL BEIM ANTIPPEN EINER WAFFE */}
+        {selectedItem && (
+          <div
+            className="fixed inset-0 z-[110] bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-2 sm:p-4 animate-in fade-in duration-150"
+            onClick={() => setSelectedItem(null)}
+          >
+            <div
+              className="bg-white w-full max-w-md max-h-[88vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-200"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal-Kopf */}
+              <div className="p-4 border-b border-slate-100 flex items-start justify-between gap-3 bg-slate-50 shrink-0">
+                <div>
+                  <span className={`inline-block text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full border mb-1 ${statusBadgeClass(selectedItem.status)}`}>
+                    {selectedItem.badge}
+                  </span>
+                  <h3 className="font-black text-slate-900 text-base leading-tight">{selectedItem.name}</h3>
+                  <div className="text-[11px] font-mono text-slate-500 mt-0.5">{selectedItem.shortRef}</div>
+                </div>
+                <button
+                  onClick={() => setSelectedItem(null)}
+                  className="p-2 bg-white rounded-full border border-slate-200 text-slate-500 hover:text-red-600 transition-colors shrink-0"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Modal-Inhalt */}
+              <div className="p-4 overflow-y-auto space-y-3 custom-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }}>
+                <div className="bg-slate-50 rounded-2xl p-3 border border-slate-200 flex items-center justify-center">
+                  <WeaponSvg id={selectedItem.id} className="w-48 h-20" />
+                </div>
+
+                <p className="text-xs text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
+                  {selectedItem.definition}
+                </p>
+
+                {/* Besitzen / Erwerben */}
+                {(() => {
+                  const s = actionBoxStyle(selectedItem.besitz.level);
+                  return (
+                    <div className={`p-3 rounded-xl border ${s.bg}`}>
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <span className={`text-[11px] font-black uppercase tracking-wide ${s.title}`}>Besitzen &amp; Erwerben</span>
+                        <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${s.pill}`}>{selectedItem.besitz.label}</span>
+                      </div>
+                      <p className={`text-xs leading-relaxed ${s.text}`}>{selectedItem.besitz.detail}</p>
+                    </div>
+                  );
+                })()}
+
+                {/* Führen */}
+                {(() => {
+                  const s = actionBoxStyle(selectedItem.fuehren.level);
+                  return (
+                    <div className={`p-3 rounded-xl border ${s.bg}`}>
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <span className={`text-[11px] font-black uppercase tracking-wide ${s.title}`}>Führen</span>
+                        <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${s.pill}`}>{selectedItem.fuehren.label}</span>
+                      </div>
+                      <p className={`text-xs leading-relaxed ${s.text}`}>{selectedItem.fuehren.detail}</p>
+                    </div>
+                  );
+                })()}
+
+                {/* Schießen (falls einschlägig) */}
+                {selectedItem.schiessen && (() => {
+                  const s = actionBoxStyle(selectedItem.schiessen.level);
+                  return (
+                    <div className={`p-3 rounded-xl border ${s.bg}`}>
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <span className={`text-[11px] font-black uppercase tracking-wide ${s.title}`}>Schießen</span>
+                        <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${s.pill}`}>{selectedItem.schiessen.label}</span>
+                      </div>
+                      <p className={`text-xs leading-relaxed ${s.text}`}>{selectedItem.schiessen.detail}</p>
+                    </div>
+                  );
+                })()}
+
+                {/* Straftaten */}
+                <div className="bg-red-50/70 border border-red-200 p-3 rounded-xl">
+                  <div className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wide text-red-800 mb-1">
+                    <Gavel className="w-3.5 h-3.5" /> Straftaten (§§ 51, 52 WaffG)
+                  </div>
+                  <p className="text-xs text-red-950 leading-relaxed font-medium">{selectedItem.straftat}</p>
+                </div>
+
+                {/* Ordnungswidrigkeiten */}
+                <div className="bg-amber-50/70 border border-amber-200 p-3 rounded-xl">
+                  <div className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wide text-amber-800 mb-1">
+                    <AlertTriangle className="w-3.5 h-3.5" /> Ordnungswidrigkeiten (§ 53 WaffG)
+                  </div>
+                  <p className="text-xs text-amber-950 leading-relaxed font-medium">{selectedItem.owi}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
   
   function KnowledgeBaseView({ initialView = 'overview', onBack }) {
     const dateTime = useDateTime();
@@ -5680,6 +7105,9 @@ const ESCOOTER_TUNING_MODELS = [
     const [escooterTuningTab, setEscooterTuningTab] = useState('allgemein');
     const [selectedTuningBrand, setSelectedTuningBrand] = useState('Alle');
     const [expandedTuningIdx, setExpandedTuningIdx] = useState(null);
+    const [waffgCategory, setWaffgCategory] = useState('messer');
+    const [waffgSearch, setWaffgSearch] = useState('');
+    const [selectedWeaponId, setSelectedWeaponId] = useState(null);
     
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [reifenExpanded, setReifenExpanded] = useState({ profil: true, winter: false, spikes: false });
@@ -5692,7 +7120,7 @@ const ESCOOTER_TUNING_MODELS = [
   // Automatisches Scrollen nach ganz oben, wenn das Register gewechselt wird
   useEffect(() => {
       window.scrollTo(0, 0);
-  }, [view, kzView, alkDroView, kcangView, lasiView, lasiAblegereife, escooterSpeed, escooterOrigin, escooterTuningTab, kindersitzView, ebikeView, taxiView, sozialView]);
+  }, [view, kzView, alkDroView, kcangView, lasiView, lasiAblegereife, escooterSpeed, escooterOrigin, escooterTuningTab, kindersitzView, ebikeView, taxiView, sozialView, waffgCategory]);
 
   const tabs = [
       { id: 'blut', label: 'Blutentnahme', icon: Syringe, color: 'text-red-500', bg: 'bg-red-50' },
@@ -5711,7 +7139,8 @@ const ESCOOTER_TUNING_MODELS = [
       { id: 'rauchverbot', label: 'Rauchverbot', icon: CigaretteOff, color: 'text-slate-500', bg: 'bg-slate-100' },
       { id: 'reifen', label: 'Reifen', icon: CircleDashed, color: 'text-slate-600', bg: 'bg-slate-100' },
       { id: 'sozial', label: 'Sozialvorschriften', icon: Truck, color: 'text-orange-500', bg: 'bg-orange-50' },
-      { id: 'taxi', label: 'Taxi / Mietwagen', icon: Briefcase, color: 'text-blue-500', bg: 'bg-blue-50' }
+      { id: 'taxi', label: 'Taxi / Mietwagen', icon: Briefcase, color: 'text-blue-500', bg: 'bg-blue-50' },
+      { id: 'waffg', label: 'Waffengesetz', icon: ShieldAlert, color: 'text-red-600', bg: 'bg-red-50' }
   ];
 
   return (
@@ -9186,6 +10615,9 @@ const ESCOOTER_TUNING_MODELS = [
                     </div>
                  </div>
             )}
+
+            {/* WAFFENGESETZ */}
+            {view === 'waffg' && <WaffgKnowledgeSection />}
       </div>
       <AppVersionFooter />
     </div>
