@@ -360,6 +360,430 @@ const AutobahnIcon = ({ className }) => (
     </svg>
 );
 
+// --- FAHRZEUGAUFBAU GRAFIKEN (NIEDERZURREN) ---
+const VanBoxSvg = ({ className = "w-28 h-12" }) => (
+  <svg viewBox="0 0 190 78" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Schatten */}
+    <ellipse cx="95" cy="70" rx="80" ry="3.5" fill="currentColor" fillOpacity="0.14" />
+    {/* Kastenaufbau / Karosserie Sprinter */}
+    <path
+      d="M14 56 V20 C14 15 17 12 22 12 H108 C116 12 122 15 128 22 L146 37 L169 41 C173 42 175 45 175 49 V56 C175 59 173 61 170 61 H156 C156 51 138 51 138 61 H54 C54 51 36 51 36 61 H19 C16 61 14 59 14 56 Z"
+      fill="currentColor"
+      fillOpacity="0.14"
+      stroke="currentColor"
+      strokeWidth="2.4"
+      strokeLinejoin="round"
+    />
+    {/* Dachsicke & Seitenlinie */}
+    <line x1="20" y1="17" x2="111" y2="17" stroke="currentColor" strokeWidth="1.2" strokeOpacity="0.45" />
+    <line x1="16" y1="44" x2="140" y2="44" stroke="currentColor" strokeWidth="1.4" strokeOpacity="0.45" />
+    {/* Trennlinie Fahrerhaus */}
+    <line x1="112" y1="13" x2="112" y2="60" stroke="currentColor" strokeWidth="1.8" />
+    {/* Seitenfenster Fahrerhaus */}
+    <path
+      d="M117 19 H126 L141 36 H117 Z"
+      fill="#ffffff"
+      fillOpacity="0.9"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinejoin="round"
+    />
+    {/* Schiebetür-Kontur */}
+    <rect x="72" y="20" width="35" height="37" rx="1.5" stroke="currentColor" strokeWidth="1.3" strokeOpacity="0.55" />
+    <line x1="76" y1="39" x2="81" y2="39" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    {/* Scheinwerfer & Rücklicht */}
+    <rect x="169" y="45" width="5" height="6" rx="1" fill="#f59e0b" />
+    <rect x="14" y="44" width="3.5" height="9" rx="1" fill="#ef4444" />
+    {/* Räder */}
+    <circle cx="45" cy="61" r="10" fill="#1e293b" stroke="currentColor" strokeWidth="2" />
+    <circle cx="45" cy="61" r="4.2" fill="#cbd5e1" />
+    <circle cx="147" cy="61" r="10" fill="#1e293b" stroke="currentColor" strokeWidth="2" />
+    <circle cx="147" cy="61" r="4.2" fill="#cbd5e1" />
+  </svg>
+);
+
+const FlatbedConstructionTruckSvg = ({ className = "w-32 h-12" }) => (
+  <svg viewBox="0 0 215 78" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Schatten */}
+    <ellipse cx="107" cy="70" rx="95" ry="3.5" fill="currentColor" fillOpacity="0.14" />
+    {/* Baustellen-Ladung (Paletten / Baustoffe auf der offenen Pritsche) */}
+    <rect
+      x="20"
+      y="31"
+      width="38"
+      height="12"
+      rx="1"
+      fill="currentColor"
+      fillOpacity="0.12"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    />
+    <line x1="20" y1="39" x2="58" y2="39" stroke="currentColor" strokeWidth="1.2" />
+    <rect
+      x="66"
+      y="27"
+      width="42"
+      height="16"
+      rx="1"
+      fill="currentColor"
+      fillOpacity="0.12"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    />
+    <line x1="66" y1="33" x2="108" y2="33" stroke="currentColor" strokeWidth="1.1" strokeOpacity="0.6" />
+    <line x1="66" y1="39" x2="108" y2="39" stroke="currentColor" strokeWidth="1.2" />
+    {/* Hohe Stirnwand / Kabinenschutzgitter direkt hinter dem Fahrerhaus */}
+    <rect
+      x="129"
+      y="14"
+      width="5"
+      height="29"
+      rx="1"
+      fill="currentColor"
+      fillOpacity="0.28"
+      stroke="currentColor"
+      strokeWidth="1.9"
+    />
+    <line x1="129" y1="20" x2="134" y2="20" stroke="currentColor" strokeWidth="1.3" />
+    <line x1="129" y1="26" x2="134" y2="26" stroke="currentColor" strokeWidth="1.3" />
+    <line x1="129" y1="32" x2="134" y2="32" stroke="currentColor" strokeWidth="1.3" />
+    <line x1="129" y1="38" x2="134" y2="38" stroke="currentColor" strokeWidth="1.3" />
+    {/* Niedrige, offene Bordwände der Pritsche */}
+    <rect
+      x="10"
+      y="43"
+      width="124"
+      height="13"
+      rx="1"
+      fill="currentColor"
+      fillOpacity="0.32"
+      stroke="currentColor"
+      strokeWidth="2.1"
+    />
+    {/* Bordwand-Rungen / Verschlüsse */}
+    <line x1="51" y1="43" x2="51" y2="56" stroke="currentColor" strokeWidth="1.8" />
+    <line x1="93" y1="43" x2="93" y2="56" stroke="currentColor" strokeWidth="1.8" />
+    {/* Rundumleuchte auf dem Fahrerhausdach */}
+    <rect x="155" y="10" width="6" height="4" rx="1.5" fill="#f59e0b" />
+    {/* LKW-Fahrerhaus (Baustellen-Pritschenwagen) */}
+    <path
+      d="M138 56 V20 C138 16 141 14 145 14 H174 C180 14 184 17 186 22 L192 36 L199 39 C201 40 202 42 202 46 V56 H138 Z"
+      fill="currentColor"
+      fillOpacity="0.2"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinejoin="round"
+    />
+    {/* Fenster LKW-Fahrerhaus */}
+    <path
+      d="M168 19 H182 L188 34 H168 Z"
+      fill="#ffffff"
+      fillOpacity="0.92"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinejoin="round"
+    />
+    {/* Scheinwerfer & Rücklicht */}
+    <rect x="197" y="46" width="4.5" height="5.5" rx="1" fill="#f59e0b" />
+    <rect x="10" y="48" width="3" height="5" rx="0.5" fill="#ef4444" />
+    {/* LKW-Räder */}
+    <circle cx="38" cy="61" r="9" fill="#1e293b" stroke="currentColor" strokeWidth="1.9" />
+    <circle cx="38" cy="61" r="3.6" fill="#cbd5e1" />
+    <circle cx="176" cy="61" r="9" fill="#1e293b" stroke="currentColor" strokeWidth="1.9" />
+    <circle cx="176" cy="61" r="3.6" fill="#cbd5e1" />
+  </svg>
+);
+
+const TautlinerSemiSvg = ({ codeLabel = "CODE L", badgeColor = "#4f46e5", className = "w-32 h-12" }) => (
+  <svg viewBox="0 0 225 78" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Schatten */}
+    <ellipse cx="112" cy="70" rx="102" ry="3.5" fill="currentColor" fillOpacity="0.14" />
+    {/* Sattelauflieger Schiebeplane (Tautliner) */}
+    <rect
+      x="8"
+      y="9"
+      width="148"
+      height="44"
+      rx="2"
+      fill="currentColor"
+      fillOpacity="0.12"
+      stroke="currentColor"
+      strokeWidth="2.3"
+    />
+    {/* Dachholm & Planen-Unterkante */}
+    <line x1="8" y1="14" x2="156" y2="14" stroke="currentColor" strokeWidth="1.4" strokeOpacity="0.6" />
+    <line x1="8" y1="48" x2="156" y2="48" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.6" />
+    {/* Senkrechte Rungen */}
+    <line x1="45" y1="9" x2="45" y2="53" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.55" />
+    <line x1="82" y1="9" x2="82" y2="53" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.55" />
+    <line x1="119" y1="9" x2="119" y2="53" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.55" />
+    {/* Planenspanner / Schnallen unten */}
+    {[16, 26, 36, 54, 64, 74, 90, 100, 110, 128, 138, 148].map((sx) => (
+      <line key={sx} x1={sx} y1="48" x2={sx} y2="53" stroke="currentColor" strokeWidth="1.5" strokeOpacity="0.8" />
+    ))}
+    {/* Code-Badge auf der Plane */}
+    <rect x="49" y="21" width="66" height="18" rx="3" fill={badgeColor} />
+    <text x="82" y="33" textAnchor="middle" fontSize="10" fontFamily="sans-serif" fontWeight="900" fill="#ffffff" letterSpacing="0.5">
+      {codeLabel}
+    </text>
+    {/* Chassis Auflieger & Palettenkasten */}
+    <line x1="8" y1="56" x2="158" y2="56" stroke="currentColor" strokeWidth="2.5" />
+    <rect x="72" y="56" width="28" height="6" rx="1" fill="currentColor" fillOpacity="0.45" />
+    {/* Sattelzugmaschine */}
+    <path
+      d="M160 56 V20 C160 16 163 14 167 14 H190 C195 14 198 17 200 22 L206 35 L213 38 C215 39 216 41 216 45 V56 H160 Z"
+      fill="currentColor"
+      fillOpacity="0.2"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinejoin="round"
+    />
+    {/* Fenster Zugmaschine */}
+    <path
+      d="M186 19 H197 L202 33 H186 Z"
+      fill="#ffffff"
+      fillOpacity="0.92"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinejoin="round"
+    />
+    {/* Scheinwerfer & Rücklicht */}
+    <rect x="211" y="46" width="4.5" height="5.5" rx="1" fill="#f59e0b" />
+    <rect x="8" y="48" width="3" height="5" rx="0.5" fill="#ef4444" />
+    {/* 3 Auflieger-Achsen */}
+    {[22, 38, 54].map((cx) => (
+      <g key={cx}>
+        <circle cx={cx} cy="62" r="8" fill="#1e293b" stroke="currentColor" strokeWidth="1.8" />
+        <circle cx={cx} cy="62" r="3.2" fill="#cbd5e1" />
+      </g>
+    ))}
+    {/* Zugmaschinen-Räder */}
+    <circle cx="168" cy="62" r="8" fill="#1e293b" stroke="currentColor" strokeWidth="1.8" />
+    <circle cx="168" cy="62" r="3.2" fill="#cbd5e1" />
+    <circle cx="202" cy="62" r="8" fill="#1e293b" stroke="currentColor" strokeWidth="1.8" />
+    <circle cx="202" cy="62" r="3.2" fill="#cbd5e1" />
+  </svg>
+);
+
+const HamburgerVerdeckTruckSvg = ({ codeLabel = "CODE L", badgeColor = "#4f46e5", className = "w-32 h-12" }) => (
+  <svg viewBox="0 0 215 78" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Schatten */}
+    <ellipse cx="107" cy="70" rx="95" ry="3.5" fill="currentColor" fillOpacity="0.14" />
+    {/* Hamburger Verdeck: Eckiger Planenaufbau oben + hohe Bordwände */}
+    <rect
+      x="10"
+      y="10"
+      width="124"
+      height="34"
+      rx="1.5"
+      fill="currentColor"
+      fillOpacity="0.11"
+      stroke="currentColor"
+      strokeWidth="2.1"
+    />
+    {/* Obere Planenkante / Dachholm */}
+    <line x1="10" y1="15" x2="134" y2="15" stroke="currentColor" strokeWidth="1.2" strokeOpacity="0.5" />
+    {/* Senkrechte Spriegel / Planenstreben */}
+    <line x1="41" y1="10" x2="41" y2="44" stroke="currentColor" strokeWidth="1.3" strokeOpacity="0.45" />
+    <line x1="72" y1="10" x2="72" y2="44" stroke="currentColor" strokeWidth="1.3" strokeOpacity="0.45" />
+    <line x1="103" y1="10" x2="103" y2="44" stroke="currentColor" strokeWidth="1.3" strokeOpacity="0.45" />
+    {/* Zickzack-Zollschnur / Planenösen auf der Plane */}
+    <path
+      d="M14 40 L20 35 L26 40 L32 35 L38 40 M45 40 L51 35 L57 40 L63 35 L69 40 M76 40 L82 35 L88 40 L94 35 L100 40 M107 40 L113 35 L119 40 L125 35 L131 40"
+      stroke="currentColor"
+      strokeWidth="1.1"
+      strokeOpacity="0.65"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    {/* Code-L-Badge auf der Plane */}
+    <rect x="44" y="17" width="56" height="15" rx="2.5" fill={badgeColor} />
+    <text x="72" y="27.5" textAnchor="middle" fontSize="9" fontFamily="sans-serif" fontWeight="900" fill="#ffffff" letterSpacing="0.5">
+      {codeLabel}
+    </text>
+    {/* Hohe feste Alubordwände (kennzeichnend für Hamburger Verdeck) */}
+    <rect
+      x="10"
+      y="44"
+      width="124"
+      height="12"
+      rx="1"
+      fill="currentColor"
+      fillOpacity="0.32"
+      stroke="currentColor"
+      strokeWidth="2.1"
+    />
+    {/* Bordwand-Rungen / Verschlüsse */}
+    <line x1="51" y1="44" x2="51" y2="56" stroke="currentColor" strokeWidth="1.8" />
+    <line x1="93" y1="44" x2="93" y2="56" stroke="currentColor" strokeWidth="1.8" />
+    {/* LKW-Fahrerhaus (Verteiler-LKW 7,5t - 12t) */}
+    <path
+      d="M138 56 V20 C138 16 141 14 145 14 H174 C180 14 184 17 186 22 L192 36 L199 39 C201 40 202 42 202 46 V56 H138 Z"
+      fill="currentColor"
+      fillOpacity="0.2"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinejoin="round"
+    />
+    {/* Fenster LKW-Fahrerhaus */}
+    <path
+      d="M168 19 H182 L188 34 H168 Z"
+      fill="#ffffff"
+      fillOpacity="0.92"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinejoin="round"
+    />
+    {/* Scheinwerfer & Rücklicht */}
+    <rect x="197" y="46" width="4.5" height="5.5" rx="1" fill="#f59e0b" />
+    <rect x="10" y="48" width="3" height="5" rx="0.5" fill="#ef4444" />
+    {/* LKW-Räder */}
+    <circle cx="38" cy="61" r="9" fill="#1e293b" stroke="currentColor" strokeWidth="1.9" />
+    <circle cx="38" cy="61" r="3.6" fill="#cbd5e1" />
+    <circle cx="176" cy="61" r="9" fill="#1e293b" stroke="currentColor" strokeWidth="1.9" />
+    <circle cx="176" cy="61" r="3.6" fill="#cbd5e1" />
+  </svg>
+);
+
+const PolensprinterSvg = ({ codeLabel = "CODE L", badgeColor = "#4f46e5", className = "w-28 h-12" }) => (
+  <svg viewBox="0 0 190 78" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Schatten */}
+    <ellipse cx="95" cy="70" rx="82" ry="3.5" fill="currentColor" fillOpacity="0.14" />
+    {/* Planenaufbau (Polensprinter / 3,5t Pritsche-Plane) */}
+    <rect
+      x="12"
+      y="11"
+      width="100"
+      height="36"
+      rx="2"
+      fill="currentColor"
+      fillOpacity="0.12"
+      stroke="currentColor"
+      strokeWidth="2.2"
+    />
+    {/* Senkrechte Spriegel / Planenstreben */}
+    <line x1="45" y1="11" x2="45" y2="47" stroke="currentColor" strokeWidth="1.3" strokeOpacity="0.45" />
+    <line x1="78" y1="11" x2="78" y2="47" stroke="currentColor" strokeWidth="1.3" strokeOpacity="0.45" />
+    {/* Code-L-Badge auf der Plane */}
+    <rect x="35" y="21" width="54" height="16" rx="2.5" fill={badgeColor} />
+    <text x="62" y="32" textAnchor="middle" fontSize="9" fontFamily="sans-serif" fontWeight="900" fill="#ffffff" letterSpacing="0.5">
+      {codeLabel}
+    </text>
+    {/* Alubordwand unten */}
+    <rect
+      x="12"
+      y="47"
+      width="100"
+      height="9"
+      rx="1"
+      fill="currentColor"
+      fillOpacity="0.3"
+      stroke="currentColor"
+      strokeWidth="2"
+    />
+    {/* Typischer Schlafkabinen-Dachspoiler auf Sprinter-Fahrerhaus */}
+    <path
+      d="M115 25 L115 11 C127 11 135 16 139 25 Z"
+      fill="currentColor"
+      fillOpacity="0.22"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinejoin="round"
+    />
+    {/* Fahrerhaus Sprinter */}
+    <path
+      d="M115 56 V25 H139 L154 38 L172 42 C175 43 177 45 177 49 V56 H115 Z"
+      fill="currentColor"
+      fillOpacity="0.18"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinejoin="round"
+    />
+    {/* Fenster Fahrerhaus */}
+    <path
+      d="M120 28 H136 L149 39 H120 Z"
+      fill="#ffffff"
+      fillOpacity="0.92"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinejoin="round"
+    />
+    {/* Scheinwerfer & Rücklicht */}
+    <rect x="172" y="45" width="4.5" height="5.5" rx="1" fill="#f59e0b" />
+    <rect x="12" y="49" width="3" height="5" rx="0.5" fill="#ef4444" />
+    {/* Räder */}
+    <circle cx="39" cy="61" r="8.8" fill="#1e293b" stroke="currentColor" strokeWidth="1.8" />
+    <circle cx="39" cy="61" r="3.6" fill="#cbd5e1" />
+    <circle cx="155" cy="61" r="8.8" fill="#1e293b" stroke="currentColor" strokeWidth="1.8" />
+    <circle cx="155" cy="61" r="3.6" fill="#cbd5e1" />
+  </svg>
+);
+
+const BoxSemiSvg = ({ codeLabel = "CODE XL", badgeColor = "#059669", className = "w-32 h-12" }) => (
+  <svg viewBox="0 0 225 78" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Schatten */}
+    <ellipse cx="112" cy="70" rx="102" ry="3.5" fill="currentColor" fillOpacity="0.14" />
+    {/* Fester Kofferaufbau (ohne Planenschnallen) */}
+    <rect
+      x="8"
+      y="9"
+      width="148"
+      height="45"
+      rx="1.5"
+      fill="currentColor"
+      fillOpacity="0.22"
+      stroke="currentColor"
+      strokeWidth="2.4"
+    />
+    {/* Koffer-Sicken / Paneel-Linien */}
+    <line x1="8" y1="15" x2="156" y2="15" stroke="currentColor" strokeWidth="1.2" strokeOpacity="0.45" />
+    <line x1="8" y1="49" x2="156" y2="49" stroke="currentColor" strokeWidth="1.4" strokeOpacity="0.55" />
+    <line x1="33" y1="9" x2="33" y2="54" stroke="currentColor" strokeWidth="1.1" strokeOpacity="0.3" />
+    <line x1="131" y1="9" x2="131" y2="54" stroke="currentColor" strokeWidth="1.1" strokeOpacity="0.3" />
+    {/* Code-Badge auf dem Koffer */}
+    <rect x="49" y="21" width="66" height="18" rx="3" fill={badgeColor} />
+    <text x="82" y="33" textAnchor="middle" fontSize="10" fontFamily="sans-serif" fontWeight="900" fill="#ffffff" letterSpacing="0.5">
+      {codeLabel}
+    </text>
+    {/* Chassis Auflieger & Unterfahrschutz */}
+    <line x1="8" y1="56" x2="158" y2="56" stroke="currentColor" strokeWidth="2.5" />
+    <rect x="72" y="56" width="28" height="6" rx="1" fill="currentColor" fillOpacity="0.45" />
+    {/* Sattelzugmaschine */}
+    <path
+      d="M160 56 V20 C160 16 163 14 167 14 H190 C195 14 198 17 200 22 L206 35 L213 38 C215 39 216 41 216 45 V56 H160 Z"
+      fill="currentColor"
+      fillOpacity="0.2"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinejoin="round"
+    />
+    {/* Fenster Zugmaschine */}
+    <path
+      d="M186 19 H197 L202 33 H186 Z"
+      fill="#ffffff"
+      fillOpacity="0.92"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinejoin="round"
+    />
+    {/* Scheinwerfer & Rücklicht */}
+    <rect x="211" y="46" width="4.5" height="5.5" rx="1" fill="#f59e0b" />
+    <rect x="8" y="48" width="3" height="5" rx="0.5" fill="#ef4444" />
+    {/* 3 Auflieger-Achsen */}
+    {[22, 38, 54].map((cx) => (
+      <g key={cx}>
+        <circle cx={cx} cy="62" r="8" fill="#1e293b" stroke="currentColor" strokeWidth="1.8" />
+        <circle cx={cx} cy="62" r="3.2" fill="#cbd5e1" />
+      </g>
+    ))}
+    {/* Zugmaschinen-Räder */}
+    <circle cx="168" cy="62" r="8" fill="#1e293b" stroke="currentColor" strokeWidth="1.8" />
+    <circle cx="168" cy="62" r="3.2" fill="#cbd5e1" />
+    <circle cx="202" cy="62" r="8" fill="#1e293b" stroke="currentColor" strokeWidth="1.8" />
+    <circle cx="202" cy="62" r="3.2" fill="#cbd5e1" />
+  </svg>
+);
+
 const Sign237 = ({ className }) => (
     <svg viewBox="0 0 100 100" className={className}>
         <circle cx="50" cy="50" r="50" fill="#005293"/>
@@ -3031,7 +3455,7 @@ function LashingCalculator({ onOpenKnowledge }) {
 
   const getPrintBodyCertDescription = () => {
     if (bodyCert === 'NONE') {
-      return 'Kein geprüfter Aufbau (z. B. Kleintransporter mit geschlossenem Kastenaufbau)';
+      return 'Kein geprüfter Aufbau (z. B. Kastenwagen oder offener Pritschen-LKW)';
     }
     if (bodyCert === 'XL') {
       return 'Code XL (Zertifizierter Aufbau nach DIN EN 12642 XL - Stirn: 50%, Seite: 30%, Heck: 40% der Nutzlast)';
@@ -3559,34 +3983,69 @@ function LashingCalculator({ onOpenKnowledge }) {
                    <ShieldCheck className="w-3.5 h-3.5" /> Fahrzeugaufbau wählen
                </div>
                <div className="grid grid-cols-2 gap-2">
-                    <button onClick={() => setBodyCert('NONE')} className={`col-span-2 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm border-2 flex flex-col items-center justify-center transition-all ${bodyCert === 'NONE' ? 'bg-slate-700 text-white border-slate-700 shadow-md transform scale-[1.02]' : 'bg-white text-slate-600 border-slate-100 hover:border-indigo-200'}`}>
+                    <button onClick={() => setBodyCert('NONE')} className={`col-span-2 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm border-2 flex flex-col items-center justify-center transition-all ${bodyCert === 'NONE' ? 'bg-slate-700 text-white border-slate-700 shadow-md transform scale-[1.01]' : 'bg-white text-slate-600 border-slate-100 hover:border-indigo-200'}`}>
+                         <div className="grid grid-cols-2 gap-3 items-end mb-1.5 w-full max-w-[320px]">
+                           <div className="flex flex-col items-center">
+                             <VanBoxSvg className={`w-full h-12 ${bodyCert === 'NONE' ? 'text-white' : 'text-slate-700'}`} />
+                             <span className={`text-[9px] font-semibold mt-0.5 ${bodyCert === 'NONE' ? 'text-slate-200' : 'text-slate-500'}`}>Kastenwagen</span>
+                           </div>
+                           <div className="flex flex-col items-center">
+                             <FlatbedConstructionTruckSvg className={`w-full h-12 ${bodyCert === 'NONE' ? 'text-white' : 'text-slate-700'}`} />
+                             <span className={`text-[9px] font-semibold mt-0.5 ${bodyCert === 'NONE' ? 'text-slate-200' : 'text-slate-500'}`}>Offener Pritschen-LKW</span>
+                           </div>
+                         </div>
                          <span>Kein geprüfter Aufbau</span>
-                         <span className={`text-[10px] font-normal mt-0.5 ${bodyCert === 'NONE' ? 'text-slate-200' : 'text-slate-400'}`}>(z.B.: Kleintransporter mit geschlossenem Kastenaufbau)</span>
+                         <span className={`text-[10px] font-normal mt-0.5 ${bodyCert === 'NONE' ? 'text-slate-200' : 'text-slate-400'}`}>(z.B.: Kastenwagen oder offener Pritschen-LKW)</span>
                    </button>
-                   <button onClick={() => setBodyCert('L')} className={`py-2.5 px-2 rounded-xl font-bold text-xs sm:text-sm border-2 flex flex-col items-center justify-center text-center transition-all ${bodyCert === 'L' ? 'bg-indigo-600 text-white border-indigo-600 shadow-md transform scale-[1.02]' : 'bg-white text-slate-600 border-slate-100 hover:border-indigo-200'}`}>
+                   <button onClick={() => setBodyCert('L')} className={`col-span-2 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm border-2 flex flex-col items-center justify-between text-center transition-all ${bodyCert === 'L' ? 'bg-indigo-600 text-white border-indigo-600 shadow-md transform scale-[1.01]' : 'bg-white text-slate-600 border-slate-100 hover:border-indigo-200'}`}>
+                       <div className="grid grid-cols-3 gap-1.5 items-end mb-1.5 w-full">
+                         <div className="flex flex-col items-center">
+                           <TautlinerSemiSvg codeLabel="CODE L" badgeColor={bodyCert === 'L' ? '#312e81' : '#4f46e5'} className={`w-full h-11 ${bodyCert === 'L' ? 'text-white' : 'text-indigo-700'}`} />
+                           <span className={`text-[8.5px] font-semibold mt-0.5 ${bodyCert === 'L' ? 'text-indigo-100' : 'text-slate-500'}`}>Planenauflieger</span>
+                         </div>
+                         <div className="flex flex-col items-center">
+                           <HamburgerVerdeckTruckSvg codeLabel="CODE L" badgeColor={bodyCert === 'L' ? '#312e81' : '#4f46e5'} className={`w-full h-11 ${bodyCert === 'L' ? 'text-white' : 'text-indigo-700'}`} />
+                           <span className={`text-[8.5px] font-semibold mt-0.5 ${bodyCert === 'L' ? 'text-indigo-100' : 'text-slate-500'}`}>Hamburger Verdeck</span>
+                         </div>
+                         <div className="flex flex-col items-center">
+                           <PolensprinterSvg codeLabel="CODE L" badgeColor={bodyCert === 'L' ? '#312e81' : '#4f46e5'} className={`w-full h-11 ${bodyCert === 'L' ? 'text-white' : 'text-indigo-700'}`} />
+                           <span className={`text-[8.5px] font-semibold mt-0.5 ${bodyCert === 'L' ? 'text-indigo-100' : 'text-slate-500'}`}>Polensprinter</span>
+                         </div>
+                       </div>
                        <span>Code L</span>
-                       <span className={`text-[9px] font-normal leading-tight mt-0.5 ${bodyCert === 'L' ? 'text-indigo-100' : 'text-slate-400'}`}>(z.B. „Polensprinter, Planenauflieger, Hamburger Verdeck“)</span>
+                       <span className={`text-[10px] font-normal leading-tight mt-0.5 ${bodyCert === 'L' ? 'text-indigo-100' : 'text-slate-400'}`}>(Planenauflieger, Hamburger Verdeck, Polensprinter)</span>
                    </button>
-                    <button onClick={() => setBodyCert('XL')} className={`py-2.5 px-2 rounded-xl font-bold text-xs sm:text-sm border-2 flex flex-col items-center justify-center transition-all ${bodyCert === 'XL' ? 'bg-indigo-600 text-white border-indigo-600 shadow-md transform scale-[1.02]' : 'bg-white text-slate-600 border-slate-100 hover:border-indigo-200'}`}>
+                    <button onClick={() => setBodyCert('XL')} className={`col-span-2 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm border-2 flex flex-col items-center justify-between text-center transition-all ${bodyCert === 'XL' ? 'bg-indigo-600 text-white border-indigo-600 shadow-md transform scale-[1.01]' : 'bg-white text-slate-600 border-slate-100 hover:border-indigo-200'}`}>
+                       <div className="grid grid-cols-2 gap-3 items-end mb-1.5 w-full max-w-[320px]">
+                         <div className="flex flex-col items-center">
+                           <TautlinerSemiSvg codeLabel="CODE XL" badgeColor={bodyCert === 'XL' ? '#065f46' : '#059669'} className={`w-full h-12 ${bodyCert === 'XL' ? 'text-white' : 'text-emerald-700'}`} />
+                           <span className={`text-[9px] font-semibold mt-0.5 ${bodyCert === 'XL' ? 'text-indigo-100' : 'text-slate-500'}`}>Planenauflieger</span>
+                         </div>
+                         <div className="flex flex-col items-center">
+                           <BoxSemiSvg codeLabel="CODE XL" badgeColor={bodyCert === 'XL' ? '#065f46' : '#059669'} className={`w-full h-12 ${bodyCert === 'XL' ? 'text-white' : 'text-emerald-700'}`} />
+                           <span className={`text-[9px] font-semibold mt-0.5 ${bodyCert === 'XL' ? 'text-indigo-100' : 'text-slate-500'}`}>Festaufbau (Koffer)</span>
+                         </div>
+                       </div>
                        <span>Code XL</span>
+                       <span className={`text-[10px] font-normal leading-tight mt-0.5 ${bodyCert === 'XL' ? 'text-indigo-100' : 'text-slate-400'}`}>(Zertifizierter Planenauflieger / Festaufbau)</span>
                    </button>
                </div>
 
                {bodyCert === 'L' && (
                    <div className="mt-3 pt-2.5 border-t border-slate-100 animate-in fade-in slide-in-from-top-1 duration-200 space-y-2.5">
-                       {/* Auswahl: Planenauflieger vs. Hamburger Verdeck / Polensprinter */}
+                       {/* Auswahl: Planenauflieger vs. Hamburger Verdeck / Polensprinter (nur Text, ohne Bilder) */}
                        <div className="grid grid-cols-2 gap-2">
                            <button
                                onClick={() => setCodeLType('planenauflieger')}
-                               className={`py-2 px-2 rounded-lg font-bold text-xs border transition-all flex items-center justify-center text-center ${codeLType === 'planenauflieger' ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}
+                               className={`py-2.5 px-2 rounded-lg font-bold text-xs border transition-all flex items-center justify-center text-center ${codeLType === 'planenauflieger' ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}
                            >
-                               Planenauflieger
+                               <span>Planenauflieger</span>
                            </button>
                            <button
                                onClick={() => setCodeLType('hamburger')}
-                               className={`py-2 px-2 rounded-lg font-bold text-xs border transition-all flex items-center justify-center text-center leading-tight ${codeLType === 'hamburger' ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}
+                               className={`py-2.5 px-2 rounded-lg font-bold text-xs border transition-all flex items-center justify-center text-center leading-tight ${codeLType === 'hamburger' ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}
                            >
-                               Hamburger Verdeck / Polensprinter
+                               <span>Hamburger Verdeck / Polensprinter</span>
                            </button>
                        </div>
 
@@ -3672,9 +4131,12 @@ function LashingCalculator({ onOpenKnowledge }) {
                     <RotateCw className={`w-4 h-4 ${isTippingHazard ? 'text-amber-600' : 'text-slate-400'}`} />
                     <span>Ladung kippgefährdet</span>
                   </span>
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${isTippingHazard ? 'bg-amber-500 text-white' : 'bg-slate-200 text-slate-500'}`}>
-                    {isTippingHazard ? 'Aktiv' : 'Aus'}
-                  </span>
+                  <input
+                    type="checkbox"
+                    checked={isTippingHazard}
+                    readOnly
+                    className="w-4 h-4 rounded border-slate-300 text-amber-600 pointer-events-none"
+                  />
                 </button>
                 <button
                   type="button"
