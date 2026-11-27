@@ -12,13 +12,12 @@ import {
 // ============================================================================
 // SCHRITT FÜR VS CODE / VERCEL:
 // Lösche in VS Code einfach die zwei Schrägstriche (//) vor der nächsten Zeile:
-//import tatbestaendeData from './Tatbestaende.json';
+import tatbestaendeData from './Tatbestaende.json';
 //const tatbestaendeData = [];
 // ============================================================================
 
 // --- THEME CONTEXT & STYLES ---
 const ThemeContext = React.createContext({ isDarkMode: false, toggleDarkMode: () => {} });
-const PrintContext = React.createContext({ isPrinting: false, triggerPrint: () => {}, cancelPrint: () => {} });
 
 const darkThemeCSS = `
   .dark { background-color: #0f172a; min-height: 100vh; }
@@ -53,196 +52,947 @@ const darkThemeCSS = `
   .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; }
 `;
 
-// --- GLOBAL STYLES FOR PRINTING ---
+// --- VERSTECKTE PROTOKOLL-CONTAINER (WERDEN DIREKT ALS PDF EXPORTIERT, NIE ANGEZEIGT) ---
 const PrintStyles = () => (
   <style>{`
-    @media print {
-      @page {
-        size: A4;
-        margin: 1.2cm;
-      }
-      html, body {
-        background: #ffffff !important;
-        background-color: #ffffff !important;
-        color: #000000 !important;
-        font-family: Arial, Helvetica, sans-serif !important;
-        font-size: 10.5pt !important;
-        height: auto !important;
-        min-height: 0 !important;
-        overflow: visible !important;
-        position: static !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-      }
-
-      /* iOS WebKit: Flex- und Höhen-Container aufbrechen, damit mehrere Seiten sauber gedruckt werden */
-      #root, .app-shell, .app-content {
-        display: block !important;
-        height: auto !important;
-        min-height: 0 !important;
-        max-width: 100% !important;
-        width: 100% !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        overflow: visible !important;
-        background: #ffffff !important;
-      }
-      
-      /* HIDE SCREEN ELEMENTS */
-      .no-print, nav, footer, button, .screen-only, .fixed, .sticky {
-        display: none !important;
-      }
-
-      /* SHOW PRINT ELEMENTS */
-      .print-only {
-        display: block !important;
-      }
-
-      /* GENERAL PRINT LAYOUT */
-      .print-container {
-        width: 100%;
-        max-width: 100%;
-        margin: 0;
-        padding: 0;
-        color: #1e293b;
-        background: #ffffff !important;
-      }
-      body {
-        background-color: white !important;
-        color: #000 !important;
-        font-family: Arial, Helvetica, sans-serif !important;
-        font-size: 11pt !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-      }
-      
-      /* HIDE SCREEN ELEMENTS */
-      .no-print, nav, footer, button, .screen-only, .fixed, .sticky {
-        display: none !important;
-      }
-
-      /* SHOW PRINT ELEMENTS */
-      .print-only {
-        display: block !important;
-      }
-
-      /* GENERAL PRINT LAYOUT */
-      .print-container {
-        width: 100%;
-        max-width: 100%;
-        margin: 0;
-        padding: 0;
-        color: #1e293b;
-      }
-
-      h1.print-title {
-        font-size: 16pt;
-        font-weight: 900;
-        margin-bottom: 4px;
-        border-bottom: 2px solid #0f172a;
-        padding-bottom: 6px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: #0f172a;
-      }
-
-      h2.print-section {
-        font-size: 11pt;
-        font-weight: 800;
-        margin-top: 16px;
-        margin-bottom: 8px;
-        background-color: #f1f5f9 !important;
-        padding: 5px 10px;
-        border-left: 4px solid #334155;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: #0f172a;
-      }
-
-      .print-meta {
-        font-size: 9pt;
-        color: #475569;
-        margin-bottom: 16px;
-      }
-
-      /* PRINT TABLES */
-      table.print-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 14px;
-        font-size: 9.5pt;
-        page-break-inside: avoid;
-      }
-      
-      table.print-table th, table.print-table td {
-        border: 1px solid #cbd5e1;
-        padding: 6px 10px;
-        text-align: left;
-        vertical-align: middle;
-      }
-
-      table.print-table th {
-        background-color: #f8fafc !important;
-        font-weight: 700;
-        color: #334155;
-        width: 38%;
-      }
-
-      /* RESULT BOX IN PRINT */
-      .print-result-box {
-        border: 2px solid #0f172a;
-        border-radius: 6px;
-        padding: 12px 14px;
-        margin-top: 14px;
-        page-break-inside: avoid;
-        background-color: #f8fafc !important;
-      }
-      
-      .print-result-header {
-        font-weight: 900;
-        font-size: 11pt;
-        margin-bottom: 6px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        border-bottom: 1px solid #cbd5e1;
-        padding-bottom: 4px;
-      }
-
-      .print-warning {
-        color: #dc2626 !important;
-        font-weight: bold;
-      }
-
-      /* HIDE ICONS GLOBALLY IN PRINT */
-      svg:not(.print-safe) {
-        display: none !important;
-      }
-    }
-
-    /* SCREEN ONLY STYLES */
     .print-only {
-      display: none;
-    }
-
-    /* AKTIVER DRUCKMODUS (für iOS Safari / iPadOS / PWA) */
-    .is-printing-mode .no-print {
-      display: none !important;
-    }
-    .is-printing-mode .print-only {
-      display: block !important;
-      background: #ffffff !important;
-      padding: 16px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      margin-bottom: 24px;
-    }
-    .is-printing-mode .print-only svg:not(.print-safe) {
       display: none !important;
     }
   `}</style>
 );
+
+// --- DIREKTER A4-VEKTOR-PDF-GENERATOR (FÜR iOS & ANDROID OHNE DRUCKVORSCHAU) ---
+const JSPDF_CDN_URLS = [
+  'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+  'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js'
+];
+
+let jsPdfLoadPromise = null;
+
+// Prüft, ob jsPDF bereits synchron im Speicher verfügbar ist (wichtig für iOS Safari User-Gesture)
+const getLoadedJsPdf = () => {
+  if (typeof window === 'undefined') return null;
+  if (window.jspdf && typeof window.jspdf.jsPDF === 'function') return window.jspdf.jsPDF;
+  if (typeof window.jsPDF === 'function') return window.jsPDF;
+  return null;
+};
+
+// Lädt jsPDF einmalig im Hintergrund vor, damit der Download-Klick auf iOS sofort synchron ausgelöst wird
+const preloadJsPdf = () => {
+  const existing = getLoadedJsPdf();
+  if (existing) return Promise.resolve(existing);
+  if (jsPdfLoadPromise) return jsPdfLoadPromise;
+
+  jsPdfLoadPromise = new Promise((resolve, reject) => {
+    const loadFromIndex = (idx) => {
+      if (idx >= JSPDF_CDN_URLS.length) {
+        jsPdfLoadPromise = null;
+        reject(new Error('PDF-Bibliothek konnte nicht geladen werden. Bitte Internetverbindung prüfen.'));
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = JSPDF_CDN_URLS[idx];
+      script.async = true;
+      script.onload = () => {
+        const ctor = getLoadedJsPdf();
+        if (ctor) resolve(ctor);
+        else loadFromIndex(idx + 1);
+      };
+      script.onerror = () => {
+        script.remove();
+        loadFromIndex(idx + 1);
+      };
+      document.head.appendChild(script);
+    };
+    loadFromIndex(0);
+  });
+
+  return jsPdfLoadPromise;
+};
+
+// Wandelt Sonderzeichen außerhalb des PDF-Standardzeichensatzes (WinAnsi) sauber um
+const sanitizePdfText = (rawText) => {
+  if (!rawText) return '';
+  return String(rawText)
+    .replace(/\u00A0/g, ' ')
+    .replace(/⚠️|⚠/g, 'ACHTUNG: ')
+    .replace(/α/g, 'alpha')
+    .replace(/≥/g, '>=')
+    .replace(/≤/g, '<=')
+    .replace(/−/g, '-')
+    .replace(/➔|→/g, '->')
+    .replace(/˜/g, '~')
+    .replace(/[₀₁₂₃₄₅₆₇₈₉]/g, (ch) => String('₀₁₂₃₄₅₆₇₈₉'.indexOf(ch)))
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
+// Parst Hex- oder RGB-Farbangaben in [r, g, b]
+const parseCssColor = (colorStr, fallback = [15, 23, 42]) => {
+  if (!colorStr || colorStr === 'none' || colorStr === 'transparent') return null;
+  const s = colorStr.trim().toLowerCase();
+  if (s === 'white') return [255, 255, 255];
+  if (s === 'black') return [0, 0, 0];
+  if (s.startsWith('#')) {
+    let hex = s.slice(1);
+    if (hex.length === 3) hex = hex.split('').map((c) => c + c).join('');
+    if (hex.length === 6) {
+      return [
+        parseInt(hex.slice(0, 2), 16),
+        parseInt(hex.slice(2, 4), 16),
+        parseInt(hex.slice(4, 6), 16)
+      ];
+    }
+  }
+  const rgbMatch = s.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+  if (rgbMatch) {
+    return [Number(rgbMatch[1]), Number(rgbMatch[2]), Number(rgbMatch[3])];
+  }
+  return fallback;
+};
+
+// Erzeugt einen sauberen, betriebssystem- und iOS-sicheren PDF-Dateinamen
+const buildPdfFilename = (titleText) => {
+  const now = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  const stamp = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}_${pad(now.getHours())}-${pad(now.getMinutes())}`;
+  const cleanTitle = (titleText || 'Protokoll')
+    .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue')
+    .replace(/Ä/g, 'Ae').replace(/Ö/g, 'Oe').replace(/Ü/g, 'Ue')
+    .replace(/ß/g, 'ss')
+    .replace(/[^a-zA-Z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '') || 'Protokoll';
+  return `${cleanTitle}_${stamp}.pdf`;
+};
+
+// Zeichnet SVG-Grafiken (z. B. PKW-Transporter) synchron und gestochen scharf als Vektorgrafik ins PDF
+const renderSvgToJsPdf = (doc, svgEl, boxX, boxY, boxW, boxH, options = {}) => {
+  const { label = '', variant = '' } = options;
+  const headerH = label ? 7.5 : 0;
+
+  const isSoll = variant === 'soll';
+  const borderRgb = isSoll ? [16, 185, 129] : [148, 163, 184];
+  const headerBgRgb = isSoll ? [236, 253, 245] : [241, 245, 249];
+  const headerTextRgb = isSoll ? [6, 95, 70] : [30, 41, 59];
+
+  // Weißer Kartenhintergrund
+  doc.setFillColor(255, 255, 255);
+  doc.roundedRect(boxX, boxY, boxW, boxH, 2, 2, 'F');
+
+  // Optionaler farbiger Kopfbalken für die Gegenüberstellung (Ist- vs. Soll-Zustand)
+  if (label) {
+    doc.setFillColor(...headerBgRgb);
+    doc.roundedRect(boxX, boxY, boxW, headerH, 2, 2, 'F');
+    doc.rect(boxX, boxY + headerH - 2, boxW, 2, 'F');
+
+    doc.setDrawColor(...borderRgb);
+    doc.setLineWidth(0.25);
+    doc.line(boxX, boxY + headerH, boxX + boxW, boxY + headerH);
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8.2);
+    doc.setTextColor(...headerTextRgb);
+    doc.text(sanitizePdfText(label).toUpperCase(), boxX + boxW / 2, boxY + 5.1, { align: 'center' });
+  }
+
+  // Rahmen sauber über Karte & Kopfbalken zeichnen
+  doc.setDrawColor(...borderRgb);
+  doc.setLineWidth(0.35);
+  doc.roundedRect(boxX, boxY, boxW, boxH, 2, 2, 'S');
+
+  const innerPadX = 3;
+  const innerPadY = 2.5;
+  const svgAreaX = boxX + innerPadX;
+  const svgAreaY = boxY + headerH + innerPadY;
+  const svgAreaW = Math.max(10, boxW - innerPadX * 2);
+  const svgAreaH = Math.max(10, boxH - headerH - innerPadY * 2);
+
+  const vbAttr = svgEl.getAttribute('viewBox') || '0 0 130 200';
+  const vbParts = vbAttr.trim().split(/[\s,]+/).map(Number);
+  const vbX = vbParts[0] || 0;
+  const vbY = vbParts[1] || 0;
+  const vbW = vbParts[2] || 130;
+  const vbH = vbParts[3] || 200;
+
+  const scale = Math.min(svgAreaW / vbW, svgAreaH / vbH);
+  const drawW = vbW * scale;
+  const drawH = vbH * scale;
+  const baseX = svgAreaX + (svgAreaW - drawW) / 2;
+  const baseY = svgAreaY + (svgAreaH - drawH) / 2;
+
+  const sx = (x) => baseX + (x - vbX) * scale;
+  const sy = (y) => baseY + (y - vbY) * scale;
+
+  const walkSvgNode = (node, ox, oy) => {
+    if (!node || node.nodeType !== 1) return;
+    const tag = node.tagName.toLowerCase();
+
+    let tx = ox;
+    let ty = oy;
+    const transformAttr = node.getAttribute('transform');
+    if (transformAttr) {
+      const m = transformAttr.match(/translate\(\s*([-\d.]+)(?:[\s,]+([-\d.]+))?\s*\)/);
+      if (m) {
+        tx += parseFloat(m[1]) || 0;
+        ty += parseFloat(m[2]) || 0;
+      }
+    }
+
+    if (tag === 'g' || tag === 'svg') {
+      Array.from(node.children).forEach((child) => walkSvgNode(child, tx, ty));
+      return;
+    }
+
+    const fillAttr = node.getAttribute('fill');
+    const strokeAttr = node.getAttribute('stroke');
+    const strokeWidthAttr = parseFloat(node.getAttribute('stroke-width') || '1');
+    const dashAttr = node.getAttribute('stroke-dasharray');
+
+    // Gelbe Radkeile (#fde047) im PDF etwas satter zeichnen, damit sie auf weißem Papier gut sichtbar sind
+    const normalizedStroke = strokeAttr && strokeAttr.toLowerCase() === '#fde047' ? '#eab308' : strokeAttr;
+    const fillRgb = parseCssColor(fillAttr, null);
+    const strokeRgb = parseCssColor(normalizedStroke, null);
+
+    if (dashAttr && typeof doc.setLineDashPattern === 'function') {
+      doc.setLineDashPattern([1, 1], 0);
+    }
+
+    if (tag === 'rect') {
+      const x = (parseFloat(node.getAttribute('x')) || 0) + tx;
+      const y = (parseFloat(node.getAttribute('y')) || 0) + ty;
+      const w = parseFloat(node.getAttribute('width')) || 0;
+      const h = parseFloat(node.getAttribute('height')) || 0;
+      const rx = parseFloat(node.getAttribute('rx')) || 0;
+
+      let style = '';
+      if (fillRgb) {
+        doc.setFillColor(...fillRgb);
+        style += 'F';
+      }
+      if (strokeRgb) {
+        doc.setDrawColor(...strokeRgb);
+        doc.setLineWidth(Math.max(0.18, strokeWidthAttr * scale));
+        style += 'D';
+      }
+      if (style) {
+        if (rx > 0) {
+          doc.roundedRect(sx(x), sy(y), w * scale, h * scale, rx * scale, rx * scale, style);
+        } else {
+          doc.rect(sx(x), sy(y), w * scale, h * scale, style);
+        }
+      }
+    } else if (tag === 'line') {
+      const x1 = (parseFloat(node.getAttribute('x1')) || 0) + tx;
+      const y1 = (parseFloat(node.getAttribute('y1')) || 0) + ty;
+      const x2 = (parseFloat(node.getAttribute('x2')) || 0) + tx;
+      const y2 = (parseFloat(node.getAttribute('y2')) || 0) + ty;
+      if (strokeRgb) {
+        doc.setDrawColor(...strokeRgb);
+        doc.setLineWidth(Math.max(0.22, strokeWidthAttr * scale));
+        doc.line(sx(x1), sy(y1), sx(x2), sy(y2));
+      }
+    } else if (tag === 'path') {
+      const d = node.getAttribute('d') || '';
+      const tokens = d.match(/[MLHVZmlhvz]|-?\d*\.?\d+/g) || [];
+      if (strokeRgb && tokens.length > 0) {
+        doc.setDrawColor(...strokeRgb);
+        doc.setLineWidth(Math.max(0.22, strokeWidthAttr * scale));
+        let i = 0;
+        let cmd = '';
+        let cx = 0;
+        let cy = 0;
+        let startX = 0;
+        let startY = 0;
+        while (i < tokens.length) {
+          if (/^[MLHVZmlhvz]$/.test(tokens[i])) {
+            cmd = tokens[i++];
+          }
+          if (cmd === 'M' || cmd === 'm') {
+            const nx = parseFloat(tokens[i++]);
+            const ny = parseFloat(tokens[i++]);
+            cx = cmd === 'm' ? cx + nx : nx;
+            cy = cmd === 'm' ? cy + ny : ny;
+            startX = cx;
+            startY = cy;
+            cmd = cmd === 'm' ? 'l' : 'L';
+          } else if (cmd === 'L' || cmd === 'l') {
+            const nx = parseFloat(tokens[i++]);
+            const ny = parseFloat(tokens[i++]);
+            const ex = cmd === 'l' ? cx + nx : nx;
+            const ey = cmd === 'l' ? cy + ny : ny;
+            doc.line(sx(cx + tx), sy(cy + ty), sx(ex + tx), sy(ey + ty));
+            cx = ex;
+            cy = ey;
+          } else if (cmd === 'Z' || cmd === 'z') {
+            doc.line(sx(cx + tx), sy(cy + ty), sx(startX + tx), sy(startY + ty));
+            cx = startX;
+            cy = startY;
+          } else {
+            i++;
+          }
+        }
+      }
+    } else if (tag === 'text') {
+      const x = (parseFloat(node.getAttribute('x')) || 0) + tx;
+      const y = (parseFloat(node.getAttribute('y')) || 0) + ty;
+      const fontSizeAttr = parseFloat(node.getAttribute('font-size') || '8');
+      const isBold = (node.getAttribute('font-weight') || '').includes('bold');
+      const isUpper = (node.getAttribute('class') || '').includes('uppercase');
+      const anchor = node.getAttribute('text-anchor') || 'start';
+      const txtColor = parseCssColor(fillAttr, [51, 65, 85]);
+      let txt = sanitizePdfText(node.textContent);
+      if (isUpper) txt = txt.toUpperCase();
+
+      if (txt) {
+        doc.setFont('helvetica', isBold ? 'bold' : 'normal');
+        doc.setFontSize(Math.max(5.5, fontSizeAttr * scale * 2.65));
+        doc.setTextColor(...(txtColor || [51, 65, 85]));
+        const align = anchor === 'middle' ? 'center' : anchor === 'end' ? 'right' : 'left';
+        doc.text(txt, sx(x), sy(y), { align });
+      }
+    }
+
+    if (dashAttr && typeof doc.setLineDashPattern === 'function') {
+      doc.setLineDashPattern([], 0);
+    }
+  };
+
+  walkSvgNode(svgEl, 0, 0);
+};
+
+// Löst den reinen Datei-Download auf iOS (Safari/Chrome) und Android (Chrome/Firefox) ohne Vorschau aus
+const triggerPdfBlobDownload = (doc, filename) => {
+  const pdfArrayBuffer = doc.output('arraybuffer');
+  const blob = new Blob([pdfArrayBuffer], { type: 'application/pdf' });
+  const blobUrl = URL.createObjectURL(blob);
+
+  const link = document.createElement('a');
+  link.href = blobUrl;
+  link.download = filename;
+  link.rel = 'noopener noreferrer';
+  link.style.display = 'none';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  // URL erst verzögert freigeben, damit iOS nach Bestätigung des nativen "Laden"-Dialogs sicher darauf zugreifen kann
+  setTimeout(() => {
+    URL.revokeObjectURL(blobUrl);
+  }, 60000);
+};
+
+// Erstellt aus dem jeweiligen .print-container ein sauberes mehrseitiges A4-Vektor-PDF
+const generateProtocolPdf = (JsPDFCtor, containerEl) => {
+  const doc = new JsPDFCtor({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const pageWidth = 210;
+  const pageHeight = 297;
+  const marginX = 14;
+  const marginTop = 14;
+  const maxY = pageHeight - 18;
+  const contentWidth = pageWidth - marginX * 2;
+  let y = marginTop;
+
+  const titleEl = containerEl.querySelector('h1.print-title');
+  const titleText = sanitizePdfText(titleEl ? titleEl.textContent : 'Protokoll');
+  const metaEl = containerEl.querySelector('.print-meta');
+  const footerMetaText = sanitizePdfText(metaEl ? metaEl.textContent : '');
+
+  const ensureSpace = (neededMm) => {
+    if (y + neededMm > maxY) {
+      doc.addPage();
+      y = marginTop;
+      return true;
+    }
+    return false;
+  };
+
+  // Zeichnet den Dokumentkopf
+  const drawDocumentHeader = (mainTitle, subtitleLine, rightMetaLine) => {
+    ensureSpace(18);
+    if (subtitleLine) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(71, 85, 105);
+      doc.text(subtitleLine.toUpperCase(), marginX, y);
+      y += 4.5;
+    }
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14.5);
+    doc.setTextColor(15, 23, 42);
+    const titleLines = doc.splitTextToSize(mainTitle.toUpperCase(), rightMetaLine ? contentWidth - 48 : contentWidth);
+    doc.text(titleLines, marginX, y);
+
+    if (rightMetaLine) {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8.5);
+      doc.setTextColor(71, 85, 105);
+      doc.text(rightMetaLine, marginX + contentWidth, y, { align: 'right' });
+    }
+
+    y += titleLines.length * 5.8;
+    doc.setDrawColor(15, 23, 42);
+    doc.setLineWidth(0.65);
+    doc.line(marginX, y, marginX + contentWidth, y);
+    y += 4.5;
+  };
+
+  // Zeichnet eine Abschnittsüberschrift (h2.print-section)
+  const drawSectionHeading = (text) => {
+    const clean = sanitizePdfText(text).toUpperCase();
+    if (!clean) return;
+    ensureSpace(16);
+    y += 2;
+    const h = 7.2;
+    doc.setFillColor(241, 245, 249);
+    doc.rect(marginX, y, contentWidth, h, 'F');
+    doc.setFillColor(51, 65, 85);
+    doc.rect(marginX, y, 1.4, h, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9.5);
+    doc.setTextColor(15, 23, 42);
+    doc.text(clean, marginX + 4, y + 4.9);
+    y += h + 3;
+  };
+
+  // Zeichnet die PKW-Legende mit echten farbigen Symbolen
+  const drawPkwLegend = (startX, availW) => {
+    ensureSpace(12);
+    const items = [
+      { label: 'Radkeil', type: 'chock' },
+      { label: 'Autotransportgurt', type: 'strap' },
+      { label: 'Mulde / Brille', type: 'mulde' },
+      { label: 'Rad', type: 'wheel' }
+    ];
+    const colW = availW / items.length;
+    items.forEach((item, idx) => {
+      const ix = startX + idx * colW;
+      const cy = y + 3.5;
+      if (item.type === 'chock') {
+        doc.setFillColor(234, 179, 8);
+        doc.setDrawColor(202, 138, 4);
+        doc.setLineWidth(0.2);
+        doc.rect(ix, cy - 0.8, 6, 1.6, 'FD');
+      } else if (item.type === 'strap') {
+        doc.setFillColor(59, 130, 246);
+        doc.setDrawColor(29, 78, 216);
+        doc.setLineWidth(0.2);
+        doc.rect(ix, cy - 0.8, 6, 1.6, 'FD');
+      } else if (item.type === 'mulde') {
+        doc.setDrawColor(148, 163, 184);
+        doc.setLineWidth(0.55);
+        doc.line(ix, cy - 1.5, ix, cy + 1.5);
+        doc.line(ix, cy + 1.5, ix + 6, cy + 1.5);
+        doc.line(ix + 6, cy + 1.5, ix + 6, cy - 1.5);
+      } else if (item.type === 'wheel') {
+        doc.setFillColor(15, 23, 42);
+        doc.roundedRect(ix + 1.5, cy - 2.3, 2.8, 4.6, 0.5, 0.5, 'F');
+      }
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8.5);
+      doc.setTextColor(30, 41, 59);
+      doc.text(item.label, ix + 8, cy + 1.1);
+    });
+    y += 8;
+  };
+
+  // Zeichnet eine strukturierte Tabelle (mit colSpan, Umbruch & wiederholter Kopfzeile)
+  const drawTable = (tableEl, xOffset = marginX, availWidth = contentWidth) => {
+    const theadRows = Array.from(tableEl.querySelectorAll(':scope > thead > tr'));
+    const tbodyRows = Array.from(tableEl.querySelectorAll(':scope > tbody > tr'));
+    const allRows = [...theadRows, ...tbodyRows];
+    if (allRows.length === 0) return;
+
+    // Prüfen, ob es sich um die farbige PKW-Legendentabelle handelt
+    const firstRowCells = Array.from(allRows[0].children);
+    const isLegendTable = firstRowCells.some((c) => c.querySelector('div') && !sanitizePdfText(c.textContent));
+    if (isLegendTable) {
+      drawPkwLegend(xOffset, availWidth);
+      return;
+    }
+
+    let numCols = 1;
+    allRows.forEach((tr) => {
+      let spanSum = 0;
+      Array.from(tr.children).forEach((cell) => {
+        spanSum += parseInt(cell.getAttribute('colspan') || '1', 10);
+      });
+      if (spanSum > numCols) numCols = spanSum;
+    });
+
+    // Intelligente Spaltenbreitenverteilung
+    let colWidths = [];
+    if (numCols === 2) {
+      colWidths = [availWidth * 0.40, availWidth * 0.60];
+    } else if (numCols === 4 && theadRows.length === 0) {
+      colWidths = [availWidth * 0.27, availWidth * 0.23, availWidth * 0.27, availWidth * 0.23];
+    } else {
+      colWidths = Array(numCols).fill(availWidth / numCols);
+    }
+
+    const renderRow = (tr, isHeaderRow) => {
+      const cells = Array.from(tr.children);
+      let colCursor = 0;
+      const preparedCells = cells.map((cell) => {
+        const span = parseInt(cell.getAttribute('colspan') || '1', 10);
+        let w = 0;
+        for (let k = 0; k < span; k++) {
+          w += colWidths[colCursor + k] || (availWidth / numCols);
+        }
+        const cellX = xOffset + colWidths.slice(0, colCursor).reduce((a, b) => a + b, 0);
+        colCursor += span;
+
+        const isTh = cell.tagName.toLowerCase() === 'th';
+        const isWarning = cell.classList.contains('print-warning') || Boolean(cell.querySelector('.print-warning'));
+        const inlineStyle = (cell.getAttribute('style') || '').toLowerCase();
+        const isGreen = inlineStyle.includes('#16a34a') || inlineStyle.includes('22, 163, 74');
+        const isBold = isHeaderRow || isTh || isWarning || isGreen || Boolean(cell.querySelector('strong'));
+        const isCenter = inlineStyle.includes('text-align: center') || inlineStyle.includes('text-align:center');
+        const text = sanitizePdfText(cell.textContent);
+
+        doc.setFont('helvetica', isBold ? 'bold' : 'normal');
+        doc.setFontSize(8.2);
+        const lines = text ? doc.splitTextToSize(text, Math.max(10, w - 3.6)) : [''];
+
+        return { cellX, w, isTh, isHeaderRow, isWarning, isGreen, isBold, isCenter, lines };
+      });
+
+      const maxLines = Math.max(1, ...preparedCells.map((c) => c.lines.length));
+      const rowH = Math.max(6.8, maxLines * 3.9 + 3.0);
+
+      const addedPage = ensureSpace(rowH);
+      if (addedPage && !isHeaderRow && theadRows.length > 0) {
+        theadRows.forEach((hr) => renderRow(hr, true));
+      }
+
+      preparedCells.forEach((c) => {
+        if (c.isHeaderRow || c.isTh) {
+          doc.setFillColor(241, 245, 249);
+        } else {
+          doc.setFillColor(255, 255, 255);
+        }
+        doc.setDrawColor(203, 213, 225);
+        doc.setLineWidth(0.22);
+        doc.rect(c.cellX, y, c.w, rowH, 'FD');
+
+        doc.setFont('helvetica', c.isBold ? 'bold' : 'normal');
+        doc.setFontSize(8.2);
+        if (c.isWarning) {
+          doc.setTextColor(220, 38, 38);
+        } else if (c.isGreen) {
+          doc.setTextColor(22, 163, 74);
+        } else if (c.isHeaderRow || c.isTh) {
+          doc.setTextColor(15, 23, 42);
+        } else {
+          doc.setTextColor(30, 41, 59);
+        }
+
+        const textX = c.isCenter ? c.cellX + c.w / 2 : c.cellX + 1.8;
+        const textAlign = c.isCenter ? 'center' : 'left';
+        c.lines.forEach((line, lineIdx) => {
+          doc.text(line, textX, y + 4.3 + lineIdx * 3.9, { align: textAlign });
+        });
+      });
+
+      y += rowH;
+    };
+
+    theadRows.forEach((tr) => renderRow(tr, true));
+    tbodyRows.forEach((tr) => renderRow(tr, false));
+    y += 3.5;
+  };
+
+  // Zeichnet den eingerückten Rechenweg innerhalb einer Ergebniskarte (z. B. Überladungsrechner)
+  const drawFormulaSubBlock = (blockEl, innerX, innerW) => {
+    const styleStr = (blockEl.getAttribute('style') || '').toLowerCase();
+    const isRed = styleStr.includes('#dc2626') || styleStr.includes('220, 38, 38');
+    const isGreen = styleStr.includes('#16a34a') || styleStr.includes('22, 163, 74');
+    const accentRgb = isRed ? [220, 38, 38] : isGreen ? [22, 163, 74] : [100, 116, 139];
+
+    const startPage = doc.getNumberOfPages();
+    const startY = y;
+    const textX = innerX + 3.5;
+    const valRightX = innerX + innerW - 2;
+
+    ensureSpace(16);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8.5);
+    doc.setTextColor(30, 41, 59);
+    doc.text('Rechenweg:', textX, y + 3.5);
+    y += 5;
+
+    const rows = Array.from(blockEl.querySelectorAll('table tr'));
+    rows.forEach((tr) => {
+      const cells = Array.from(tr.children);
+      if (cells.length === 0) return;
+      const leftTxt = sanitizePdfText(cells[0]?.textContent);
+      const rightTxt = sanitizePdfText(cells[1]?.textContent);
+      const cellStyle = (cells[0]?.getAttribute('style') || '').toLowerCase();
+      const isBold = cellStyle.includes('bold') || leftTxt.startsWith('=');
+      const hasBottomBorder = cellStyle.includes('border-bottom');
+
+      ensureSpace(4.8);
+      doc.setFont('courier', isBold ? 'bold' : 'normal');
+      doc.setFontSize(8);
+      if (isBold && cellStyle.includes('#dc2626')) {
+        doc.setTextColor(220, 38, 38);
+      } else if (isBold && cellStyle.includes('#16a34a')) {
+        doc.setTextColor(22, 163, 74);
+      } else {
+        doc.setTextColor(30, 41, 59);
+      }
+
+      if (leftTxt) doc.text(leftTxt, textX, y + 3.2);
+      if (rightTxt) doc.text(rightTxt, valRightX, y + 3.2, { align: 'right' });
+      y += 4.2;
+
+      if (hasBottomBorder) {
+        doc.setDrawColor(148, 163, 184);
+        doc.setLineWidth(0.2);
+        doc.line(textX, y - 0.5, valRightX, y - 0.5);
+        y += 0.8;
+      }
+    });
+
+    // Eventuelle prozentuale Formel unterhalb der Rechentabelle
+    const extraDivs = Array.from(blockEl.children).filter((c) => c.tagName.toLowerCase() === 'div');
+    extraDivs.forEach((div) => {
+      const txt = sanitizePdfText(div.textContent);
+      if (!txt) return;
+      doc.setFont('courier', 'normal');
+      doc.setFontSize(7.8);
+      doc.setTextColor(51, 65, 85);
+      const lines = doc.splitTextToSize(txt, innerW - 5);
+      ensureSpace(lines.length * 3.8 + 1.5);
+      doc.text(lines, textX, y + 3.2);
+      y += lines.length * 3.8 + 1.5;
+    });
+
+    if (doc.getNumberOfPages() === startPage) {
+      doc.setFillColor(...accentRgb);
+      doc.rect(innerX, startY, 1.1, Math.max(4, y - startY), 'F');
+    }
+    y += 2;
+  };
+
+  // Zeichnet eine gerahmte Ergebniskarte (.print-result-box)
+  const drawResultBox = (boxEl) => {
+    ensureSpace(24);
+    const startPage = doc.getNumberOfPages();
+    const startY = y;
+    const innerX = marginX + 3.5;
+    const innerW = contentWidth - 7;
+    y += 3.5;
+
+    const processBoxChild = (child) => {
+      if (!child || child.nodeType !== 1) return;
+      const tag = child.tagName.toLowerCase();
+
+      if (child.classList.contains('print-result-header')) {
+        const hdrTxt = sanitizePdfText(child.textContent);
+        if (hdrTxt) {
+          const hasWarn = Boolean(child.querySelector('.print-warning'));
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(9.5);
+          doc.setTextColor(...(hasWarn ? [220, 38, 38] : [15, 23, 42]));
+          const lines = doc.splitTextToSize(hdrTxt, innerW);
+          ensureSpace(lines.length * 4.4 + 3);
+          doc.text(lines, innerX, y + 3.4);
+          y += lines.length * 4.4 + 1.2;
+          doc.setDrawColor(226, 232, 240);
+          doc.setLineWidth(0.25);
+          doc.line(innerX, y, innerX + innerW, y);
+          y += 2.2;
+        }
+        return;
+      }
+
+      if (tag === 'table') {
+        drawTable(child, innerX, innerW);
+        return;
+      }
+
+      // Verschachtelter Rechenweg (PrintFormulaDisplay)
+      if (child.querySelector('table') && !child.querySelector('table.print-table')) {
+        drawFormulaSubBlock(child, innerX, innerW);
+        return;
+      }
+
+      // Gelbe Verdrehschutz-Hinweisbox
+      const styleStr = (child.getAttribute('style') || '').toLowerCase();
+      if (styleStr.includes('#fef3c7') || styleStr.includes('254, 243, 199')) {
+        const txt = sanitizePdfText(child.textContent);
+        if (txt) {
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(8.2);
+          const lines = doc.splitTextToSize(txt, innerW - 6);
+          const h = lines.length * 4 + 4;
+          ensureSpace(h + 2);
+          doc.setFillColor(254, 243, 199);
+          doc.rect(innerX, y, innerW, h, 'F');
+          doc.setFillColor(217, 119, 6);
+          doc.rect(innerX, y, 1.3, h, 'F');
+          doc.setTextColor(146, 64, 14);
+          doc.text(lines, innerX + 3.5, y + 4.2);
+          y += h + 2.5;
+        }
+        return;
+      }
+
+      // Falls der Container mehrere innere Zeilen-Divs hat (z. B. PrintFineDisplay)
+      const directDivChildren = Array.from(child.children).filter((c) => c.tagName.toLowerCase() === 'div' || c.tagName.toLowerCase() === 'p');
+      if (directDivChildren.length > 0 && !child.classList.contains('print-warning')) {
+        directDivChildren.forEach((sub) => processBoxChild(sub));
+        return;
+      }
+
+      const txt = sanitizePdfText(child.textContent);
+      if (!txt) return;
+      const isWarn = child.classList.contains('print-warning') || Boolean(child.querySelector('.print-warning'));
+      const isBold = isWarn || Boolean(child.querySelector('strong') && child.children.length === 1);
+
+      doc.setFont('helvetica', isBold ? 'bold' : 'normal');
+      doc.setFontSize(8.8);
+      doc.setTextColor(...(isWarn ? [220, 38, 38] : [30, 41, 59]));
+      const lines = doc.splitTextToSize(txt, innerW);
+      ensureSpace(lines.length * 4.2 + 2);
+      doc.text(lines, innerX, y + 3.5);
+      y += lines.length * 4.2 + 1.5;
+    };
+
+    Array.from(boxEl.children).forEach(processBoxChild);
+    y += 1.5;
+
+    // Außenrahmen der Ergebniskarte zeichnen
+    doc.setDrawColor(15, 23, 42);
+    doc.setLineWidth(0.45);
+    if (doc.getNumberOfPages() === startPage) {
+      doc.roundedRect(marginX, startY, contentWidth, Math.max(10, y - startY), 1.8, 1.8, 'S');
+    } else {
+      doc.line(marginX, y, marginX + contentWidth, y);
+    }
+    y += 4.5;
+  };
+
+  // Zeichnet einen Berechnungsnachweis-Block (Niederzurren & Diagonalzurren)
+  const drawProofCard = (cardEl) => {
+    const linesToDraw = [];
+    const collectLines = (node, forceMono = false) => {
+      if (!node || node.nodeType !== 1) return;
+      const cls = node.getAttribute('class') || '';
+      const stl = (node.getAttribute('style') || '').toLowerCase();
+      const isMono = forceMono || cls.includes('font-mono') || stl.includes('monospace');
+      const blockChildren = Array.from(node.children).filter((c) => ['div', 'p', 'h3', 'h4'].includes(c.tagName.toLowerCase()));
+      if (blockChildren.length > 0) {
+        blockChildren.forEach((c) => collectLines(c, isMono));
+      } else {
+        const txt = sanitizePdfText(node.textContent);
+        if (txt) {
+          const isHeading = node.tagName.toLowerCase() === 'h3' || stl.includes('uppercase') || stl.includes('800');
+          linesToDraw.push({ txt, isMono, isHeading });
+        }
+      }
+    };
+    collectLines(cardEl);
+    if (linesToDraw.length === 0) return;
+
+    ensureSpace(28);
+    const startPage = doc.getNumberOfPages();
+    const startY = y;
+    const innerX = marginX + 3.5;
+    const innerW = contentWidth - 7;
+    y += 3.5;
+
+    linesToDraw.forEach((entry, idx) => {
+      doc.setFont(entry.isMono ? 'courier' : 'helvetica', entry.isHeading || idx === 0 ? 'bold' : 'normal');
+      doc.setFontSize(entry.isHeading || idx === 0 ? 9 : entry.isMono ? 7.8 : 8.5);
+      doc.setTextColor(...(entry.isHeading || idx === 0 ? [30, 41, 59] : [51, 65, 85]));
+      const wrapped = doc.splitTextToSize(entry.txt, innerW);
+      ensureSpace(wrapped.length * 4 + 2);
+      doc.text(wrapped, innerX, y + 3);
+      y += wrapped.length * 4 + (idx === 0 ? 2.5 : 1.3);
+      if (idx === 0) {
+        doc.setDrawColor(226, 232, 240);
+        doc.setLineWidth(0.25);
+        doc.line(innerX, y - 1, innerX + innerW, y - 1);
+      }
+    });
+
+    y += 2;
+    doc.setDrawColor(203, 213, 225);
+    doc.setLineWidth(0.35);
+    if (doc.getNumberOfPages() === startPage) {
+      doc.roundedRect(marginX, startY, contentWidth, Math.max(10, y - startY), 1.8, 1.8, 'S');
+    }
+    y += 4;
+  };
+
+  // Berechnet die optimale Zeilenhöhe für nebeneinanderliegende SVG-Karten (Ist vs. Soll)
+  const calcSvgRowHeight = (svgs, hasLabels) => {
+    const gap = 6;
+    const slotW = (contentWidth - gap * (svgs.length - 1)) / svgs.length;
+    const targetSvgW = Math.min(slotW - 6, 62);
+    const headerExtra = hasLabels ? 12.5 : 5;
+    const desiredHeights = svgs.map((svg) => {
+      const vb = (svg.getAttribute('viewBox') || '0 0 130 200').trim().split(/[\s,]+/).map(Number);
+      const ratio = (vb[3] || 200) / (vb[2] || 130);
+      return Math.min(215, Math.max(68, targetSvgW * ratio)) + headerExtra;
+    });
+    return Math.max(...desiredHeights);
+  };
+
+  // Zeichnet nebeneinanderliegende SVG-Grafiken (z. B. PKW-Transporter: Ist-Zustand links, Soll-Zustand rechts)
+  const drawSvgRow = (svgs) => {
+    if (!svgs || svgs.length === 0) return;
+    const gap = 6;
+    const slotW = (contentWidth - gap * (svgs.length - 1)) / svgs.length;
+    const items = svgs.map((svg) => {
+      const wrapper = svg.closest('[data-pdf-label]');
+      return {
+        svg,
+        label: wrapper ? wrapper.getAttribute('data-pdf-label') || '' : '',
+        variant: wrapper ? wrapper.getAttribute('data-pdf-variant') || '' : ''
+      };
+    });
+    const hasLabels = items.some((item) => Boolean(item.label));
+    const rowH = calcSvgRowHeight(svgs, hasLabels);
+    ensureSpace(rowH + 4);
+
+    items.forEach((item, idx) => {
+      const x = marginX + idx * (slotW + gap);
+      renderSvgToJsPdf(doc, item.svg, x, y, slotW, rowH, {
+        label: item.label,
+        variant: item.variant
+      });
+    });
+    y += rowH + 5;
+  };
+
+  // Rekursiver DOM-Durchlauf durch den .print-container
+  let headerAlreadyDrawn = false;
+  const walkContainer = (parentEl) => {
+    Array.from(parentEl.children).forEach((el) => {
+      if (!el || el.nodeType !== 1) return;
+      const tag = el.tagName.toLowerCase();
+
+      if (tag === 'style' || tag === 'script') return;
+
+      // 1. Direkter Dokumenttitel
+      if (tag === 'h1' && el.classList.contains('print-title')) {
+        if (!headerAlreadyDrawn) {
+          drawDocumentHeader(sanitizePdfText(el.textContent), '', '');
+          headerAlreadyDrawn = true;
+        }
+        return;
+      }
+
+      // 2. Zeitstempel unter dem Titel
+      if (el.classList.contains('print-meta')) {
+        const metaTxt = sanitizePdfText(el.textContent);
+        if (metaTxt) {
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(8.5);
+          doc.setTextColor(71, 85, 105);
+          doc.text(metaTxt, marginX, y);
+          y += 5;
+        }
+        return;
+      }
+
+      // 3. Abschnittsüberschrift (bleibt bei direkter SVG-Zeile zusammen auf derselben Seite)
+      if (tag === 'h2' && el.classList.contains('print-section')) {
+        const nextEl = el.nextElementSibling;
+        const nextSvgs = nextEl ? Array.from(nextEl.querySelectorAll('svg.print-safe')) : [];
+        if (nextSvgs.length > 0) {
+          const nextHasLabels = nextSvgs.some((s) => Boolean(s.closest('[data-pdf-label]')));
+          const neededH = 14 + calcSvgRowHeight(nextSvgs, nextHasLabels);
+          if (neededH <= maxY - marginTop) {
+            ensureSpace(neededH);
+          }
+        }
+        drawSectionHeading(el.textContent);
+        return;
+      }
+
+      // 4. Tabelle
+      if (tag === 'table') {
+        drawTable(el);
+        return;
+      }
+
+      // 5. Ergebniskarte
+      if (el.classList.contains('print-result-box')) {
+        drawResultBox(el);
+        return;
+      }
+
+      // 6. Verschachtelter Flex-Kopf (z. B. Niederzurren-Protokoll)
+      if (el.querySelector('h1.print-title')) {
+        const h1 = el.querySelector('h1.print-title');
+        const mainTitle = sanitizePdfText(h1 ? h1.textContent : titleText);
+        const allTextParts = Array.from(el.querySelectorAll('div'))
+          .filter((d) => d.children.length === 0 || (d.children.length === 1 && d.children[0].tagName === 'STRONG'))
+          .map((d) => sanitizePdfText(d.textContent))
+          .filter((t) => t && t !== mainTitle);
+        const subtitle = allTextParts.find((t) => !t.toLowerCase().includes('datum')) || '';
+        const rightMeta = allTextParts.find((t) => t.toLowerCase().includes('datum')) || '';
+        drawDocumentHeader(mainTitle, subtitle, rightMeta);
+        headerAlreadyDrawn = true;
+        return;
+      }
+
+      // 7. Container mit Struktur-Kindern (z. B. Abschnitt 5 / 6 im Niederzurren-Protokoll)
+      if (el.querySelector('h2.print-section, table.print-table, .print-result-box')) {
+        walkContainer(el);
+        return;
+      }
+
+      // 8. Container mit SVG-Diagrammen (PKW-Transporter: Ist-Zustand links, Soll-Zustand rechts)
+      const svgs = Array.from(el.querySelectorAll('svg.print-safe'));
+      if (svgs.length > 0) {
+        drawSvgRow(svgs);
+        return;
+      }
+
+      // 9. Sonstige Info- oder Berechnungsnachweis-Boxen
+      if (sanitizePdfText(el.textContent)) {
+        drawProofCard(el);
+      }
+    });
+  };
+
+  walkContainer(containerEl);
+
+  // Einheitliche Fußzeile mit Seitenzahl auf jeder A4-Seite
+  const totalPages = doc.getNumberOfPages();
+  const stampLabel = footerMetaText || `Erstellt am: ${new Date().toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })} Uhr`;
+  for (let p = 1; p <= totalPages; p++) {
+    doc.setPage(p);
+    doc.setDrawColor(226, 232, 240);
+    doc.setLineWidth(0.25);
+    doc.line(marginX, pageHeight - 13, marginX + contentWidth, pageHeight - 13);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(100, 116, 139);
+    doc.text(stampLabel, marginX, pageHeight - 8.5);
+    doc.text(`Seite ${p} von ${totalPages}`, marginX + contentWidth, pageHeight - 8.5, { align: 'right' });
+  }
+
+  const filename = buildPdfFilename(titleText);
+  triggerPdfBlobDownload(doc, filename);
+  return filename;
+};
+
+// Findet ausgehend vom geklickten Button den exakt zugehörigen versteckten Protokoll-Container
+const findProtocolContainer = (triggerEl) => {
+  let node = triggerEl;
+  while (node && node !== document.body) {
+    const found = node.querySelector(':scope > .print-container, .print-container');
+    if (found) return found;
+    node = node.parentElement;
+  }
+  return document.querySelector('.print-container');
+};
 
 // --- HELPER COMPONENTS ---
 const LashingStrapIcon = ({ className }) => (
@@ -943,16 +1693,78 @@ const AppVersionFooter = () => (
 );
 
 const PrintButton = () => {
-    const { triggerPrint } = React.useContext(PrintContext);
+    const [status, setStatus] = useState('idle'); // 'idle' | 'loading' | 'done' | 'error'
+    const [errorText, setErrorText] = useState('');
+
+    const handleDownload = async (e) => {
+        const containerEl = findProtocolContainer(e.currentTarget);
+        if (!containerEl) {
+            setStatus('error');
+            setErrorText('Protokolldaten konnten nicht gefunden werden.');
+            return;
+        }
+
+        setErrorText('');
+
+        try {
+            // Synchroner Schnellpfad: Wenn jsPDF bereits vorgeladen ist, bleibt auf iOS Safari der User-Click erhalten
+            const syncJsPdf = getLoadedJsPdf();
+            if (syncJsPdf) {
+                generateProtocolPdf(syncJsPdf, containerEl);
+                setStatus('done');
+                setTimeout(() => setStatus('idle'), 2500);
+                return;
+            }
+
+            // Fallback: Falls jsPDF noch lädt, kurz warten und danach herunterladen
+            setStatus('loading');
+            const loadedJsPdf = await preloadJsPdf();
+            generateProtocolPdf(loadedJsPdf, containerEl);
+            setStatus('done');
+            setTimeout(() => setStatus('idle'), 2500);
+        } catch (err) {
+            console.error('PDF-Export fehlgeschlagen:', err);
+            setStatus('error');
+            setErrorText(err?.message || 'PDF konnte nicht erstellt werden.');
+        }
+    };
+
     return (
-        <button 
-            type="button"
-            onClick={triggerPrint} 
-            className="w-full mt-8 mb-4 py-3 bg-slate-800 text-white rounded-xl font-bold uppercase tracking-widest hover:bg-slate-700 transition-colors flex items-center justify-center gap-2 no-print shadow-lg"
-        >
-            <Printer className="w-5 h-5" />
-            Druckprotokoll erstellen
-        </button>
+        <div className="w-full mt-8 mb-4 no-print">
+            <button
+                type="button"
+                onClick={handleDownload}
+                disabled={status === 'loading'}
+                className={`w-full py-3 rounded-xl font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-lg active:scale-[0.98] ${
+                    status === 'done'
+                        ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+                        : 'bg-slate-800 text-white hover:bg-slate-700'
+                } ${status === 'loading' ? 'opacity-75 cursor-wait' : ''}`}
+            >
+                {status === 'loading' ? (
+                    <>
+                        <RotateCw className="w-5 h-5 animate-spin" />
+                        PDF wird erstellt...
+                    </>
+                ) : status === 'done' ? (
+                    <>
+                        <CheckCircle className="w-5 h-5" />
+                        PDF heruntergeladen
+                    </>
+                ) : (
+                    <>
+                        <Download className="w-5 h-5" />
+                        Protokoll als PDF herunterladen
+                    </>
+                )}
+            </button>
+            {status === 'error' && errorText && (
+                <div className="mt-2 p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 shrink-0" />
+                    <span>{errorText}</span>
+                </div>
+            )}
+        </div>
     );
 };
 
@@ -3455,7 +4267,7 @@ function LashingCalculator({ onOpenKnowledge }) {
 
   const getPrintBodyCertDescription = () => {
     if (bodyCert === 'NONE') {
-      return 'Kein geprüfter Aufbau (z. B. Kastenwagen oder offener Pritschen-LKW)';
+      return 'Kein geprüfter Aufbau';
     }
     if (bodyCert === 'XL') {
       return 'Code XL (Zertifizierter Aufbau nach DIN EN 12642 XL - Stirn: 50%, Seite: 30%, Heck: 40% der Nutzlast)';
@@ -3808,7 +4620,7 @@ function LashingCalculator({ onOpenKnowledge }) {
           <h1 className="print-title">LaSi-Protokoll (PKW-Transporter)</h1>
           <div className="print-meta">Erstellt am: {dateTime}</div>
   
-          <h2 className="print-section">Ihre Eingabe (Ist-Zustand)</h2>
+          <h2 className="print-section">1. Erfasste Fahrzeuge (Ist-Zustand)</h2>
           
           <table className="print-table" style={{ marginTop: '15px' }}>
               <thead>
@@ -3838,28 +4650,34 @@ function LashingCalculator({ onOpenKnowledge }) {
                   )}
               </tbody>
           </table>
-          
-          <div style={{ display: 'flex', width: '100%', gap: '15px', justifyContent: 'center', marginTop: '20px', pageBreakInside: 'avoid' }}>
-              <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
-                 <SvgPkwTransporter deckName="Obere Ebene" cars={carsTop} showOrientation={true} />
-             </div>
-              <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
-                 <SvgPkwTransporter deckName="Untere Ebene" cars={carsBottom} showOrientation={true} />
-             </div>
-          </div>
-  
-          <h2 className="print-section" style={{ marginTop: '30px' }}>Empfehlung nach VDI 2700 (Soll-Zustand)</h2>
-          
-          <div style={{ display: 'flex', width: '100%', gap: '15px', justifyContent: 'center', marginTop: '20px', pageBreakInside: 'avoid' }}>
-              <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
-                 <SvgPkwTransporter deckName="Obere Ebene" cars={carsTop.map(getRecommendedCarConfig)} />
-             </div>
-              <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
-                 <SvgPkwTransporter deckName="Untere Ebene" cars={carsBottom.map(getRecommendedCarConfig)} />
-             </div>
-          </div>
 
-          <div className="print-result-box" style={{ pageBreakInside: 'avoid', marginTop: '30px' }}>
+          {(carsTop.length > 0 || carsBottom.length > 0) && (
+              <h2 className="print-section" style={{ marginTop: '20px' }}>2. Gegenüberstellung: Ist-Zustand vs. Soll-Zustand (VDI 2700)</h2>
+          )}
+
+          {carsTop.length > 0 && (
+              <div style={{ display: 'flex', width: '100%', gap: '15px', justifyContent: 'center', marginTop: '15px', pageBreakInside: 'avoid' }}>
+                  <div data-pdf-label="Ist-Zustand (Ihre Eingabe)" data-pdf-variant="ist" style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+                      <SvgPkwTransporter deckName="Obere Ebene" cars={carsTop} showOrientation={true} />
+                  </div>
+                  <div data-pdf-label="Soll-Zustand (VDI 2700)" data-pdf-variant="soll" style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+                      <SvgPkwTransporter deckName="Obere Ebene" cars={carsTop.map(getRecommendedCarConfig)} />
+                  </div>
+              </div>
+          )}
+
+          {carsBottom.length > 0 && (
+              <div style={{ display: 'flex', width: '100%', gap: '15px', justifyContent: 'center', marginTop: '15px', pageBreakInside: 'avoid' }}>
+                  <div data-pdf-label="Ist-Zustand (Ihre Eingabe)" data-pdf-variant="ist" style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+                      <SvgPkwTransporter deckName="Untere Ebene" cars={carsBottom} showOrientation={true} />
+                  </div>
+                  <div data-pdf-label="Soll-Zustand (VDI 2700)" data-pdf-variant="soll" style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+                      <SvgPkwTransporter deckName="Untere Ebene" cars={carsBottom.map(getRecommendedCarConfig)} />
+                  </div>
+              </div>
+          )}
+
+          <div className="print-result-box" style={{ pageBreakInside: 'avoid', marginTop: '20px' }}>
              <div className="print-result-header">Legende</div>
              <table className="print-table" style={{ border: 'none', fontSize: '9pt' }}>
                 <tbody>
@@ -3982,37 +4800,26 @@ function LashingCalculator({ onOpenKnowledge }) {
                    <ShieldCheck className="w-3.5 h-3.5" /> Fahrzeugaufbau wählen
                </div>
                <div className="grid grid-cols-2 gap-2">
-                    <button onClick={() => setBodyCert('NONE')} className={`col-span-2 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm border-2 flex flex-col items-center justify-center transition-all ${bodyCert === 'NONE' ? 'bg-slate-700 text-white border-slate-700 shadow-md transform scale-[1.01]' : 'bg-white text-slate-600 border-slate-100 hover:border-indigo-200'}`}>
-                         <div className="grid grid-cols-2 gap-3 items-end mb-1.5 w-full max-w-[320px]">
-                           <div className="flex flex-col items-center">
-                             <VanBoxSvg className={`w-full h-12 ${bodyCert === 'NONE' ? 'text-white' : 'text-slate-700'}`} />
-                             <span className={`text-[9px] font-semibold mt-0.5 ${bodyCert === 'NONE' ? 'text-slate-200' : 'text-slate-500'}`}>Kastenwagen</span>
-                           </div>
-                           <div className="flex flex-col items-center">
-                             <FlatbedConstructionTruckSvg className={`w-full h-12 ${bodyCert === 'NONE' ? 'text-white' : 'text-slate-700'}`} />
-                             <span className={`text-[9px] font-semibold mt-0.5 ${bodyCert === 'NONE' ? 'text-slate-200' : 'text-slate-500'}`}>Offener Pritschen-LKW</span>
-                           </div>
-                         </div>
+                    <button onClick={() => setBodyCert('NONE')} className={`col-span-2 py-3 px-3 rounded-xl font-bold text-xs sm:text-sm border-2 flex flex-col items-center justify-center transition-all ${bodyCert === 'NONE' ? 'bg-slate-700 text-white border-slate-700 shadow-md transform scale-[1.01]' : 'bg-white text-slate-600 border-slate-100 hover:border-indigo-200'}`}>
                          <span>Kein geprüfter Aufbau</span>
-                         <span className={`text-[10px] font-normal mt-0.5 ${bodyCert === 'NONE' ? 'text-slate-200' : 'text-slate-400'}`}>(z.B.: Kastenwagen oder offener Pritschen-LKW)</span>
                    </button>
                    <button onClick={() => setBodyCert('L')} className={`col-span-2 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm border-2 flex flex-col items-center justify-between text-center transition-all ${bodyCert === 'L' ? 'bg-indigo-600 text-white border-indigo-600 shadow-md transform scale-[1.01]' : 'bg-white text-slate-600 border-slate-100 hover:border-indigo-200'}`}>
-                       <div className="grid grid-cols-3 gap-1.5 items-end mb-1.5 w-full">
+                       <div className="grid grid-cols-3 gap-1.5 items-start mb-1.5 w-full">
                          <div className="flex flex-col items-center">
                            <TautlinerSemiSvg codeLabel="CODE L" badgeColor={bodyCert === 'L' ? '#312e81' : '#4f46e5'} className={`w-full h-11 ${bodyCert === 'L' ? 'text-white' : 'text-indigo-700'}`} />
-                           <span className={`text-[8.5px] font-semibold mt-0.5 ${bodyCert === 'L' ? 'text-indigo-100' : 'text-slate-500'}`}>Planenauflieger</span>
+                           <span className={`text-[8.5px] font-semibold mt-0.5 leading-tight ${bodyCert === 'L' ? 'text-indigo-100' : 'text-slate-500'}`}>Planenauflieger</span>
                          </div>
                          <div className="flex flex-col items-center">
                            <HamburgerVerdeckTruckSvg codeLabel="CODE L" badgeColor={bodyCert === 'L' ? '#312e81' : '#4f46e5'} className={`w-full h-11 ${bodyCert === 'L' ? 'text-white' : 'text-indigo-700'}`} />
-                           <span className={`text-[8.5px] font-semibold mt-0.5 ${bodyCert === 'L' ? 'text-indigo-100' : 'text-slate-500'}`}>Hamburger Verdeck</span>
+                           <span className={`text-[8.5px] font-semibold mt-0.5 leading-tight ${bodyCert === 'L' ? 'text-indigo-100' : 'text-slate-500'}`}>Hamburger Verdeck</span>
                          </div>
                          <div className="flex flex-col items-center">
                            <PolensprinterSvg codeLabel="CODE L" badgeColor={bodyCert === 'L' ? '#312e81' : '#4f46e5'} className={`w-full h-11 ${bodyCert === 'L' ? 'text-white' : 'text-indigo-700'}`} />
-                           <span className={`text-[8.5px] font-semibold mt-0.5 ${bodyCert === 'L' ? 'text-indigo-100' : 'text-slate-500'}`}>Polensprinter</span>
+                           <span className={`text-[8.5px] font-semibold mt-0.5 leading-tight ${bodyCert === 'L' ? 'text-indigo-100' : 'text-slate-500'}`}>Polensprinter<br/>(ab Erstzulassung 2017)</span>
                          </div>
                        </div>
                        <span>Code L</span>
-                       <span className={`text-[10px] font-normal leading-tight mt-0.5 ${bodyCert === 'L' ? 'text-indigo-100' : 'text-slate-400'}`}>(Planenauflieger, Hamburger Verdeck, Polensprinter)</span>
+                       <span className={`text-[10px] font-normal leading-tight mt-0.5 ${bodyCert === 'L' ? 'text-indigo-100' : 'text-slate-400'}`}>(Planenauflieger, Hamburger Verdeck, Polensprinter ab Erstzulassung 2017)</span>
                    </button>
 
                    {bodyCert === 'L' && (
@@ -4029,7 +4836,7 @@ function LashingCalculator({ onOpenKnowledge }) {
                                    onClick={() => setCodeLType('hamburger')}
                                    className={`py-2.5 px-2 rounded-lg font-bold text-xs border transition-all flex items-center justify-center text-center leading-tight ${codeLType === 'hamburger' ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}
                                >
-                                   <span>Hamburger Verdeck / Polensprinter</span>
+                                   <span>Hamburger Verdeck / Polensprinter (ab Erstzulassung 2017)</span>
                                </button>
                            </div>
 
@@ -7292,7 +8099,7 @@ const ESCOOTER_TUNING_MODELS = [
                                             <li><strong>Stirnwand:</strong> 40 % der Nutzlast (max. <strong>5.000 daN</strong>)</li>
                                             <li><strong>Heck:</strong> 25 % der Nutzlast (max. <strong>3.100 daN</strong>)</li>
                                             <li><strong>Seite – Planenauflieger:</strong> mit Einstecklatten = <strong>30 %</strong> | ohne Einstecklatten = <strong>15 %</strong> der Nutzlast</li>
-                                            <li><strong>Seite – Hamburger Verdeck / Polensprinter:</strong> Formschluss Bordwand = <strong>24 %</strong> | Formschluss Planenaufbau = <strong>6 %</strong> (kombiniert = <strong>30 %</strong>)</li>
+                                            <li><strong>Seite – Hamburger Verdeck / Polensprinter (ab Erstzulassung 2017):</strong> Formschluss Bordwand = <strong>24 %</strong> | Formschluss Planenaufbau = <strong>6 %</strong> (kombiniert = <strong>30 %</strong>)</li>
                                         </ul>
                                     </div>
 
@@ -9368,111 +10175,8 @@ function StayCalculator() {
     setBeschvException('NONE');
   };
 
-  const permitStatusLabel =
-    permitStatus === 'with_work'
-      ? 'Aufenthaltstitel mit Erwerbstätigkeitserlaubnis (DE)'
-      : permitStatus === 'without_work'
-      ? 'Aufenthaltstitel ohne Erwerbstätigkeit (z. B. Art. 21 SDÜ / ohne Arbeitserlaubnis)'
-      : 'Kein Aufenthaltstitel / Visum';
-
   return (
     <div className="max-w-md mx-auto bg-slate-50 min-h-screen">
-      {/* PRINT VIEW ONLY */}
-      <div className="print-only print-container">
-        <h1 className="print-title">Aufenthaltsrechtliche Prüfung</h1>
-        <div className="print-meta">Erstellt am: {dateTime}</div>
-
-        <h2 className="print-section">1. Staatsangehörigkeit & Dokumente</h2>
-        <table className="print-table">
-          <tbody>
-            <tr><th>Herkunftsland / Staatsangehörigkeit</th><td><strong>{selectedCountry ? selectedCountry.name : 'Nicht gewählt'}</strong></td></tr>
-            <tr>
-              <th>Einstufung (VO (EU) 2018/1806)</th>
-              <td>
-                {selectedCountry?.status === 'eu' && 'EU / EWR / Schweiz (Freizügigkeit)'}
-                {selectedCountry?.status === 'visa_free' && 'Positivstaat (Anhang II – visumfrei bis 90/180 Tage)'}
-                {selectedCountry?.status === 'visa_required' && 'Negativstaat (Anhang I – grundsätzlich visumpflichtig)'}
-              </td>
-            </tr>
-            {selectedCountry?.biometricRequired && (
-              <tr><th>Biometrischer Reisepass</th><td>{hasBiometricPassport ? 'Ja' : 'Nein'}</td></tr>
-            )}
-            {selectedCountry?.status !== 'eu' && (
-              <tr><th>Vorliegender Aufenthaltstitel</th><td>{permitStatusLabel}</td></tr>
-            )}
-          </tbody>
-        </table>
-
-        {selectedCountry?.status !== 'eu' && permitStatus !== 'with_work' && (
-          <>
-            <h2 className="print-section">2. Aufenthaltsdauer & 180-Tage-Fenster</h2>
-            <table className="print-table">
-              <tbody>
-                <tr><th>Aktuelles Einreisedatum</th><td>{formatDateDE(entryDate)}</td></tr>
-                <tr><th>Kontrolldatum</th><td>{formatDateDE(controlDate)}</td></tr>
-                {stayMetrics && !stayMetrics.error && (
-                  <>
-                    <tr><th>180-Tage-Referenzzeitraum</th><td>{formatDateDE(stayMetrics.windowStartIso)} bis {formatDateDE(controlDate)}</td></tr>
-                    <tr><th>Aktueller Aufenthalt (Tage im 180-Tage-Fenster)</th><td>{stayMetrics.currentDaysIn180} Tage</td></tr>
-                    <tr><th>Anrechenbare Voraufenthalte im 180-Tage-Fenster</th><td>{stayMetrics.prevDaysCountedIn180} Tage</td></tr>
-                    <tr><th>Gesamtaufenthalt im 180-Tage-Fenster</th><td><strong>{stayMetrics.totalDaysIn180} / 90 Tage</strong></td></tr>
-                  </>
-                )}
-              </tbody>
-            </table>
-
-            {stayMetrics && stayMetrics.prevStayBreakdown && stayMetrics.prevStayBreakdown.length > 0 && (
-              <table className="print-table">
-                <thead>
-                  <tr><th>Voraufenthalt</th><th>Einreise</th><th>Ausreise</th><th>Im 180-T.-Fenster</th></tr>
-                </thead>
-                <tbody>
-                  {stayMetrics.prevStayBreakdown.map(s => (
-                    <tr key={s.index}>
-                      <td>Aufenthalt {s.index}</td>
-                      <td>{formatDateDE(s.from)}</td>
-                      <td>{formatDateDE(s.to)}</td>
-                      <td>{s.countedInWindow} Tage</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-
-            <h2 className="print-section">3. Erwerbstätigkeit</h2>
-            <table className="print-table">
-              <tbody>
-                <tr><th>Erwerbstätigkeit / Arbeit</th><td>{isWorking ? 'Ja' : 'Nein'}</td></tr>
-                {isWorking && (
-                  <tr><th>BeschV-Ausnahme</th><td>{selectedException.label} ({selectedException.norm})</td></tr>
-                )}
-              </tbody>
-            </table>
-          </>
-        )}
-
-        {evaluation && (
-          <div className="print-result-box">
-            <div className="print-result-header">
-              Ergebnis: <span className={evaluation.status === 'required' ? 'print-warning' : ''}>{evaluation.badge}</span>
-            </div>
-            <p style={{ margin: '6px 0' }}><strong>{evaluation.headline}</strong></p>
-            <p style={{ margin: '6px 0' }}>{evaluation.summary}</p>
-            {evaluation.legalRefs.length > 0 && (
-              <div style={{ marginTop: '8px', fontSize: '9pt' }}>
-                <strong>Rechtsgrundlagen:</strong> {evaluation.legalRefs.join(' | ')}
-              </div>
-            )}
-            {evaluation.violations.length > 0 && (
-              <div style={{ marginTop: '8px', fontSize: '9pt' }} className="print-warning">
-                <strong>Mögliche Verstöße:</strong> {evaluation.violations.join(' | ')}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-      {/* END PRINT VIEW */}
-
       {/* HEADER */}
       <div className="bg-emerald-700/95 backdrop-blur-md p-4 text-white flex items-center justify-between sticky top-0 z-20 shadow-lg shadow-emerald-900/10 no-print">
         <div>
@@ -9904,8 +10608,6 @@ function StayCalculator() {
             >
               Alle Eingaben zurücksetzen
             </button>
-
-            <PrintButton />
           </div>
         )}
       </div>
@@ -10501,45 +11203,13 @@ export default function App() {
   const [knowledgeResetKey, setKnowledgeResetKey] = useState(0); // <--- NEU: Zähler für den Reset
   const [returnTab, setReturnTab] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [isPrinting, setIsPrinting] = useState(false);
 
-  const triggerPrint = () => {
-      setIsPrinting(true);
-      window.scrollTo(0, 0);
-  };
-
-  const cancelPrint = () => {
-      setIsPrinting(false);
-  };
-
-  // Startet window.print() erst, nachdem iOS Safari das Protokoll sichtbar gerendert hat
+  // Lädt die PDF-Engine direkt beim Start vor, damit Downloads auf iOS ohne Verzögerung sofort ausgelöst werden
   useEffect(() => {
-      if (!isPrinting) return;
-      let timerId = null;
-      const rafId = requestAnimationFrame(() => {
-          timerId = setTimeout(() => {
-              try {
-                  window.print();
-              } catch (e) {
-                  console.error('Druckdialog konnte nicht automatisch geöffnet werden:', e);
-              }
-          }, 250);
-      });
-      return () => {
-          cancelAnimationFrame(rafId);
-          if (timerId) clearTimeout(timerId);
-      };
-  }, [isPrinting]);
-
-  // Setzt den Druckmodus nach Abschluss/Abbruch auf Desktop-Browsern automatisch zurück
-  useEffect(() => {
-      const handleAfterPrint = () => setIsPrinting(false);
-      window.addEventListener('afterprint', handleAfterPrint);
-      return () => window.removeEventListener('afterprint', handleAfterPrint);
+      preloadJsPdf().catch(() => {});
   }, []);
 
   const handleNavigateKnowledge = (viewId) => {
-      setIsPrinting(false);
       setKnowledgeView(viewId);
       setReturnTab(activeTab); // Merkt sich den vorherigen Tab (z.B. den Rechner)
       setActiveTab('knowledge');
@@ -10547,7 +11217,6 @@ export default function App() {
   };
 
   const handleTabChange = (tabId) => {
-      setIsPrinting(false);
       setActiveTab(tabId);
       setReturnTab(null); // Setzt den Zurück-Button zurück, wenn man manuell im Menü navigiert
       
@@ -10563,71 +11232,41 @@ export default function App() {
 
   return (
     <ThemeContext.Provider value={{ isDarkMode, toggleDarkMode: () => setIsDarkMode(!isDarkMode) }}>
-      <PrintContext.Provider value={{ isPrinting, triggerPrint, cancelPrint }}>
-        <div className={!isPrinting && isDarkMode ? 'dark' : ''}>
-          <style>{darkThemeCSS}</style>
-          <div className={`app-shell min-h-screen font-sans text-slate-800 flex flex-col relative selection:bg-indigo-100 transition-colors duration-300 ${isPrinting ? 'is-printing-mode bg-white' : 'bg-slate-50'}`}>
-            <PrintStyles />
+      <div className={isDarkMode ? 'dark' : ''}>
+        <style>{darkThemeCSS}</style>
+        <div className="app-shell min-h-screen font-sans text-slate-800 flex flex-col relative selection:bg-indigo-100 transition-colors duration-300 bg-slate-50">
+          <PrintStyles />
 
-            {/* Steuerleiste für iOS-Druckvorschau (wird beim eigentlichen Ausdruck ausgeblendet) */}
-            {isPrinting && (
-              <div className="no-print sticky top-0 z-50 bg-slate-900 text-white px-4 py-3 shadow-lg border-b border-slate-700">
-                <div className="max-w-2xl mx-auto flex items-center justify-between gap-2">
-                  <button
-                    type="button"
-                    onClick={cancelPrint}
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold uppercase tracking-wide transition-colors"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                    Zurück
-                  </button>
-                  <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">Druckvorschau</span>
-                  <button
-                    type="button"
-                    onClick={() => window.print()}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-black uppercase tracking-wide shadow-md transition-colors"
-                  >
-                    <Printer className="w-4 h-4" />
-                    Drucken / PDF
-                  </button>
-                </div>
-                <p className="max-w-2xl mx-auto text-[10px] text-slate-400 text-center mt-2">
-                  iOS-Hinweis: Falls der Dialog nicht automatisch erscheint, tippen Sie auf <strong>„Drucken / PDF“</strong> oder in Safari auf <strong>Teilen (↑) → Drucken</strong>.
-                </p>
-              </div>
-            )}
-
-            <div className={`app-content flex-1 z-10 relative ${isPrinting ? 'max-w-2xl w-full mx-auto p-3 pb-10' : 'pb-24'}`}>
-              <div className={activeTab === 'home' ? 'block' : 'hidden'}><HomeView onSelect={handleTabChange} /></div>
-              <div className={activeTab === 'weight' ? 'block' : 'hidden'}><WeightModule /></div>
-              <div className={activeTab === 'speed' ? 'block' : 'hidden'}><SpeedCalculator /></div>
-              <div className={activeTab === 'age' ? 'block' : 'hidden'}><AgeCalculator /></div>
-              <div className={activeTab === 'stay' ? 'block' : 'hidden'}><StayCalculator /></div>
-              <div className={activeTab === 'knowledge' ? 'block' : 'hidden'}><KnowledgeBaseView key={knowledgeResetKey} initialView={knowledgeView} onBack={returnTab ? () => handleTabChange(returnTab) : null} /></div>
-              <div className={activeTab === 'license' ? 'block' : 'hidden'}><DriverLicenseModule /></div>
-              <div className={activeTab === 'info' ? 'block' : 'hidden'}><InfoView /></div>
-              <div className={activeTab === 'donate' ? 'block' : 'hidden'}><DonateView /></div>
-              <div className={activeTab === 'lashing' ? 'block' : 'hidden'}><LashingCalculator onOpenKnowledge={handleNavigateKnowledge} /></div>
-              <div className={activeTab === 'bkat' ? 'block' : 'hidden'}><BkatModule /></div>
-            </div>
-            <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] pb-safe z-50 no-print transition-colors duration-300">
-              <div className="max-w-md mx-auto flex justify-evenly items-center p-2">
-                <button onClick={() => handleTabChange('home')} className={`w-20 flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-300 ${activeTab === 'home' ? 'text-indigo-600 bg-indigo-50 shadow-sm' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'}`}>
-                  <Home className="w-6 h-6" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest mt-0.5">Home</span>
-                </button>
-                <button onClick={() => handleTabChange('info')} className={`w-20 flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-300 ${activeTab === 'info' ? 'text-slate-800 bg-slate-100 shadow-sm' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'}`}>
-                  <FileText className="w-6 h-6" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest mt-0.5">Infos</span>
-                </button>
-                <button onClick={() => handleTabChange('donate')} className={`w-20 flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-300 ${activeTab === 'donate' ? 'text-pink-600 bg-pink-50 shadow-sm' : 'text-slate-400 hover:text-pink-500 hover:bg-slate-50'}`}>
-                  <Heart className="w-6 h-6" />
-                </button>
-              </div>
+          <div className="app-content flex-1 z-10 relative pb-24">
+            <div className={activeTab === 'home' ? 'block' : 'hidden'}><HomeView onSelect={handleTabChange} /></div>
+            <div className={activeTab === 'weight' ? 'block' : 'hidden'}><WeightModule /></div>
+            <div className={activeTab === 'speed' ? 'block' : 'hidden'}><SpeedCalculator /></div>
+            <div className={activeTab === 'age' ? 'block' : 'hidden'}><AgeCalculator /></div>
+            <div className={activeTab === 'stay' ? 'block' : 'hidden'}><StayCalculator /></div>
+            <div className={activeTab === 'knowledge' ? 'block' : 'hidden'}><KnowledgeBaseView key={knowledgeResetKey} initialView={knowledgeView} onBack={returnTab ? () => handleTabChange(returnTab) : null} /></div>
+            <div className={activeTab === 'license' ? 'block' : 'hidden'}><DriverLicenseModule /></div>
+            <div className={activeTab === 'info' ? 'block' : 'hidden'}><InfoView /></div>
+            <div className={activeTab === 'donate' ? 'block' : 'hidden'}><DonateView /></div>
+            <div className={activeTab === 'lashing' ? 'block' : 'hidden'}><LashingCalculator onOpenKnowledge={handleNavigateKnowledge} /></div>
+            <div className={activeTab === 'bkat' ? 'block' : 'hidden'}><BkatModule /></div>
+          </div>
+          <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] pb-safe z-50 no-print transition-colors duration-300">
+            <div className="max-w-md mx-auto flex justify-evenly items-center p-2">
+              <button onClick={() => handleTabChange('home')} className={`w-20 flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-300 ${activeTab === 'home' ? 'text-indigo-600 bg-indigo-50 shadow-sm' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'}`}>
+                <Home className="w-6 h-6" />
+                <span className="text-[10px] font-bold uppercase tracking-widest mt-0.5">Home</span>
+              </button>
+              <button onClick={() => handleTabChange('info')} className={`w-20 flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-300 ${activeTab === 'info' ? 'text-slate-800 bg-slate-100 shadow-sm' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'}`}>
+                <FileText className="w-6 h-6" />
+                <span className="text-[10px] font-bold uppercase tracking-widest mt-0.5">Infos</span>
+              </button>
+              <button onClick={() => handleTabChange('donate')} className={`w-20 flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-300 ${activeTab === 'donate' ? 'text-pink-600 bg-pink-50 shadow-sm' : 'text-slate-400 hover:text-pink-500 hover:bg-slate-50'}`}>
+                <Heart className="w-6 h-6" />
+              </button>
             </div>
           </div>
         </div>
-      </PrintContext.Provider>
+      </div>
     </ThemeContext.Provider>
   );
 }
